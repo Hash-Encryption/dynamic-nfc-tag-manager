@@ -1,0 +1,28 @@
+{
+  "name": "dynamic-nfc-tag-manager",
+  "version": "1.0.0",
+  "description": "نظام إدارة بطاقات NFC الذكية والتحويل الديناميكي للروابط مع لوحة تحكم عصرية",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "nfc",
+    "dynamic-links",
+    "qr-code",
+    "vcard",
+    "redirect-engine",
+    "rtl",
+    "arabic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

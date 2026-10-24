@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>البطاقة غير موجودة | 404</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Tajawal', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Ambient Glow -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-40 -start-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+  </div>
+
+  <main class="w-full max-w-md bg-slate-900/80 border border-slate-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+    <!-- NFC Icon with Wave -->
+    <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+      <div class="absolute inset-0 bg-red-500/20 rounded-full nfc-wave-1"></div>
+      <div class="absolute inset-2 bg-red-500/30 rounded-full nfc-wave-2"></div>
+      <div class="relative w-16 h-16 bg-gradient-to-tr from-red-600 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <span class="inline-block px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-full text-xs font-semibold mb-3">
+      رمز الخطأ 404
+    </span>
+
+    <h1 class="text-2xl font-bold mb-3 text-white">البطاقة غير موجودة</h1>
+    
+    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+      عذراً، الرابط أو البطاقة الذكية التي تم مسحها غير مسجلة في هذا النظام، أو قد يكون المعرف (Slug) غير صحيح أو تم حذفه.
+    </p>
+
+    <div class="p-4 bg-slate-800/60 border border-slate-750 rounded-2xl mb-6 text-xs text-slate-400 space-y-1">
+      <div class="flex justify-between items-center">
+        <span>حالة الفحص:</span>
+        <span class="text-red-400 font-medium">سجل مفقود</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span>المسار المطلوب:</span>
+        <span class="font-mono text-slate-300" id="currentPath">/c/...</span>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <a href="/" class="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-medium rounded-xl transition-all shadow-lg shadow-indigo-600/30">
+        العودة للرئيسية
+      </a>
+      <a href="/login.html" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-all border border-slate-700">
+        دخول لوحة التحكم (المدير)
+      </a>
+    </div>
+
+    <p class="text-[11px] text-slate-500 mt-6">
+      نظام إدارة بطاقات NFC الذكية الديناميكية &copy; 2026
+    </p>
+  </main>
+
+  <script>
+    document.getElementById('currentPath').textContent = window.location.pathname;
+  </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>البطاقة متوقفة حالياً</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Tajawal', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-amber-500 selection:text-white">
+
+  <!-- Ambient Glow -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-40 -start-40 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-orange-600/15 rounded-full blur-3xl"></div>
+  </div>
+
+  <main class="w-full max-w-md bg-slate-900/85 border border-slate-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+    
+    <!-- Pause / Inactive Icon -->
+    <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+      <div class="absolute inset-0 bg-amber-500/20 rounded-full nfc-wave-1"></div>
+      <div class="relative w-16 h-16 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+        <svg class="w-8 h-8 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold mb-3">
+      <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+      حالة الشريحة: غير نشطة
+    </span>
+
+    <h1 class="text-2xl font-bold mb-3 text-white">هذه البطاقة متوقفة حالياً</h1>
+    
+    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+      تم إيقاف تفعيل هذا الرابط مؤقتاً من قبل صاحب البطاقة. لا يمكن تحويلك أو عرض البيانات في الوقت الحالي.
+    </p>
+
+    <!-- Info Box -->
+    <div class="p-4 bg-slate-800/60 border border-slate-700/60 rounded-2xl mb-6 text-xs text-slate-400 space-y-2 text-start">
+      <div class="flex items-center gap-2 text-amber-300">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span class="font-medium">هل أنت صاحب هذه البطاقة؟</span>
+      </div>
+      <p class="text-slate-400 text-[11px] leading-relaxed">
+        يمكنك إعادة تفعيل البطاقة فوراً وفي أي ثانية عن طريق الدخول إلى لوحة التحكم والضغط على زر "تفعيل".
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="space-y-3">
+      <button onclick="window.location.reload()" class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-white font-medium rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <span>إعادة المحاولة والتحديث</span>
+      </button>
+
+      <a href="/login.html" class="block w-full py-2.5 px-4 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-sm font-medium rounded-xl transition-all border border-indigo-500/30">
+        تسجيل الدخول للوحة التحكم
+      </a>
+    </div>
+
+    <p class="text-[11px] text-slate-500 mt-6">
+      نظام بطاقات NFC الذكية &copy; 2026
+    </p>
+  </main>
+
+</body>
+</html>
