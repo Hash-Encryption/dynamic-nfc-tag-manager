@@ -1,7 +1,11 @@
 [
   {
     "id": "card-ksnjv",
+<<<<<<< HEAD
     "title": "Ø¨Ø·Ø§Ù‚Ø© ØªÙ‚ÙŠÙŠÙ… Ø¬ÙˆØ¬Ù„ Ø§Ù„Ø°ÙƒÙŠØ©",
+=======
+    "title": "بطاقة تقييم جوجل الذكية",
+>>>>>>> 7c57efb (fix(404): add real-time cloud database lookup and on-the-spot tag activation)
     "slug": "card-ksnjv",
     "actionType": "direct",
     "destinationUrl": "https://maps.google.com",
