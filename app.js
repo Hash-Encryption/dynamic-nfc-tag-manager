@@ -44,12 +44,27 @@ function playChime(success = true) {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  cleanOldFakeData();
   registerServiceWorker();
   initTheme();
   initAdminSecurity();
   checkAuthAndLoad();
   setupEventListeners();
 });
+
+// Purge any legacy fake/demo data from browser storage
+function cleanOldFakeData() {
+  try {
+    const raw = localStorage.getItem('nfc_cards_db');
+    if (raw && (raw.includes('ceo-card') || raw.includes('alsafir-hub') || raw.includes('lounge-menu') || raw.includes('vip-vault') || raw.includes('app-smart-route') || raw.includes('أحمد خالد') || raw.includes('مطعم السفير'))) {
+      localStorage.removeItem('nfc_cards_db');
+    }
+    const rawScans = localStorage.getItem('nfc_scans_db');
+    if (rawScans && (rawScans.includes('ceo-card') || rawScans.includes('alsafir-hub') || rawScans.includes('lounge-menu') || rawScans.includes('vip-vault'))) {
+      localStorage.removeItem('nfc_scans_db');
+    }
+  } catch (e) {}
+}
 
 // Register PWA Service Worker
 function registerServiceWorker() {
@@ -206,23 +221,28 @@ function loadLocalStats() {
   const totalScans = cards.reduce((sum, c) => sum + (c.scanCount || 0), 0);
   const topCard = cards.length ? [...cards].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0))[0] : null;
 
+  let realScans = [];
+  try {
+    const rawScans = localStorage.getItem('nfc_scans_db');
+    if (rawScans) realScans = JSON.parse(rawScans);
+  } catch (e) {}
+
+  const deviceStats = { iPhone: 0, Android: 0, Other: 0 };
+  if (Array.isArray(realScans)) {
+    realScans.forEach(s => {
+      const dev = s.deviceType || 'Other';
+      if (deviceStats[dev] !== undefined) deviceStats[dev]++;
+      else deviceStats.Other++;
+    });
+  }
+
   const stats = {
     totalCards,
     activeCards,
     totalScans,
-    topCard: topCard ? { title: topCard.title, scanCount: topCard.scanCount || 0 } : null,
-    deviceStats: { 
-      iPhone: Math.round(totalScans * 0.58) || 32, 
-      Android: Math.round(totalScans * 0.36) || 20, 
-      Other: Math.round(totalScans * 0.06) || 4 
-    },
-    recentScans: cards.slice(0, 6).map(c => ({
-      cardTitle: c.title,
-      slug: c.slug,
-      deviceType: 'iPhone',
-      browser: 'Safari',
-      timestamp: c.lastScannedAt || new Date().toISOString()
-    }))
+    topCard: topCard && (topCard.scanCount || 0) > 0 ? { title: topCard.title, scanCount: topCard.scanCount || 0 } : null,
+    deviceStats: deviceStats,
+    recentScans: Array.isArray(realScans) ? realScans.slice(0, 10) : []
   };
 
   applyStatsToUI(stats);
@@ -235,12 +255,32 @@ function applyStatsToUI(s) {
   document.getElementById('statTotalScans').textContent = s.totalScans || 0;
   document.getElementById('statActiveCards').textContent = s.activeCards || 0;
 
-  if (s.topCard) {
+  if (s.topCard && (s.topCard.scanCount || 0) > 0) {
     document.getElementById('statTopCardTitle').textContent = s.topCard.title;
     document.getElementById('statTopCardScans').textContent = `${s.topCard.scanCount || 0} عملية مسح`;
   } else {
-    document.getElementById('statTopCardTitle').textContent = 'لا توجد بطاقات';
-    document.getElementById('statTopCardScans').textContent = '0 عملية';
+    document.getElementById('statTopCardTitle').textContent = '-';
+    document.getElementById('statTopCardScans').textContent = '-';
+  }
+
+  const devEl = document.getElementById('statTopDevice');
+  const devLabel = document.getElementById('statTopDeviceLabel');
+  if (devEl) {
+    if (s.totalScans > 0 && s.deviceStats) {
+      let maxDev = '-';
+      let maxCount = 0;
+      for (const [dev, count] of Object.entries(s.deviceStats)) {
+        if (count > maxCount) {
+          maxCount = count;
+          maxDev = dev;
+        }
+      }
+      devEl.textContent = maxDev;
+      if (devLabel) devLabel.textContent = `الأكثر استخداماً (${maxCount} مسحة)`;
+    } else {
+      devEl.textContent = '-';
+      if (devLabel) devLabel.textContent = 'بانتظار أول مسحة';
+    }
   }
 }
 
@@ -252,7 +292,20 @@ function getLocalCards() {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {}
-  return [];
+  return [
+    {
+      id: "card-ksnjv",
+      slug: "card-ksnjv",
+      title: "بطاقة تقييم جوجل الذكية",
+      actionType: "direct",
+      mode: "direct",
+      destinationUrl: "https://maps.google.com",
+      isActive: true,
+      scanCount: 0,
+      createdAt: "2026-10-25T17:25:00.000Z",
+      savedTargets: []
+    }
+  ];
 }
 
 function saveLocalCards(cards) {
@@ -1092,14 +1145,15 @@ function openSimulatorDrawer(cardId) {
       <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-2xl shadow-lg mx-auto">🍽️</div>
       <div>
         <h4 class="text-sm font-black text-white">${cat.businessName || card.title}</h4>
-        <p class="text-[11px] text-slate-300">${cat.tagline || 'أشهى المأكولات والمشروبات'}</p>
+        ${cat.tagline ? `<p class="text-[11px] text-slate-300">${cat.tagline}</p>` : ''}
       </div>
       
       <div class="w-full max-w-[220px] space-y-2 pt-1 text-xs">
+        ${cat.wifiPassword ? `
         <div class="p-2.5 bg-slate-800/90 rounded-xl border border-slate-700 flex items-center justify-between">
-          <span class="text-slate-300">📶 واي فاي مجاني:</span>
-          <span class="font-mono font-bold text-amber-300">${cat.wifiPassword || 'alsafir2026'}</span>
-        </div>
+          <span class="text-slate-300">📶 واي فاي:</span>
+          <span class="font-mono font-bold text-amber-300">${cat.wifiPassword}</span>
+        </div>` : ''}
         <a href="${cat.googleReviewUrl || card.destinationUrl || '#'}" target="_blank" class="block w-full py-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-black rounded-xl shadow">
           ⭐⭐⭐⭐⭐ تقييم Google
         </a>
@@ -1312,11 +1366,11 @@ function renderAnalytics() {
 
 function renderAnalyticsData(stats) {
   const dev = stats.deviceStats || { iPhone: 0, Android: 0, Other: 0 };
-  const total = (dev.iPhone || 0) + (dev.Android || 0) + (dev.Other || 0) || 1;
+  const total = (dev.iPhone || 0) + (dev.Android || 0) + (dev.Other || 0);
 
-  const pctIPhone = Math.round(((dev.iPhone || 0) / total) * 100);
-  const pctAndroid = Math.round(((dev.Android || 0) / total) * 100);
-  const pctOther = 100 - pctIPhone - pctAndroid;
+  const pctIPhone = total > 0 ? Math.round(((dev.iPhone || 0) / total) * 100) : 0;
+  const pctAndroid = total > 0 ? Math.round(((dev.Android || 0) / total) * 100) : 0;
+  const pctOther = total > 0 ? Math.max(0, 100 - pctIPhone - pctAndroid) : 0;
 
   const elP1 = document.getElementById('devPercentIPhone');
   const elB1 = document.getElementById('devBarIPhone');
@@ -1347,16 +1401,20 @@ function renderAnalyticsData(stats) {
 
   const topList = document.getElementById('analyticsTopCardsList');
   if (topList) {
-    const sorted = [...cardsList].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0));
-    topList.innerHTML = sorted.slice(0, 4).map((c, i) => `
-      <div class="flex items-center justify-between p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 text-xs">
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-400 font-black flex items-center justify-center text-xs">#${i + 1}</span>
-          <span class="font-bold text-white">${c.title}</span>
+    if (!cardsList || cardsList.length === 0) {
+      topList.innerHTML = `<div class="p-4 text-center text-slate-500 text-xs">لا توجد بطاقات مسجلة بعد</div>`;
+    } else {
+      const sorted = [...cardsList].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0));
+      topList.innerHTML = sorted.slice(0, 4).map((c, i) => `
+        <div class="flex items-center justify-between p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-400 font-black flex items-center justify-center text-xs">#${i + 1}</span>
+            <span class="font-bold text-white">${c.title}</span>
+          </div>
+          <span class="font-mono font-bold text-indigo-300">${c.scanCount || 0} عملية مسح</span>
         </div>
-        <span class="font-mono font-bold text-indigo-300">${c.scanCount || 0} عملية مسح</span>
-      </div>
-    `).join('');
+      `).join('');
+    }
   }
 }
 

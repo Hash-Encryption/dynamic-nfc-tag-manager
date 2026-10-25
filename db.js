@@ -11,7 +11,7 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Initial seed cards loaded from data/cards.json if available
+// Initial real card loaded from data/cards.json
 let seedCards = [];
 try {
   if (fs.existsSync(CARDS_SEED_FILE)) {
@@ -19,35 +19,7 @@ try {
     seedCards = JSON.parse(rawCards);
   }
 } catch (e) {
-  console.warn('Could not read seed cards.json:', e);
-}
-
-// Generate realistic scan records for demo analytics
-function generateSeedScans(cards) {
-  const scans = [];
-  const devices = ['iPhone', 'iPhone', 'Android', 'Android', 'iPhone', 'iPad', 'Windows', 'Android'];
-  const browsers = ['Safari', 'Chrome', 'Samsung Internet', 'Safari', 'Chrome'];
-  const now = Date.now();
-
-  cards.forEach(card => {
-    const count = card.scanCount || 5;
-    for (let i = 0; i < Math.min(count, 30); i++) {
-      const minutesAgo = Math.floor(Math.random() * 60 * 24 * 7); // within last 7 days
-      const scanTime = new Date(now - minutesAgo * 60 * 1000).toISOString();
-      scans.push({
-        id: 'scan-' + crypto.randomUUID().slice(0, 8),
-        cardId: card.id,
-        slug: card.slug,
-        timestamp: scanTime,
-        deviceType: devices[Math.floor(Math.random() * devices.length)],
-        browser: browsers[Math.floor(Math.random() * browsers.length)],
-        referrer: 'NFC Tag Tap',
-        ip: '192.168.1.' + Math.floor(Math.random() * 200 + 10)
-      });
-    }
-  });
-
-  return scans.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  console.warn('Could not read cards.json:', e);
 }
 
 const initialData = {
@@ -58,12 +30,12 @@ const initialData = {
     createdAt: new Date().toISOString()
   },
   settings: {
-    siteTitle: 'Dynamic NFC Tag Manager PRO',
+    siteTitle: 'Dynamic NFC Tag Manager',
     baseUrl: '',
     theme: 'dark'
   },
   cards: seedCards,
-  scans: generateSeedScans(seedCards)
+  scans: [] // 100% Real scans only, zero fake data
 };
 
 class Database {
@@ -79,10 +51,9 @@ class Database {
       } else {
         const raw = fs.readFileSync(DB_FILE, 'utf8');
         this.data = JSON.parse(raw);
-        if (!this.data.cards || this.data.cards.length < seedCards.length) {
+        // Ensure defaults
+        if (!this.data.cards || this.data.cards.length === 0) {
           this.data.cards = seedCards;
-          this.data.scans = generateSeedScans(seedCards);
-          this.save();
         }
         if (!this.data.scans) this.data.scans = [];
         if (!this.data.admin) this.data.admin = initialData.admin;
@@ -171,14 +142,14 @@ class Database {
       });
     }
 
-    const mode = cardData.mode || (cardData.actionType === 'profile' ? 'profile' : 'direct');
+    const mode = cardData.mode || (cardData.actionType === 'profile' ? 'profile' : (cardData.actionType === 'catalog' ? 'catalog' : 'direct'));
 
     const newCard = {
       id: 'card-' + crypto.randomUUID().slice(0, 8),
       title: (cardData.title || 'بطاقة NFC ذكية').trim(),
       slug: cleanSlug,
       mode: mode,
-      actionType: mode, // backward compatibility
+      actionType: mode,
       destinationUrl: (cardData.destinationUrl || '').trim(),
       isActive: cardData.isActive !== false,
       createdAt: new Date().toISOString(),
@@ -195,11 +166,7 @@ class Database {
         eveningLabel: (cardData.timeRouting?.eveningLabel || 'فترة المساء').trim(),
         switchHour: Number(cardData.timeRouting?.switchHour) || 16
       },
-      conditional: cardData.conditional || {
-        type: cardData.timeRouting?.enabled ? 'time' : (cardData.pinCode ? 'pin' : 'none'),
-        time: cardData.timeRouting || {},
-        device: cardData.conditional?.device || {}
-      },
+      conditional: cardData.conditional || null,
       profile: mode === 'profile' ? (cardData.profile || {}) : null,
       catalog: mode === 'catalog' ? (cardData.catalog || {}) : null
     };
@@ -217,7 +184,6 @@ class Database {
 
     const currentCard = this.data.cards[index];
 
-    // Check slug collision
     if (updateData.slug && updateData.slug.toLowerCase() !== currentCard.slug.toLowerCase()) {
       const cleanSlug = updateData.slug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
       const existing = this.getCardBySlug(cleanSlug);
@@ -248,9 +214,7 @@ class Database {
         switchHour: Number(updateData.timeRouting?.switchHour) || 16
       };
     }
-    if (updateData.conditional !== undefined) {
-      currentCard.conditional = updateData.conditional;
-    }
+    if (updateData.conditional !== undefined) currentCard.conditional = updateData.conditional;
     if (updateData.savedTargets !== undefined && Array.isArray(updateData.savedTargets)) {
       currentCard.savedTargets = updateData.savedTargets;
     }
@@ -262,7 +226,6 @@ class Database {
     return currentCard;
   }
 
-  // Quick 1-click update for destination URL
   quickUpdateUrl(id, destinationUrl) {
     const card = this.getCardById(id);
     if (!card) throw new Error('البطاقة غير موجودة');
@@ -272,7 +235,6 @@ class Database {
     return card;
   }
 
-  // Switch active target from saved targets
   switchTarget(cardId, targetId) {
     const card = this.getCardById(cardId);
     if (!card) throw new Error('البطاقة غير موجودة');
@@ -290,7 +252,6 @@ class Database {
     return { card, activeTarget: target };
   }
 
-  // Add a new saved target
   addSavedTarget(cardId, label, url, icon = '🔗') {
     const card = this.getCardById(cardId);
     if (!card) throw new Error('البطاقة غير موجودة');
@@ -309,7 +270,6 @@ class Database {
     return { card, newTarget };
   }
 
-  // Remove a saved target
   removeSavedTarget(cardId, targetId) {
     const card = this.getCardById(cardId);
     if (!card) throw new Error('البطاقة غير موجودة');
@@ -321,7 +281,6 @@ class Database {
     return card;
   }
 
-  // Quick toggle active status
   toggleCardStatus(id) {
     const card = this.getCardById(id);
     if (!card) throw new Error('البطاقة غير موجودة');
@@ -341,7 +300,7 @@ class Database {
     return deleted;
   }
 
-  // --- Scan Engine & Analytics ---
+  // --- Real Scan Engine & Analytics ---
   recordScan(card, reqDetails = {}) {
     card.scanCount = (card.scanCount || 0) + 1;
     card.lastScannedAt = new Date().toISOString();
@@ -372,13 +331,16 @@ class Database {
     const inactiveCards = totalCards - activeCards;
     const totalScans = this.data.cards.reduce((sum, c) => sum + (c.scanCount || 0), 0);
 
-    // Most active card
+    // Most active card (only if it has real scans)
     let topCard = null;
     if (totalCards > 0) {
-      topCard = [...this.data.cards].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0))[0];
+      const sorted = [...this.data.cards].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0));
+      if (sorted[0] && (sorted[0].scanCount || 0) > 0) {
+        topCard = sorted[0];
+      }
     }
 
-    // Device breakdown
+    // Device breakdown from actual real scans
     const devices = {
       iPhone: 0,
       Android: 0,
@@ -397,24 +359,6 @@ class Database {
       }
     });
 
-    // Scans in last 7 days breakdown
-    const dailyScans = {};
-    const now = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const key = d.toISOString().split('T')[0];
-      dailyScans[key] = 0;
-    }
-
-    this.data.scans.forEach(scan => {
-      const scanDate = scan.timestamp ? scan.timestamp.split('T')[0] : '';
-      if (dailyScans[scanDate] !== undefined) {
-        dailyScans[scanDate]++;
-      }
-    });
-
-    // Recent 15 scans
     const recentScans = this.data.scans.slice(0, 15).map(s => {
       const card = this.getCardById(s.cardId);
       return {
@@ -435,7 +379,6 @@ class Database {
         scanCount: topCard.scanCount || 0
       } : null,
       deviceStats: devices,
-      dailyScans,
       recentScans
     };
   }

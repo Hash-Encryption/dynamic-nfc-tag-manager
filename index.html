@@ -227,8 +227,8 @@
             <span class="text-xs font-semibold">الجهاز الأكثر استخداماً</span>
             <span class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-sm">📱</span>
           </div>
-          <div class="text-2xl font-black text-blue-400" id="statTopDevice">iPhone</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">أنظمة iOS المفضلة</div>
+          <div class="text-2xl font-black text-blue-400" id="statTopDevice">-</div>
+          <div class="text-[10px] text-slate-400 mt-0.5" id="statTopDeviceLabel">بانتظار أول مسحة</div>
         </div>
 
         <!-- Stat 4: Top Card -->
@@ -237,8 +237,8 @@
             <span class="text-xs font-semibold">الأكثر نشاطاً</span>
             <span class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm">🔥</span>
           </div>
-          <div class="text-xs font-bold text-amber-300 truncate" id="statTopCardTitle">جاري التحميل...</div>
-          <div class="text-[10px] text-slate-400 mt-0.5" id="statTopCardScans">0 عملية مسح</div>
+          <div class="text-xs font-bold text-amber-300 truncate" id="statTopCardTitle">-</div>
+          <div class="text-[10px] text-slate-400 mt-0.5" id="statTopCardScans">-</div>
         </div>
       </div>
 
@@ -782,23 +782,23 @@
           <p class="text-xs text-slate-400">إعدادات المنيو والكتالوج الذكي للمطاعم والمتاجر:</p>
           
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">اسم المنشأة / المطعم</label>
-            <input type="text" id="inpCatBusinessName" placeholder="مطعم وكافيه السفير" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+            <label class="block text-slate-300 font-semibold mb-1">اسم المنشأة / النشاط</label>
+            <input type="text" id="inpCatBusinessName" placeholder="اسم المتجر أو النشاط التجاري" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div>
             <label class="block text-slate-300 font-semibold mb-1">الوصف المختصر</label>
-            <input type="text" id="inpCatTagline" placeholder="أشهى المأكولات والمشروبات المختصة" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+            <input type="text" id="inpCatTagline" placeholder="وصف مختصر للنشاط أو الخدمات" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-slate-300 font-semibold mb-1">اسم شبكة الواي فاي</label>
-              <input type="text" id="inpCatWifiSsid" placeholder="AlSafir_Guest" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <input type="text" id="inpCatWifiSsid" placeholder="مثال: Guest_WiFi" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
               <label class="block text-slate-300 font-semibold mb-1">كلمة سر الواي فاي</label>
-              <input type="text" id="inpCatWifiPass" placeholder="alsafir2026" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <input type="text" id="inpCatWifiPass" placeholder="كلمة مرور الشبكة (اختياري)" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
           </div>
 

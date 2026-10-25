@@ -119,7 +119,7 @@
         </div>
         <div>
           <span class="text-[10px] text-slate-400 font-semibold block">واي فاي مجاني للعملاء (Wi-Fi)</span>
-          <span class="text-xs font-bold text-white font-mono" id="wifiSsidDisplay">AlSafir_Guest</span>
+          <span class="text-xs font-bold text-white font-mono" id="wifiSsidDisplay">-</span>
         </div>
       </div>
       <button id="btnCopyWifi" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/30 flex items-center gap-1 active:scale-90 transition-all">
@@ -178,7 +178,7 @@
     }
 
     const currentSlug = getQueryParam('slug') || getQueryParam('c') || 'card-ksnjv';
-    let currentWifiPass = 'alsafir2026';
+    let currentWifiPass = '';
 
     function showToast(msg, icon = '✨') {
       if (navigator.vibrate) navigator.vibrate(15);
@@ -218,65 +218,54 @@
     }
 
     function renderCatalog(card) {
+      if (!card) {
+        window.location.href = './404.html';
+        return;
+      }
+
       document.getElementById('catalogLoading').classList.add('hidden');
       document.getElementById('catalogContent').classList.remove('hidden');
 
-      const cat = card?.catalog || {
-        businessName: card?.title || 'مطعم وكافيه السفير الذكي',
-        tagline: 'تجربة ضيافة استثنائية وقائمة أطباق عالمية',
-        wifiSsid: 'AlSafir_Guest',
-        wifiPassword: 'alsafir_wifi_2026',
-        googleReviewUrl: card?.destinationUrl || 'https://maps.google.com/?cid=123456789',
-        whatsappPhone: '+966501234567',
-        callPhone: '+966501234567',
-        locationUrl: 'https://maps.google.com/?q=AlSafir+Restaurant+Riyadh',
-        items: [
-          {
-            title: 'مشروب القهوة المختصة V60',
-            description: 'بن إثيوبي فاخر محمص بعناية مع إيحاءات التوت والياسمين',
-            price: '24 ر.س',
-            badge: 'الأكثر طلباً 🔥',
-            image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80'
-          },
-          {
-            title: 'ستيك لحم أنجوس مشوي بصوص الترافل',
-            description: 'قطعة تندرلوين طازجة تقدم مع خضار مشوية وبطاطس مهروسة',
-            price: '115 ر.س',
-            badge: 'شيف سبيشال ⭐',
-            image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80'
-          },
-          {
-            title: 'باستا فيتوتشيني ألفريدو مع الدجاج',
-            description: 'باستا إيطالية أصيلة بصلصة الكريمة الغنية وجبن البارميزان',
-            price: '58 ر.س',
-            badge: '',
-            image: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281b37?auto=format&fit=crop&w=300&q=80'
-          },
-          {
-            title: 'كيكة الشوكولاتة الذائبة (سوفليه)',
-            description: 'كعكة دافئة محشوة بالشوكولاتة البلجيكية تقدم مع آيس كريم الفانيليا',
-            price: '36 ر.س',
-            badge: 'حلوى مميزة 🍰',
-            image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=300&q=80'
-          }
-        ]
-      };
+      const cat = card.catalog || {};
+      const businessName = cat.businessName || card.title || 'القائمة والكتالوج الذكي';
 
-      document.getElementById('catalogTitle').textContent = cat.businessName;
-      if (cat.tagline) document.getElementById('catalogTagline').textContent = cat.tagline;
+      document.getElementById('catalogTitle').textContent = businessName;
+      if (cat.tagline) {
+        document.getElementById('catalogTagline').textContent = cat.tagline;
+      } else {
+        document.getElementById('catalogTagline').textContent = '';
+      }
 
       // Google Review Button Link
-      const revLink = cat.googleReviewUrl || card?.destinationUrl || 'https://maps.google.com';
+      const revLink = cat.googleReviewUrl || card.destinationUrl || 'https://maps.google.com';
       document.getElementById('linkGoogleReview').href = revLink;
 
       // Wi-Fi setup
-      currentWifiPass = cat.wifiPassword || 'alsafir2026';
-      document.getElementById('wifiSsidDisplay').textContent = cat.wifiSsid || 'Guest_WiFi';
+      currentWifiPass = cat.wifiPassword || '';
+      const boxWifi = document.getElementById('boxWifi');
+      if (currentWifiPass) {
+        document.getElementById('wifiSsidDisplay').textContent = cat.wifiSsid || 'شبكة Wi-Fi';
+        if (boxWifi) boxWifi.classList.remove('hidden');
+      } else {
+        if (boxWifi) boxWifi.classList.add('hidden');
+      }
 
       // Buttons
       const waNumber = (cat.whatsappPhone || '').replace(/[^0-9]/g, '');
-      document.getElementById('btnWhatsappOrder').href = waNumber ? `https://wa.me/${waNumber}?text=مرحباً، أود الطلب والاستفسار من المنيو` : '#';
-      document.getElementById('btnCallPhone').href = cat.callPhone ? `tel:${cat.callPhone}` : '#';
+      const btnWa = document.getElementById('btnWhatsappOrder');
+      if (waNumber) {
+        btnWa.href = `https://wa.me/${waNumber}?text=${encodeURIComponent('مرحباً، أود الطلب والاستفسار')}`;
+      } else {
+        btnWa.classList.add('hidden');
+      }
+
+      const btnCall = document.getElementById('btnCallPhone');
+      if (cat.callPhone) {
+        btnCall.href = `tel:${cat.callPhone}`;
+      } else {
+        btnCall.classList.add('hidden');
+      }
+
       document.getElementById('btnLocationMap').href = cat.locationUrl || revLink;
 
       // Items list
@@ -284,23 +273,28 @@
       const items = Array.isArray(cat.items) ? cat.items : [];
       document.getElementById('catalogCategoryCount').textContent = `${items.length} أصناف`;
 
-      itemsContainer.innerHTML = items.map(item => `
-        <div class="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl flex items-center gap-3 backdrop-blur-xl">
-          <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'}" alt="${item.title}" class="w-16 h-16 rounded-xl object-cover shrink-0 bg-slate-800">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center justify-between gap-1 mb-0.5">
-              <h4 class="text-xs font-black text-white truncate">${item.title}</h4>
-              <span class="text-xs font-black text-amber-400 font-mono whitespace-nowrap">${item.price}</span>
+      if (items.length === 0) {
+        itemsContainer.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs bg-slate-900/60 rounded-2xl border border-slate-800">لا توجد عناصر مضافة في هذا الكتالوج بعد.</div>`;
+      } else {
+        itemsContainer.innerHTML = items.map(item => `
+          <div class="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl flex items-center gap-3 backdrop-blur-xl">
+            <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'}" alt="${item.title}" class="w-16 h-16 rounded-xl object-cover shrink-0 bg-slate-800">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-1 mb-0.5">
+                <h4 class="text-xs font-black text-white truncate">${item.title}</h4>
+                <span class="text-xs font-black text-amber-400 font-mono whitespace-nowrap">${item.price}</span>
+              </div>
+              <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">${item.description}</p>
+              ${item.badge ? `<span class="inline-block mt-1 text-[9px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/20 px-2 py-0.5 rounded-full">${item.badge}</span>` : ''}
             </div>
-            <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">${item.description}</p>
-            ${item.badge ? `<span class="inline-block mt-1 text-[9px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/20 px-2 py-0.5 rounded-full">${item.badge}</span>` : ''}
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
     }
 
     // 1-Click Wi-Fi Copy Button
     document.getElementById('btnCopyWifi').addEventListener('click', async () => {
+      if (!currentWifiPass) return;
       try {
         await navigator.clipboard.writeText(currentWifiPass);
         showToast('تم نسخ كلمة سر الواي فاي بنجاح! 📶', '✅');
@@ -315,7 +309,7 @@
         try {
           await navigator.share({
             title: document.title,
-            text: 'تفضل بزيارة قائمة ومنيو السفير الذكي:',
+            text: 'تفضل بزيارة القائمة والكتالوج الذكي:',
             url: window.location.href
           });
         } catch (e) {}

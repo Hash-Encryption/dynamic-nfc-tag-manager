@@ -206,13 +206,18 @@
     // Extract slug from URL path: /c/:slug or ?slug=...
     const urlParams = new URLSearchParams(window.location.search);
     const pathParts = window.location.pathname.split('/').filter(Boolean);
-    let slug = urlParams.get('slug') || pathParts[pathParts.length - 1] || 'ahmed-profile';
-    if (slug.endsWith('.html')) slug = 'ahmed-profile';
+    let slug = urlParams.get('slug') || pathParts[pathParts.length - 1] || '';
+    if (slug.endsWith('.html')) slug = '';
 
     let currentCardData = null;
 
     // Fetch Card Profile Data (with offline/static fallback)
     async function fetchCardProfile() {
+      if (!slug) {
+        window.location.href = './404.html';
+        return;
+      }
+
       try {
         const res = await fetch(`/api/public/card/${slug}`);
         if (!res.ok) throw new Error('API not reachable');
@@ -232,7 +237,7 @@
 
         renderProfile(card);
       } catch (err) {
-        // Fallback to localStorage or seed demo
+        // Fallback to localStorage
         let stored = null;
         try {
           const raw = localStorage.getItem('nfc_cards_db');
