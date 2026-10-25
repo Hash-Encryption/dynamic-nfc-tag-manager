@@ -1,7 +1,6 @@
 /**
- * Dynamic NFC Tag Manager - Universal Frontend Engine
- * Hybrid Architecture: Works both with Node.js Express Backend AND Static GitHub Pages (LocalStorage fallback)
- * Full Mobile-First Responsive UI & Fast Touch Interactions
+ * Dynamic NFC Tag Manager - Frontend Engine
+ * Real Data Mode (Zero Dummy Data) & Compact Fixed Responsive UI
  */
 
 // Application State
@@ -9,86 +8,34 @@ let cardsList = [];
 let baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
 let currentActiveCardForQr = null;
 let currentActiveCardForNfc = null;
-let isOfflineOrStatic = false; // Set to true if running on GitHub Pages / static host
-
-// Default seed data for offline / GitHub Pages demo mode
-const SEED_CARDS = [
-  {
-    id: 'card-sample-1',
-    title: 'بطاقة تقييم جوجل ماب - المتجر الرئيسي',
-    slug: 'review-store',
-    actionType: 'direct',
-    destinationUrl: 'https://maps.google.com/?q=Riyadh+Saudi+Arabia',
-    isActive: true,
-    createdAt: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-    scanCount: 142,
-    lastScannedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    profile: null
-  },
-  {
-    id: 'card-sample-2',
-    title: 'بطاقة الأعمال الذكية - مدير التطوير',
-    slug: 'ahmed-profile',
-    actionType: 'profile',
-    destinationUrl: '',
-    isActive: true,
-    createdAt: new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-    scanCount: 89,
-    lastScannedAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-    profile: {
-      fullName: 'م. أحمد خالد الشهري',
-      jobTitle: 'مدير تطوير الأعمال والتقنية',
-      company: 'شركة الآفاق الذكية للتقنية',
-      bio: 'متخصص في حلول التحول الرقمي وإنترنت الأشياء (IoT) والأنظمة السحابية المتكاملة.',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      phone: '+966551234567',
-      whatsapp: '+966551234567',
-      email: 'ahmed.khalid@example.com',
-      website: 'https://example.com',
-      location: 'الرياض، المملكة العربية السعودية',
-      socials: {
-        twitter: 'https://x.com',
-        linkedin: 'https://linkedin.com',
-        instagram: 'https://instagram.com'
-      },
-      customLinks: [
-        { title: 'كتالوج الخدمات والعروض 2026', url: 'https://example.com/catalog', icon: 'file' },
-        { title: 'احجز موعد استشارة تقنية', url: 'https://calendly.com', icon: 'calendar' }
-      ]
-    }
-  },
-  {
-    id: 'card-sample-3',
-    title: 'منيو المطعم الرقمي - الفرع الجديد',
-    slug: 'menu-cafe',
-    actionType: 'direct',
-    destinationUrl: 'https://example.com/menu.pdf',
-    isActive: false,
-    createdAt: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-    scanCount: 310,
-    lastScannedAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
-    profile: null
-  }
-];
+let isOfflineOrStatic = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  cleanOldFakeData();
   checkAuthAndLoad();
   setupEventListeners();
 });
 
+// Remove any lingering fake / dummy data from old sessions
+function cleanOldFakeData() {
+  try {
+    const raw = localStorage.getItem('nfc_cards_db');
+    if (raw && (raw.includes('card-sample-') || raw.includes('أحمد خالد') || raw.includes('menu-cafe'))) {
+      localStorage.removeItem('nfc_cards_db');
+    }
+  } catch (e) {}
+}
+
 // ==========================================
-// 1. AUTH & DATA LOADING (WITH AUTO FALLBACK)
+// 1. AUTH & DATA LOADING (REAL DATA)
 // ==========================================
 async function checkAuthAndLoad() {
   try {
     const res = await fetch('/api/auth/check');
     if (!res.ok && res.status !== 401) {
-      throw new Error('Static environment detected');
+      throw new Error('Static environment');
     }
 
     const data = await res.json();
@@ -96,26 +43,25 @@ async function checkAuthAndLoad() {
       if (window.location.hostname.includes('github.io')) {
         enableStaticStorageMode();
       } else {
-        window.location.href = '/login.html';
+        window.location.href = './login.html';
         return;
       }
     }
 
     await Promise.all([loadStats(), loadCards()]);
   } catch (err) {
-    console.info('Switching to LocalStorage offline/static engine for GitHub Pages preview.');
     enableStaticStorageMode();
   }
 }
 
 function enableStaticStorageMode() {
   isOfflineOrStatic = true;
+  // Initialize with empty real database if not exists
   if (!localStorage.getItem('nfc_cards_db')) {
-    localStorage.setItem('nfc_cards_db', JSON.stringify(SEED_CARDS));
+    localStorage.setItem('nfc_cards_db', JSON.stringify([]));
   }
   loadLocalStats();
   loadLocalCards();
-  showToast('يعمل التطبيق الآن في وضع المعاينة المباشر السريع 📱', 'info');
 }
 
 async function loadStats() {
@@ -143,20 +89,20 @@ function loadLocalStats() {
     totalCards,
     activeCards,
     totalScans,
-    topCard: topCard ? { title: topCard.title, scanCount: topCard.scanCount || 0 } : null
+    topCard: topCard && topCard.scanCount > 0 ? { title: topCard.title, scanCount: topCard.scanCount } : null
   });
 }
 
 function applyStatsToUI(s) {
-  document.getElementById('statTotalCards').textContent = s.totalCards;
-  document.getElementById('statTotalScans').textContent = s.totalScans;
-  document.getElementById('statActiveCards').textContent = s.activeCards;
+  document.getElementById('statTotalCards').textContent = s.totalCards || 0;
+  document.getElementById('statTotalScans').textContent = s.totalScans || 0;
+  document.getElementById('statActiveCards').textContent = s.activeCards || 0;
 
-  if (s.topCard) {
+  if (s.topCard && s.topCard.scanCount > 0) {
     document.getElementById('statTopCardTitle').textContent = s.topCard.title;
     document.getElementById('statTopCardScans').textContent = `${s.topCard.scanCount} مسحة`;
   } else {
-    document.getElementById('statTopCardTitle').textContent = 'لا توجد بيانات بعد';
+    document.getElementById('statTopCardTitle').textContent = 'لا توجد مسحات بعد';
     document.getElementById('statTopCardScans').textContent = '0 مسحة';
   }
 }
@@ -199,9 +145,9 @@ function loadLocalCards() {
 function getLocalCards() {
   try {
     const raw = localStorage.getItem('nfc_cards_db');
-    return raw ? JSON.parse(raw) : SEED_CARDS;
+    return raw ? JSON.parse(raw) : [];
   } catch (e) {
-    return SEED_CARDS;
+    return [];
   }
 }
 
@@ -209,8 +155,15 @@ function saveLocalCards(cards) {
   localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
 }
 
+// Compute Clean Short NFC URL
+function getCleanNfcUrl(slug) {
+  // If hosted on GitHub Pages or custom domain
+  const root = baseUrl.replace(/\/landing\.html.*$/, '').replace(/\/index\.html.*$/, '').replace(/\/$/, '');
+  return `${root}/c/${slug}`;
+}
+
 // ==========================================
-// 2. RENDERING CARDS (MOBILE OPTIMIZED)
+// 2. RENDERING CARDS (COMPACT & BUG-FREE)
 // ==========================================
 function renderCards() {
   const grid = document.getElementById('cardsGrid');
@@ -222,8 +175,8 @@ function renderCards() {
 
   const filtered = cardsList.filter(card => {
     const matchSearch = 
-      card.title.toLowerCase().includes(search) ||
-      card.slug.toLowerCase().includes(search) ||
+      (card.title && card.title.toLowerCase().includes(search)) ||
+      (card.slug && card.slug.toLowerCase().includes(search)) ||
       (card.destinationUrl && card.destinationUrl.toLowerCase().includes(search));
 
     if (!matchSearch) return false;
@@ -253,25 +206,17 @@ function renderCards() {
 
 function createCardElement(card) {
   const el = document.createElement('div');
-  el.className = `bg-slate-900/85 border ${card.isActive ? 'border-slate-800' : 'border-amber-500/25 bg-amber-950/10'} rounded-3xl p-4 sm:p-6 shadow-xl transition-all glow-on-hover flex flex-col justify-between relative overflow-hidden`;
+  el.className = `bg-slate-900/90 border ${card.isActive ? 'border-slate-800 hover:border-slate-700' : 'border-amber-500/25 bg-amber-950/10'} rounded-3xl p-5 shadow-xl transition-all glow-on-hover flex flex-col justify-between relative overflow-hidden`;
 
-  let fullFixedUrl = card.fixedUrl;
-  if (!fullFixedUrl) {
-    if (isOfflineOrStatic) {
-      fullFixedUrl = `${baseUrl}/landing.html?slug=${card.slug}`;
-    } else {
-      fullFixedUrl = `${baseUrl}/c/${card.slug}`;
-    }
-  }
-
+  const cleanShortUrl = getCleanNfcUrl(card.slug);
   const relativeTime = getArabicRelativeTime(card.lastScannedAt);
 
   el.innerHTML = `
     <div>
-      <!-- Top Row: Status badge & Toggle & Type -->
+      <!-- Top Header Row: Badges on Right, iOS Toggle on Left -->
       <div class="flex items-center justify-between gap-2 mb-3">
-        <div class="flex items-center gap-1.5 sm:gap-2">
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+        <div class="flex items-center gap-1.5">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
             card.isActive 
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
               : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -280,51 +225,68 @@ function createCardElement(card) {
             ${card.isActive ? 'نشطة' : 'متوقفة مؤقتاً'}
           </span>
 
-          <span class="text-[10px] px-2 py-0.5 rounded-md font-medium ${
+          <span class="text-[10px] px-2.5 py-1 rounded-md font-medium ${
             card.actionType === 'profile' 
               ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20' 
               : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20'
           }">
-            ${card.actionType === 'profile' ? 'ملف شخصي' : 'تحويل مباشر'}
+            ${card.actionType === 'profile' ? 'صفحة ملف شخصي' : 'تحويل مباشر'}
           </span>
         </div>
 
-        <!-- Quick Toggle Active Switch -->
-        <button onclick="toggleCardStatus('${card.id}')" title="${card.isActive ? 'تعطيل البطاقة مؤقتاً' : 'تفعيل البطاقة'}" class="p-1 rounded-lg text-slate-400 hover:text-white transition-colors">
-          <div class="w-8 h-4.5 bg-slate-800 border border-slate-700 rounded-full relative ${card.isActive ? 'bg-emerald-600/30 border-emerald-500/50' : ''}">
-            <div class="w-3.5 h-3.5 rounded-full transition-transform ${card.isActive ? 'bg-emerald-400 -translate-x-3.5 rtl:translate-x-3.5' : 'bg-slate-400 translate-x-0'} top-0.5 relative"></div>
+        <!-- Toggle Active Status Button (iOS Style) -->
+        <button onclick="toggleCardStatus('${card.id}')" title="${card.isActive ? 'تعطيل البطاقة مؤقتاً' : 'تفعيل البطاقة'}" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer group">
+          <span class="text-[10px] text-slate-400 group-hover:text-slate-300">${card.isActive ? 'إيقاف' : 'تفعيل'}</span>
+          <div class="w-9 h-5 rounded-full transition-colors relative flex items-center p-0.5 ${card.isActive ? 'bg-emerald-500' : 'bg-slate-700'}">
+            <div class="w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ${card.isActive ? 'translate-x-0' : '-translate-x-4 rtl:translate-x-4'}"></div>
           </div>
         </button>
       </div>
 
-      <!-- Card Title & Permanent Link -->
-      <h3 class="text-base font-bold text-white mb-1.5 leading-snug truncate" title="${card.title}">${card.title}</h3>
+      <!-- Card Title -->
+      <h3 class="text-base font-bold text-white mb-2 leading-snug truncate" title="${card.title}">${card.title}</h3>
       
-      <div class="flex items-center gap-2 bg-slate-800/70 border border-slate-750 p-2 sm:p-2.5 rounded-xl mb-3.5 font-mono text-[11px] sm:text-xs text-indigo-300">
-        <span class="text-slate-400 text-[10px] shrink-0 select-none">رابط NFC:</span>
-        <a href="${fullFixedUrl}" target="_blank" class="truncate hover:underline text-indigo-300 flex-1" title="معاينة الرابط">${fullFixedUrl}</a>
+      <!-- Short Permanent NFC URL Bar with Instant Copy & QR buttons -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-2.5 mb-3 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span class="text-[10px] font-bold text-slate-400 bg-slate-700/60 px-2 py-0.5 rounded-md shrink-0 select-none">رابط NFC</span>
+          <span class="font-mono text-xs text-indigo-300 truncate" dir="ltr" title="${cleanShortUrl}">${cleanShortUrl}</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="copyFixedUrl('${cleanShortUrl}')" title="نسخ الرابط الثابت للشريحة" class="px-2 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 active:scale-95 text-indigo-300 transition-all flex items-center gap-1 text-[11px] font-medium border border-indigo-500/20">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+            <span>نسخ</span>
+          </button>
+          <button onclick="openQrModal('${card.id}')" title="عرض وتحميل رمز QR" class="p-1 rounded-lg bg-slate-750 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Inline Quick Destination URL Editor -->
+      <!-- Action Type Content -->
       ${card.actionType === 'direct' ? `
-        <div class="mb-3.5 bg-slate-800/40 p-2.5 sm:p-3 rounded-2xl border border-slate-750">
-          <label class="block text-[11px] font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-            <span>الرابط الهدف الحالي (Destination URL):</span>
-            <span class="text-[10px] text-indigo-400">تعديل فوري</span>
-          </label>
+        <!-- Direct Redirect Mode: Inline Target URL Editor -->
+        <div class="mb-3 bg-slate-800/40 p-3 rounded-2xl border border-slate-700/50">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-bold text-slate-300">الرابط الهدف الحالي (Destination URL):</span>
+            <span class="text-[10px] text-indigo-400 font-medium">⚡ تعديل فوري</span>
+          </div>
           <div class="flex items-center gap-2">
-            <input 
-              type="url" 
-              id="inlineUrl-${card.id}" 
-              value="${card.destinationUrl || ''}" 
-              placeholder="https://..." 
-              class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
+            <div class="relative flex-1">
+              <input 
+                type="url" 
+                id="inlineUrl-${card.id}" 
+                value="${card.destinationUrl || ''}" 
+                placeholder="https://maps.google.com/..." 
+                dir="ltr"
+                class="w-full bg-slate-800 border border-slate-700 text-white text-xs font-mono rounded-xl px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-500"
+              >
+            </div>
             <button 
               onclick="saveQuickUrl('${card.id}')" 
               id="btnSaveQuick-${card.id}" 
-              title="حفظ الرابط الجديد فوراً"
-              class="px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-semibold rounded-xl transition-all shrink-0 flex items-center gap-1 min-h-[38px]"
+              title="حفظ الرابط فوراً"
+              class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-semibold rounded-xl transition-all shrink-0 flex items-center gap-1 shadow-md shadow-indigo-600/20"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               <span>حفظ</span>
@@ -332,82 +294,70 @@ function createCardElement(card) {
           </div>
         </div>
       ` : `
-        <div class="mb-3.5 bg-purple-950/20 border border-purple-500/20 p-2.5 sm:p-3 rounded-2xl flex items-center justify-between text-xs">
-          <div class="flex items-center gap-2 text-purple-300 truncate">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <span class="truncate">الملف: ${card.profile?.fullName || 'غير محدد'}</span>
+        <!-- Profile Mode: Clean Profile Box -->
+        <div class="mb-3 bg-purple-950/20 border border-purple-500/20 p-3 rounded-2xl flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0 font-bold text-xs">
+              ${card.profile?.fullName ? card.profile.fullName.charAt(0) : '🪪'}
+            </div>
+            <div class="truncate">
+              <div class="text-xs font-bold text-purple-200 truncate">${card.profile?.fullName || 'الملف الشخصي الرقمي'}</div>
+              <div class="text-[10px] text-purple-400/80 truncate">${card.profile?.jobTitle || 'بطاقة أعمال رقمية مع vCard'}</div>
+            </div>
           </div>
-          <a href="${fullFixedUrl}" target="_blank" class="text-[11px] text-purple-400 hover:underline shrink-0 font-medium">معاينة</a>
+          <a href="${cleanShortUrl}" target="_blank" class="px-3 py-1.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs font-medium transition-colors shrink-0 flex items-center gap-1">
+            <span>معاينة</span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
         </div>
       `}
+    </div>
 
-      <!-- Scan Statistics summary for this card -->
-      <div class="flex items-center justify-between text-xs py-2 px-3 bg-slate-800/40 rounded-xl mb-3.5 border border-slate-800">
+    <!-- Bottom Actions Row: Stats on Right, Tools on Left (Fits comfortably on screen!) -->
+    <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2.5">
         <div class="flex items-center gap-1.5 text-slate-300">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
           <span class="font-bold text-white">${card.scanCount || 0}</span>
           <span class="text-slate-400 text-[11px]">مسحة</span>
         </div>
-        <div class="text-[11px] text-slate-400">
-          ${card.lastScannedAt ? `آخر مسح: ${relativeTime}` : 'لم تمسح بعد'}
-        </div>
+        <span class="text-slate-600">|</span>
+        <span class="text-[11px] text-slate-400">${card.lastScannedAt ? relativeTime : 'لم تمسح بعد'}</span>
       </div>
-    </div>
 
-    <!-- Action Buttons Row -->
-    <div class="pt-3.5 border-t border-slate-800/80 space-y-2">
-      <div class="grid grid-cols-3 gap-2">
-        <button 
-          onclick="copyFixedUrl('${fullFixedUrl}')" 
-          class="py-2.5 px-2 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1 active:scale-95"
-          title="نسخ الرابط الدائم لوضعه في الشريحة"
-        >
-          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-          <span>نسخ الرابط</span>
-        </button>
-
-        <button 
-          onclick="openQrModal('${card.id}')" 
-          class="py-2.5 px-2 bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-1 active:scale-95"
-          title="توليد وتحميل رمز QR للبطاقة"
-        >
-          <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-          <span>رمز QR</span>
-        </button>
-
+      <!-- Action Tools -->
+      <div class="flex items-center gap-1">
         <button 
           onclick="openNfcWriterModal('${card.id}')" 
-          class="py-2.5 px-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-medium rounded-xl border border-indigo-500/30 transition-all flex items-center justify-center gap-1 active:scale-95"
-          title="برمجة شريحة الـ NFC مباشرة عبر الهاتف"
+          title="برمجة شريحة الـ NFC" 
+          class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-indigo-400 transition-colors border border-slate-700/60"
         >
-          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          <span>برمجة NFC</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
         </button>
-      </div>
 
-      <div class="flex items-center justify-between pt-1">
         <button 
           onclick="openAnalyticsModal('${card.id}')" 
-          class="text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1 transition-colors py-1"
+          title="سجل التحليلات" 
+          class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/60"
         >
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-          <span>سجل المسح</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
         </button>
 
-        <div class="flex items-center gap-3">
-          <button 
-            onclick="editCardModal('${card.id}')" 
-            class="text-xs text-slate-400 hover:text-white transition-colors py-1"
-          >
-            تعديل شامل
-          </button>
-          <button 
-            onclick="confirmDeleteCard('${card.id}', '${card.title.replace(/'/g, "\\'")}')" 
-            class="text-xs text-red-400 hover:text-red-300 transition-colors py-1"
-          >
-            حذف
-          </button>
-        </div>
+        <button 
+          onclick="editCardModal('${card.id}')" 
+          title="تعديل شامل للبطاقة" 
+          class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/60"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        </button>
+
+        <button 
+          onclick="confirmDeleteCard('${card.id}', '${card.title.replace(/'/g, "\\'")}')" 
+          title="حذف البطاقة" 
+          class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors border border-red-500/20"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </button>
       </div>
     </div>
   `;
@@ -424,7 +374,7 @@ async function saveQuickUrl(cardId) {
   const newUrl = (input.value || '').trim();
 
   if (!newUrl) {
-    showToast('يرجى إدخال الرابط الهدف', 'error');
+    showToast('يرجى كتابة الرابط الهدف', 'error');
     input.focus();
     return;
   }
@@ -443,10 +393,10 @@ async function saveQuickUrl(cardId) {
         saveLocalCards(cards);
         cardsList = cards;
       }
-      showToast('تم تحديث الرابط الهدف فوراً بنجاح! ⚡', 'success');
+      showToast('تم حفظ وتحديث الرابط الهدف فوراً! ⚡', 'success');
       btn.innerHTML = originalContent;
       btn.disabled = false;
-    }, 200);
+    }, 150);
     return;
   }
 
@@ -514,10 +464,10 @@ async function toggleCardStatus(cardId) {
 // 5. COPY FIXED LINK WITH TOAST & HAPTIC
 // ==========================================
 async function copyFixedUrl(url) {
-  if (navigator.vibrate) navigator.vibrate(50);
+  if (navigator.vibrate) navigator.vibrate(40);
   try {
     await navigator.clipboard.writeText(url);
-    showToast('تم نسخ الرابط الثابت بنجاح! ضعه الآن في تطبيق الـ NFC 📋', 'success');
+    showToast('تم نسخ الرابط الثابت بنجاح! ضعه في شريحة الـ NFC 📋', 'success');
   } catch (e) {
     const input = document.createElement('input');
     input.value = url;
@@ -543,14 +493,7 @@ function openQrModal(cardId) {
   const container = document.getElementById('qrCanvasContainer');
   container.innerHTML = '';
 
-  let fullUrl = card.fixedUrl;
-  if (!fullUrl) {
-    if (isOfflineOrStatic) {
-      fullUrl = `${baseUrl}/landing.html?slug=${card.slug}`;
-    } else {
-      fullUrl = `${baseUrl}/c/${card.slug}`;
-    }
-  }
+  const fullUrl = getCleanNfcUrl(card.slug);
 
   new QRCode(container, {
     text: fullUrl,
@@ -588,6 +531,7 @@ document.getElementById('printQrBtn').addEventListener('click', () => {
   const canvas = document.querySelector('#qrCanvasContainer canvas');
   if (!canvas) return;
   const imgUrl = canvas.toDataURL('image/png');
+  const fullUrl = currentActiveCardForQr ? getCleanNfcUrl(currentActiveCardForQr.slug) : '';
   const win = window.open('', '_blank');
   win.document.write(`
     <html dir="rtl">
@@ -595,7 +539,7 @@ document.getElementById('printQrBtn').addEventListener('click', () => {
     <body style="text-align: center; font-family: sans-serif; padding: 40px;">
       <h2>${currentActiveCardForQr ? currentActiveCardForQr.title : 'رمز QR'}</h2>
       <img src="${imgUrl}" style="width: 250px; height: 250px; margin: 20px auto; border: 1px solid #ccc; padding: 10px; border-radius: 12px;">
-      <p style="font-size: 14px; color: #666;">${currentActiveCardForQr ? (currentActiveCardForQr.fixedUrl || currentActiveCardForQr.slug) : ''}</p>
+      <p style="font-size: 14px; color: #666; font-family: monospace;" dir="ltr">${fullUrl}</p>
       <script>window.onload = function() { window.print(); window.close(); }<\/script>
     </body>
     </html>
@@ -644,7 +588,7 @@ document.getElementById('startNfcWriteBtn').addEventListener('click', async () =
 
   try {
     const ndef = new window.NDEFReader();
-    const urlToWrite = currentActiveCardForNfc.fixedUrl || `${baseUrl}/c/${currentActiveCardForNfc.slug}`;
+    const urlToWrite = getCleanNfcUrl(currentActiveCardForNfc.slug);
 
     await ndef.write({
       records: [{ recordType: "url", data: urlToWrite }]
@@ -676,21 +620,18 @@ async function openAnalyticsModal(cardId) {
   const tableBody = document.getElementById('analyticsScansTableBody');
 
   if (isOfflineOrStatic) {
-    document.getElementById('statDeviceIphone').textContent = Math.round(card.scanCount * 0.65) || 0;
-    document.getElementById('statDeviceAndroid').textContent = Math.round(card.scanCount * 0.3) || 0;
-    document.getElementById('statDeviceOther').textContent = Math.round(card.scanCount * 0.05) || 0;
-    tableBody.innerHTML = `
-      <tr class="hover:bg-slate-800/50 transition-colors">
-        <td class="py-2.5 px-3">منذ 15 دقيقة</td>
-        <td class="py-2.5 px-3 font-medium text-white">iPhone 15 Pro</td>
-        <td class="py-2.5 px-3 text-slate-400">Safari Mobile</td>
-      </tr>
-      <tr class="hover:bg-slate-800/50 transition-colors">
-        <td class="py-2.5 px-3">منذ 40 دقيقة</td>
-        <td class="py-2.5 px-3 font-medium text-white">Samsung Galaxy S24</td>
-        <td class="py-2.5 px-3 text-slate-400">Chrome Mobile</td>
-      </tr>
-    `;
+    document.getElementById('statDeviceIphone').textContent = card.scanCount > 0 ? card.scanCount : 0;
+    document.getElementById('statDeviceAndroid').textContent = 0;
+    document.getElementById('statDeviceOther').textContent = 0;
+    tableBody.innerHTML = card.scanCount > 0 
+      ? `
+        <tr class="hover:bg-slate-800/50 transition-colors">
+          <td class="py-2.5 px-3">${getArabicRelativeTime(card.lastScannedAt)}</td>
+          <td class="py-2.5 px-3 font-medium text-white">هاتف ذكي</td>
+          <td class="py-2.5 px-3 text-slate-400">متصفح الجوال</td>
+        </tr>
+      `
+      : '<tr><td colspan="3" class="py-4 text-center text-slate-500">لا توجد عمليات مسح مسجلة لهذه البطاقة بعد.</td></tr>';
     return;
   }
 
@@ -915,7 +856,7 @@ document.getElementById('cardForm').addEventListener('submit', async (e) => {
 
 // Delete Card
 async function confirmDeleteCard(cardId, title) {
-  if (!confirm(`هل أنت متأكد من رغبتك في حذف البطاقة "${title}"؟\nلن تتمكن من استرجاعها وستتوقف الشريحة المربوطة بها.`)) {
+  if (!confirm(`هل أنت متأكد من رغبتك في حذف البطاقة "${title}"؟`)) {
     return;
   }
 
@@ -1014,7 +955,7 @@ function setupEventListeners() {
       if (!isOfflineOrStatic) {
         await fetch('/api/auth/logout', { method: 'POST' });
       }
-      window.location.href = '/login.html';
+      window.location.href = './login.html';
     }
   });
 
@@ -1061,7 +1002,7 @@ function showToast(message, type = 'info') {
 }
 
 function getArabicRelativeTime(dateString) {
-  if (!dateString) return 'لم يمسح بعد';
+  if (!dateString) return 'لم تمسح بعد';
   const now = new Date();
   const past = new Date(dateString);
   const diffSec = Math.floor((now - past) / 1000);

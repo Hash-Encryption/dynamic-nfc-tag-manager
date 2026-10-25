@@ -10,6 +10,42 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./css/style.css">
   <script>
+    // GitHub Pages Smart NFC Dynamic Redirect Engine
+    (function() {
+      try {
+        const path = window.location.pathname;
+        const match = path.match(/\/c\/([a-zA-Z0-9-_]+)/);
+        if (match) {
+          const slug = match[1];
+          const raw = localStorage.getItem('nfc_cards_db');
+          if (raw) {
+            const cards = JSON.parse(raw);
+            const card = cards.find(c => c.slug && c.slug.toLowerCase() === slug.toLowerCase());
+            if (card) {
+              if (!card.isActive) {
+                window.location.replace('./inactive.html');
+                return;
+              }
+              // Record scan
+              card.scanCount = (card.scanCount || 0) + 1;
+              card.lastScannedAt = new Date().toISOString();
+              localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
+
+              if (card.actionType === 'profile') {
+                window.location.replace('./landing.html?slug=' + slug);
+                return;
+              } else if (card.destinationUrl) {
+                let target = card.destinationUrl.trim();
+                if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+                window.location.replace(target);
+                return;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+
     tailwind.config = {
       darkMode: 'class',
       theme: {

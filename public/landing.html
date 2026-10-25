@@ -243,33 +243,8 @@
         } catch (e) {}
 
         if (!stored) {
-          // Use Ahmed Khalid default profile
-          stored = {
-            title: 'بطاقة الأعمال الذكية',
-            slug: 'ahmed-profile',
-            actionType: 'profile',
-            isActive: true,
-            profile: {
-              fullName: 'م. أحمد خالد الشهري',
-              jobTitle: 'مدير تطوير الأعمال والتقنية',
-              company: 'شركة الآفاق الذكية للتقنية',
-              bio: 'متخصص في حلول التحول الرقمي وإنترنت الأشياء (IoT) والأنظمة السحابية المتكاملة.',
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-              phone: '+966551234567',
-              whatsapp: '+966551234567',
-              email: 'ahmed.khalid@example.com',
-              website: 'https://example.com',
-              socials: {
-                twitter: 'https://x.com',
-                linkedin: 'https://linkedin.com',
-                instagram: 'https://instagram.com'
-              },
-              customLinks: [
-                { title: 'كتالوج الخدمات والعروض 2026', url: 'https://example.com/catalog' },
-                { title: 'احجز موعد استشارة تقنية', url: 'https://calendly.com' }
-              ]
-            }
-          };
+          window.location.href = './404.html';
+          return;
         }
 
         renderProfile(stored);
