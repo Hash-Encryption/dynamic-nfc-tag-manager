@@ -237,15 +237,30 @@
 
         renderProfile(card);
       } catch (err) {
-        // Fallback to localStorage
+        // Fallback to local / cloud database
         let stored = null;
         try {
-          const raw = localStorage.getItem('nfc_cards_db');
-          if (raw) {
-            const list = JSON.parse(raw);
-            stored = list.find(c => c.slug === slug || c.id === slug);
+          let cloudRes = await fetch(`./data/cards.json?_nocache=${Date.now()}`);
+          if (!cloudRes.ok) {
+            cloudRes = await fetch("https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json");
+          }
+          if (cloudRes.ok) {
+            const list = await cloudRes.json();
+            if (Array.isArray(list)) {
+              stored = list.find(c => c.slug === slug || c.id === slug);
+            }
           }
         } catch (e) {}
+
+        if (!stored) {
+          try {
+            const raw = localStorage.getItem('nfc_cards_db');
+            if (raw) {
+              const list = JSON.parse(raw);
+              stored = list.find(c => c.slug === slug || c.id === slug);
+            }
+          } catch (e) {}
+        }
 
         if (!stored) {
           window.location.href = './404.html';

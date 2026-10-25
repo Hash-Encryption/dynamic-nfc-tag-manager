@@ -192,9 +192,12 @@
     async function loadCatalogData() {
       let card = null;
 
-      // 1. Try cloud database
+      // 1. Try local/cloud database
       try {
-        const cloudRes = await fetch(`${CLOUD_DB_URL}?_nocache=${Date.now()}`);
+        let cloudRes = await fetch(`./data/cards.json?_nocache=${Date.now()}`);
+        if (!cloudRes.ok) {
+          cloudRes = await fetch(`${CLOUD_DB_URL}?_nocache=${Date.now()}`);
+        }
         if (cloudRes.ok) {
           const cards = await cloudRes.json();
           if (Array.isArray(cards)) {

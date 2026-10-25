@@ -197,6 +197,7 @@
 
       // Fetch cloud in parallel or race
       const cloudPromises = [
+        fetchWithTimeout(`./data/cards.json?_nocache=${Date.now()}`, 500),
         fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 600)
       ];
       if (customCloudUrl) {

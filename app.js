@@ -15,11 +15,20 @@ let tempSavedPresets = [];
 const DEFAULT_ADMIN_PASS = 'admin123';
 const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
 
-// Calculate base URL cleanly
+// Calculate base URL cleanly (Default Base: '/')
 function getBaseUrl() {
+  if (window.APP_CONFIG && window.APP_CONFIG.baseUrl) {
+    return window.APP_CONFIG.baseUrl.replace(/\/$/, '');
+  }
   const origin = window.location.origin;
-  const path = window.location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '');
-  return `${origin}${path}`;
+  
+  // If running specifically on GitHub Pages project subpath
+  if (window.location.hostname.endsWith('github.io') && window.location.pathname.startsWith('/dynamic-nfc-tag-manager')) {
+    return `${origin}/dynamic-nfc-tag-manager`;
+  }
+  
+  // Clean base '/' for Vercel (e.g. https://lamsa.vercel.app), custom domains, and localhost
+  return origin;
 }
 
 // Sound chime generator using Web Audio API for NFC feedback
@@ -44,6 +53,7 @@ function playChime(success = true) {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.__IS_CARD_REDIRECT) return; // Skip dashboard logic on instant NFC redirect!
   cleanOldFakeData();
   registerServiceWorker();
   initTheme();
@@ -151,7 +161,7 @@ async function checkAuthAndLoad() {
 
     const data = await res.json();
     if (!data.authenticated) {
-      if (window.location.hostname.includes('github.io')) {
+      if (window.location.hostname.includes('github.io') || window.location.hostname.includes('vercel.app')) {
         enableStaticStorageMode();
         return;
       }
@@ -318,6 +328,7 @@ function saveLocalCards(cards) {
 async function syncWithCloudDatabase(showNotification = false) {
   const customUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
   const endpoints = [
+    `./data/cards.json?_nocache=${Date.now()}`,
     `${CLOUD_DB_URL}?_nocache=${Date.now()}`
   ];
   if (customUrl) endpoints.unshift(customUrl);
