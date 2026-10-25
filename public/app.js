@@ -15,6 +15,9 @@ let tempSavedPresets = [];
 const DEFAULT_ADMIN_PASS = 'admin123';
 const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
 
+// i18n Translation Helper
+const t = (key, fallback) => (window.I18N ? window.I18N.t(key, fallback) : (fallback || key));
+
 // Calculate base URL cleanly (Default Base: '/')
 function getBaseUrl() {
   if (window.APP_CONFIG && window.APP_CONFIG.baseUrl) {
@@ -54,6 +57,7 @@ function playChime(success = true) {
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
   if (window.__IS_CARD_REDIRECT) return; // Skip dashboard logic on instant NFC redirect!
+  if (window.I18N) window.I18N.init();
   cleanOldFakeData();
   registerServiceWorker();
   initTheme();
@@ -451,11 +455,11 @@ function renderCardsGrid() {
   if (!cardsList || cardsList.length === 0) {
     container.innerHTML = `
       <div class="col-span-full bg-slate-900/60 border border-slate-800 rounded-3xl p-10 text-center space-y-3">
-        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-2xl">💳</div>
-        <h3 class="text-sm font-bold text-white">لا توجد بطاقات مسجلة بعد</h3>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto">ابدأ بإضافة بطاقتك الأولى لتوليد رابط وبرمجته داخل شريحة الـ NFC.</p>
-        <button onclick="openAddCardDrawer()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 active:scale-95 transition-all">
-          + إضافة بطاقة جديدة الآن
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-2xl">💳</div>
+        <h3 class="text-sm font-bold text-white">${t('empty_cards_title', 'لا توجد بطاقات مسجلة بعد')}</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto">${t('empty_cards_desc', 'ابدأ بإضافة بطاقتك الأولى لتوليد رابط وبرمجته داخل شريحة الـ NFC.')}</p>
+        <button onclick="openAddCardDrawer()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 active:scale-95 transition-all">
+          ${t('empty_cards_btn', '+ إضافة بطاقة جديدة الآن')}
         </button>
       </div>
     `;
@@ -485,8 +489,8 @@ function renderCardsGrid() {
       presetsHtml = `
         <div class="mt-3 pt-3 border-t border-slate-800/80">
           <div class="flex items-center justify-between text-[11px] mb-2">
-            <span class="font-bold text-slate-300">التبديل السريع للوجهة (1-Tap Switch):</span>
-            <span class="text-emerald-400 font-semibold">${savedTargets.length} روابط سريعة</span>
+            <span class="font-bold text-slate-300">1-Tap Switch:</span>
+            <span class="text-emerald-400 font-semibold">${savedTargets.length} links</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
             ${savedTargets.map(t => `
@@ -499,7 +503,7 @@ function renderCardsGrid() {
                 }"
               >
                 <span>${t.icon || '🔗'}</span>
-                <span>${t.label || 'رابط'}</span>
+                <span>${t.label || 'link'}</span>
               </button>
             `).join('')}
           </div>
@@ -508,10 +512,10 @@ function renderCardsGrid() {
     }
 
     // Mode Badge Text
-    let modeBadge = 'تحويل مباشر 🚀';
-    if (isProfile) modeBadge = 'كرت شخصي 👤';
-    else if (isCatalog) modeBadge = 'منيو وكتالوج 🍽️';
-    else if (isConditional) modeBadge = 'توجيه مشروط 🔀';
+    let modeBadge = `${t('card_mode_direct', 'تحويل مباشر')} 🚀`;
+    if (isProfile) modeBadge = `${t('card_mode_profile', 'ملف شخصي')} 👤`;
+    else if (isCatalog) modeBadge = `${t('card_mode_catalog', 'منيو وكتالوج')} 🍽️`;
+    else if (isConditional) modeBadge = `${t('card_pin_protected', 'توجيه مشروط')} 🔀`;
 
     return `
       <div class="bg-slate-900/90 border border-slate-800 hover:border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
@@ -527,7 +531,7 @@ function renderCardsGrid() {
             </div>
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${card.isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
-                ${card.isActive ? 'نشطة 🟢' : 'معطلة 🔴'}
+                ${card.isActive ? `${t('card_status_active', 'نشطة')} 🟢` : `${t('card_status_paused', 'معطلة')} 🔴`}
               </span>
               <svg class="w-6 h-6 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -541,18 +545,18 @@ function renderCardsGrid() {
             <div class="flex flex-wrap items-center gap-1.5 mt-1">
               <span class="text-[10px] bg-black/50 px-2 py-0.5 rounded font-mono text-emerald-300 font-semibold border border-emerald-500/20" dir="ltr">/c/${card.slug}</span>
               <span class="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded">${modeBadge}</span>
-              ${card.pinCode ? '<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">PIN 🔒</span>' : ''}
+              ${card.pinCode ? `<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">${t('card_pin_protected', 'PIN')} 🔒</span>` : ''}
             </div>
           </div>
 
           <!-- Bottom: Scans & Copy Link -->
           <div class="flex items-center justify-between text-[11px] text-white/90 z-10 pt-1 border-t border-white/10">
             <div class="flex items-center gap-1">
-              <span>مرات المسح:</span>
+              <span>${t('scans_count_suffix', 'مرات المسح')}:</span>
               <strong class="text-white font-mono text-xs">${card.scanCount || 0}</strong>
             </div>
-            <button onclick="copyToClipboard('${fixedUrl}', 'تم نسخ رابط برمجة البطاقة 📋')" class="bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
-              <span>نسخ الرابط</span>
+            <button onclick="copyToClipboard('${fixedUrl}', '${t('toast_copied')}')" class="bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
+              <span>${t('btn_copy_link', 'نسخ الرابط')}</span>
               <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
             </button>
           </div>
@@ -566,9 +570,9 @@ function renderCardsGrid() {
         ${!isProfile && !isCatalog ? `
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-[11px]">
-              <label class="font-bold text-slate-300">الرابط الهدف الحالي (Destination URL):</label>
+              <label class="font-bold text-slate-300">${t('card_target_label', 'الرابط الهدف الحالي (Destination URL):')}</label>
               <a href="${card.destinationUrl || '#'}" target="_blank" class="text-emerald-400 hover:underline text-[10px] font-semibold flex items-center gap-0.5" dir="ltr">
-                <span>فتح الوجهة</span>
+                <span>URL</span>
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
               </a>
             </div>
@@ -584,9 +588,9 @@ function renderCardsGrid() {
               <button 
                 onclick="saveInlineUrl('${card.id}')"
                 class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
-                title="حفظ الرابط الجديد فوراً"
+                title="${t('btn_quick_save')}"
               >
-                تحديث ✓
+                ${t('btn_quick_save', 'حفظ')} ✓
               </button>
             </div>
           </div>
@@ -595,11 +599,11 @@ function renderCardsGrid() {
         ${isProfile ? `
           <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
-              <span class="font-bold text-emerald-300 block">كرت شخصي رقمي مفعل</span>
-              <span class="text-[11px] text-slate-400">${card.profile?.fullName || 'الملف التعريفي'} - تحميل vCard</span>
+              <span class="font-bold text-emerald-300 block">${t('action_profile_title', 'كرت شخصي رقمي مفعل')}</span>
+              <span class="text-[11px] text-slate-400">${card.profile?.fullName || card.title} - vCard</span>
             </div>
             <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
-              معاينة الصفحة 👤
+              ${t('btn_test_sim', 'معاينة')} 👤
             </a>
           </div>
         ` : ''}
@@ -607,11 +611,11 @@ function renderCardsGrid() {
         ${isCatalog ? `
           <div class="p-3 bg-zinc-900 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
-              <span class="font-bold text-white block">المنيو والكتالوج الذكي مفعل</span>
-              <span class="text-[11px] text-slate-400">${card.catalog?.businessName || card.title} - واي فاي وتقييم</span>
+              <span class="font-bold text-white block">${t('action_catalog_title', 'المنيو والكتالوج الذكي مفعل')}</span>
+              <span class="text-[11px] text-slate-400">${card.catalog?.businessName || card.title} - Wi-Fi & Reviews</span>
             </div>
             <a href="./catalog.html?slug=${card.slug}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
-              معاينة المنيو 🍽️
+              ${t('btn_test_sim', 'معاينة')} 🍽️
             </a>
           </div>
         ` : ''}
@@ -622,28 +626,28 @@ function renderCardsGrid() {
           <button 
             onclick="openSimulatorDrawer('${card.id}')"
             class="py-2 px-2 bg-slate-800/90 hover:bg-slate-750 text-white rounded-xl text-[11px] font-bold border border-slate-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="تجربة المسح في محاكي الهاتف"
+            title="${t('btn_test_sim', 'تجربة')}"
           >
             <span>📱</span>
-            <span>تجربة</span>
+            <span>${t('btn_test_sim', 'تجربة')}</span>
           </button>
 
           <button 
             onclick="openNfcProgrammerModal('${card.id}')"
             class="py-2 px-2 bg-slate-800/90 hover:bg-slate-750 text-emerald-400 rounded-xl text-[11px] font-bold border border-slate-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="برمجة NFC وتوليد رمز QR"
+            title="${t('btn_program_nfc', 'برمجة NFC')}"
           >
             <span>📡</span>
-            <span>برمجة</span>
+            <span>${t('btn_program_nfc', 'برمجة')}</span>
           </button>
 
           <button 
             onclick="openEditCardDrawer('${card.id}')"
             class="py-2 px-2 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-xl text-[11px] font-bold border border-slate-700/80 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="تعديل جميع الخيارات"
+            title="${t('btn_edit', 'تعديل')}"
           >
             <span>✏️</span>
-            <span>تعديل</span>
+            <span>${t('btn_edit', 'تعديل')}</span>
           </button>
 
           <button 
@@ -653,9 +657,9 @@ function renderCardsGrid() {
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
             }"
-            title="${card.isActive ? 'تعطيل مؤقتاً' : 'تفعيل'}"
+            title="${card.isActive ? t('card_status_paused') : t('card_status_active')}"
           >
-            <span>${card.isActive ? 'إيقاف ⏸' : 'تشغيل ▶'}</span>
+            <span>${card.isActive ? '⏸' : '▶'}</span>
           </button>
 
         </div>
@@ -1508,6 +1512,10 @@ function initTheme() {
 }
 
 function setupEventListeners() {
+  document.getElementById('btnLangToggle')?.addEventListener('click', () => {
+    if (window.I18N) window.I18N.toggleLanguage();
+  });
+
   document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('nfc_theme', isDark ? 'dark' : 'light');

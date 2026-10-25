@@ -127,6 +127,26 @@
   </main>
 
   <script>
+    // Bilingual Check
+    const activeLang = localStorage.getItem('taplink_lang') || 'ar';
+    if (activeLang === 'en') {
+      document.documentElement.lang = 'en';
+      document.documentElement.dir = 'ltr';
+      document.title = 'TapLink | Redirecting... - MUHAB';
+      const h3 = document.querySelector('#redirectLoadingBox h3');
+      if (h3) h3.textContent = 'Smart NFC Tag Scanned 📡';
+      const slugText = document.getElementById('loadingSlugText');
+      if (slugText) slugText.textContent = 'Redirecting to destination...';
+      const notFoundBadge = document.querySelector('#notFoundBox span');
+      if (notFoundBadge) notFoundBadge.textContent = 'New NFC Tag Requires Activation';
+      const notFoundTitle = document.querySelector('#notFoundBox h1');
+      if (notFoundTitle) notFoundTitle.textContent = 'This chip is not linked to a URL yet';
+      const activateBtn = document.querySelector('#quickActivateBtn span');
+      if (activateBtn) activateBtn.textContent = 'Save & Activate Redirection 🚀';
+      const backBtn = document.querySelector('#notFoundBox a');
+      if (backBtn) backBtn.textContent = 'Access TapLink Admin Dashboard';
+    }
+
     // Embedded High-Speed Fallback Database to guarantee 0ms response time
     const BUNDLED_FALLBACK_CARDS = [
       {

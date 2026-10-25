@@ -15,11 +15,14 @@
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./icon.svg">
 
-  <!-- Google Fonts: Tajawal & Cairo -->
+  <!-- Google Fonts: Inter, Tajawal & Cairo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- i18n Bilingual Engine -->
+  <script src="./js/i18n.js"></script>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -28,7 +31,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Tajawal', 'Cairo', 'sans-serif'],
+            sans: ['Tajawal', 'Inter', 'Cairo', 'sans-serif'],
           },
           colors: {
             brand: {
@@ -432,13 +435,19 @@
 
       <!-- Action Icons -->
       <div class="flex items-center gap-1.5">
-        <button id="btnQuickSearchToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95" title="بحث سريع">
+        <!-- Language Switcher Button -->
+        <button id="btnLangToggle" class="px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white hover:bg-emerald-950/40 text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" title="Change Language / تغيير اللغة">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+          <span id="currentLangLabel">EN</span>
+        </button>
+
+        <button id="btnQuickSearchToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_search" title="بحث سريع">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </button>
-        <button id="btnThemeToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95" title="تبديل المظهر">
+        <button id="btnThemeToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_theme" title="تبديل المظهر">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
         </button>
-        <button id="btnLockAdmin" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" title="قفل لوحة التحكم">
+        <button id="btnLockAdmin" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_lock" title="قفل لوحة التحكم">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         </button>
       </div>
@@ -497,40 +506,40 @@
         <!-- Stat 1: Total Cards -->
         <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
           <div class="flex items-center justify-between text-zinc-400 mb-1">
-            <span class="text-xs font-semibold">إجمالي البطاقات</span>
+            <span class="text-xs font-semibold" data-i18n="stat_total_cards">إجمالي البطاقات</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">💳</span>
           </div>
           <div class="text-2xl font-black text-white" id="statTotalCards">0</div>
           <div class="text-[10px] text-zinc-400 mt-0.5 flex items-center gap-1">
             <span class="text-emerald-400 font-bold" id="statActiveCards">0</span>
-            <span>بطاقة نشطة للعمل</span>
+            <span data-i18n="stat_active_ratio">بطاقة نشطة للعمل</span>
           </div>
         </div>
 
         <!-- Stat 2: Total Scans -->
         <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
           <div class="flex items-center justify-between text-zinc-400 mb-1">
-            <span class="text-xs font-semibold">إجمالي المسحات</span>
+            <span class="text-xs font-semibold" data-i18n="stat_total_scans">إجمالي المسحات</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">📡</span>
           </div>
           <div class="text-2xl font-black text-emerald-400" id="statTotalScans">0</div>
-          <div class="text-[10px] text-zinc-400 mt-0.5">مسح لاسلكي موثق</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5" data-i18n="stat_all_phones">لكافة بطاقات المنظومة</div>
         </div>
 
         <!-- Stat 3: Top Device -->
         <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
           <div class="flex items-center justify-between text-zinc-400 mb-1">
-            <span class="text-xs font-semibold">الجهاز الأكثر استخداماً</span>
+            <span class="text-xs font-semibold" data-i18n="stat_top_device">الجهاز الأكثر استخداماً</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">📱</span>
           </div>
           <div class="text-2xl font-black text-white" id="statTopDevice">-</div>
-          <div class="text-[10px] text-zinc-400 mt-0.5" id="statTopDeviceLabel">بانتظار أول مسحة</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5" id="statTopDeviceLabel" data-i18n="stat_awaiting_scans">بانتظار أول مسحة</div>
         </div>
 
         <!-- Stat 4: Top Card -->
         <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
           <div class="flex items-center justify-between text-zinc-400 mb-1">
-            <span class="text-xs font-semibold">الأكثر نشاطاً</span>
+            <span class="text-xs font-semibold" data-i18n="stat_top_card">الأكثر نشاطاً</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">🔥</span>
           </div>
           <div class="text-xs font-bold text-emerald-300 truncate" id="statTopCardTitle">-</div>
@@ -701,8 +710,37 @@
     <section id="viewSettings" class="hidden space-y-5">
       
       <div>
-        <h2 class="text-lg font-black text-white">إعدادات النظام والمزامنة السحابية</h2>
-        <p class="text-xs text-zinc-400">منظومة TapLink الذكية - التابعة لشركة MUHAB</p>
+        <h2 class="text-lg font-black text-white" data-i18n="settings_tab_title">إعدادات النظام والمزامنة السحابية</h2>
+        <p class="text-xs text-zinc-400" data-i18n="lock_sub">منظومة TapLink الذكية - التابعة لشركة MUHAB</p>
+      </div>
+
+      <!-- Language Selection Card -->
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">🌐</div>
+          <div>
+            <h3 class="text-sm font-bold text-white" data-i18n="settings_lang_title">لغة واجهة النظام (Interface Language)</h3>
+            <p class="text-[11px] text-zinc-400" data-i18n="settings_lang_desc">اختر اللغة المفضلة لعرض لوحة التحكم بالكامل</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <label class="flex items-center gap-3 p-3.5 bg-zinc-900 border border-zinc-800 rounded-2xl cursor-pointer hover:border-emerald-500/40 transition-all">
+            <input type="radio" name="systemLanguage" id="langRadioAr" value="ar" checked onchange="window.I18N && window.I18N.setLanguage('ar')" class="text-emerald-500 focus:ring-emerald-500">
+            <div>
+              <div class="text-xs font-bold text-white">العربية (RTL)</div>
+              <div class="text-[10px] text-zinc-400">واجهة عربية كاملة</div>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-3 p-3.5 bg-zinc-900 border border-zinc-800 rounded-2xl cursor-pointer hover:border-emerald-500/40 transition-all">
+            <input type="radio" name="systemLanguage" id="langRadioEn" value="en" onchange="window.I18N && window.I18N.setLanguage('en')" class="text-emerald-500 focus:ring-emerald-500">
+            <div>
+              <div class="text-xs font-bold text-white">English (LTR)</div>
+              <div class="text-[10px] text-zinc-400">Full English Interface</div>
+            </div>
+          </label>
+        </div>
       </div>
 
       <!-- Real-Time Cloud Sync Panel -->
@@ -842,7 +880,7 @@
         <div class="nav-icon-container">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
         </div>
-        <span>الرئيسية</span>
+        <span data-i18n="nav_home">الرئيسية</span>
       </button>
 
       <!-- Tab 2: بطاقاتي -->
@@ -850,7 +888,7 @@
         <div class="nav-icon-container">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
         </div>
-        <span>بطاقاتي</span>
+        <span data-i18n="nav_cards">بطاقاتي</span>
       </button>
 
       <!-- Elevated Floating Action Button (+) -->
@@ -859,6 +897,7 @@
           id="fabAddCard" 
           onclick="openAddCardDrawer()" 
           class="w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-emerald-500 via-emerald-400 to-green-500 text-slate-950 flex items-center justify-center shadow-2xl fab-elevated active:scale-90 transition-transform cursor-pointer border-2 border-black" 
+          data-i18n-title="nav_add_quick"
           title="إضافة بطاقة جديدة"
         >
           <svg class="w-7 h-7 font-black stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
@@ -870,7 +909,7 @@
         <div class="nav-icon-container">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
         </div>
-        <span>التحليلات</span>
+        <span data-i18n="nav_stats">التحليلات</span>
       </button>
 
       <!-- Tab 4: الإعدادات -->
@@ -878,7 +917,7 @@
         <div class="nav-icon-container">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </div>
-        <span>الإعدادات</span>
+        <span data-i18n="nav_settings">الإعدادات</span>
       </button>
 
     </div>
