@@ -136,10 +136,33 @@ async function loadCards() {
   }
 }
 
-function loadLocalCards() {
-  document.getElementById('cardsLoadingState').classList.add('hidden');
+const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
+
+async function loadLocalCards() {
+  const loading = document.getElementById('cardsLoadingState');
+  if (loading) loading.classList.remove('hidden');
+
+  try {
+    const cloudRes = await fetch(`${CLOUD_DB_URL}?_nocache=${Date.now()}`);
+    if (cloudRes.ok) {
+      const cloudCards = await cloudRes.json();
+      if (Array.isArray(cloudCards) && cloudCards.length > 0) {
+        cardsList = cloudCards;
+        saveLocalCards(cloudCards);
+        if (loading) loading.classList.add('hidden');
+        renderCards();
+        loadLocalStats();
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not fetch cloud cards, using local storage fallback:', e);
+  }
+
+  if (loading) loading.classList.add('hidden');
   cardsList = getLocalCards();
   renderCards();
+  loadLocalStats();
 }
 
 function getLocalCards() {
