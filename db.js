@@ -58,7 +58,7 @@ const initialData = {
     createdAt: new Date().toISOString()
   },
   settings: {
-    siteTitle: 'Dynamic NFC Tag Manager',
+    siteTitle: 'Dynamic NFC Tag Manager PRO',
     baseUrl: '',
     theme: 'dark'
   },
@@ -79,12 +79,11 @@ class Database {
       } else {
         const raw = fs.readFileSync(DB_FILE, 'utf8');
         this.data = JSON.parse(raw);
-        if (!this.data.cards || this.data.cards.length === 0) {
+        if (!this.data.cards || this.data.cards.length < seedCards.length) {
           this.data.cards = seedCards;
           this.data.scans = generateSeedScans(seedCards);
           this.save();
         }
-        // Ensure default structures
         if (!this.data.scans) this.data.scans = [];
         if (!this.data.admin) this.data.admin = initialData.admin;
         if (!this.data.settings) this.data.settings = initialData.settings;
@@ -167,15 +166,19 @@ class Database {
         id: 't-' + crypto.randomUUID().slice(0, 6),
         label: 'الرابط الأساسي',
         url: cardData.destinationUrl.trim(),
-        active: true
+        active: true,
+        icon: '🔗'
       });
     }
+
+    const mode = cardData.mode || (cardData.actionType === 'profile' ? 'profile' : 'direct');
 
     const newCard = {
       id: 'card-' + crypto.randomUUID().slice(0, 8),
       title: (cardData.title || 'بطاقة NFC ذكية').trim(),
       slug: cleanSlug,
-      actionType: cardData.actionType === 'profile' ? 'profile' : 'direct',
+      mode: mode,
+      actionType: mode, // backward compatibility
       destinationUrl: (cardData.destinationUrl || '').trim(),
       isActive: cardData.isActive !== false,
       createdAt: new Date().toISOString(),
@@ -183,6 +186,7 @@ class Database {
       scanCount: 0,
       lastScannedAt: null,
       pinCode: (cardData.pinCode || '').trim(),
+      savedTargets: savedTargets,
       timeRouting: {
         enabled: Boolean(cardData.timeRouting?.enabled),
         morningUrl: (cardData.timeRouting?.morningUrl || '').trim(),
@@ -191,8 +195,13 @@ class Database {
         eveningLabel: (cardData.timeRouting?.eveningLabel || 'فترة المساء').trim(),
         switchHour: Number(cardData.timeRouting?.switchHour) || 16
       },
-      savedTargets: savedTargets,
-      profile: cardData.actionType === 'profile' ? (cardData.profile || {}) : null
+      conditional: cardData.conditional || {
+        type: cardData.timeRouting?.enabled ? 'time' : (cardData.pinCode ? 'pin' : 'none'),
+        time: cardData.timeRouting || {},
+        device: cardData.conditional?.device || {}
+      },
+      profile: mode === 'profile' ? (cardData.profile || {}) : null,
+      catalog: mode === 'catalog' ? (cardData.catalog || {}) : null
     };
 
     this.data.cards.push(newCard);
@@ -219,7 +228,13 @@ class Database {
     }
 
     if (updateData.title !== undefined) currentCard.title = updateData.title.trim();
-    if (updateData.actionType !== undefined) currentCard.actionType = updateData.actionType;
+    if (updateData.mode !== undefined) {
+      currentCard.mode = updateData.mode;
+      currentCard.actionType = updateData.mode;
+    } else if (updateData.actionType !== undefined) {
+      currentCard.mode = updateData.actionType;
+      currentCard.actionType = updateData.actionType;
+    }
     if (updateData.destinationUrl !== undefined) currentCard.destinationUrl = updateData.destinationUrl.trim();
     if (updateData.isActive !== undefined) currentCard.isActive = Boolean(updateData.isActive);
     if (updateData.pinCode !== undefined) currentCard.pinCode = String(updateData.pinCode || '').trim();
@@ -233,10 +248,14 @@ class Database {
         switchHour: Number(updateData.timeRouting?.switchHour) || 16
       };
     }
+    if (updateData.conditional !== undefined) {
+      currentCard.conditional = updateData.conditional;
+    }
     if (updateData.savedTargets !== undefined && Array.isArray(updateData.savedTargets)) {
       currentCard.savedTargets = updateData.savedTargets;
     }
     if (updateData.profile !== undefined) currentCard.profile = updateData.profile;
+    if (updateData.catalog !== undefined) currentCard.catalog = updateData.catalog;
 
     currentCard.updatedAt = new Date().toISOString();
     this.save();
@@ -272,7 +291,7 @@ class Database {
   }
 
   // Add a new saved target
-  addSavedTarget(cardId, label, url) {
+  addSavedTarget(cardId, label, url, icon = '🔗') {
     const card = this.getCardById(cardId);
     if (!card) throw new Error('البطاقة غير موجودة');
     if (!Array.isArray(card.savedTargets)) card.savedTargets = [];
@@ -281,7 +300,8 @@ class Database {
       id: 't-' + crypto.randomUUID().slice(0, 6),
       label: (label || 'رابط إضافي').trim(),
       url: (url || '').trim(),
-      active: false
+      active: false,
+      icon: icon
     };
     card.savedTargets.push(newTarget);
     card.updatedAt = new Date().toISOString();
@@ -444,7 +464,7 @@ class Database {
   // Backup & Restore
   exportBackup() {
     return {
-      version: '2.0',
+      version: '3.0',
       exportedAt: new Date().toISOString(),
       cards: this.data.cards,
       scans: this.data.scans,

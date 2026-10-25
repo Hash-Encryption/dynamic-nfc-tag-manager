@@ -14,46 +14,50 @@
       "id": "card-ksnjv",
       "title": "بطاقة تقييم جوجل الذكية - مطعم السفير",
       "slug": "card-ksnjv",
+      "mode": "direct",
       "actionType": "direct",
       "destinationUrl": "https://maps.google.com/?cid=123456789",
       "isActive": true,
-      "scanCount": 49,
-      "lastScannedAt": "2026-10-25T17:46:43.968Z",
+      "scanCount": 55,
+      "lastScannedAt": "2026-10-25T18:03:49.774Z",
       "createdAt": "2026-10-25T17:25:00.000Z",
-      "updatedAt": "2026-10-25T20:30:00.000Z",
+      "updatedAt": "2026-10-25T20:50:00.000Z",
       "pinCode": "",
-      "timeRouting": {
-        "enabled": false,
-        "morningUrl": "",
-        "morningLabel": "",
-        "eveningUrl": "",
-        "eveningLabel": "",
-        "switchHour": 16
-      },
       "savedTargets": [
         {
           "id": "t1",
           "label": "تقييم جوجل (فرع العليا)",
           "url": "https://maps.google.com/?cid=123456789",
-          "active": true
+          "active": true,
+          "icon": "⭐"
         },
         {
           "id": "t2",
           "label": "تقييم جوجل (فرع الملقا)",
           "url": "https://maps.google.com/?cid=987654321",
-          "active": false
+          "active": false,
+          "icon": "📍"
         },
         {
           "id": "t3",
-          "label": "قائمة الطعام الرقمية (المنيو)",
-          "url": "https://menu.alsafir.sa",
-          "active": false
+          "label": "واتساب الحجوزات والطلبات",
+          "url": "https://wa.me/966501234567?text=مرحباً، أود حجز طاولة",
+          "active": false,
+          "icon": "💬"
         },
         {
           "id": "t4",
           "label": "حساب انستغرام الرسمي",
           "url": "https://instagram.com/alsafir_restaurant",
-          "active": false
+          "active": false,
+          "icon": "📸"
+        },
+        {
+          "id": "t5",
+          "label": "المنيو الرقمي والأسعار",
+          "url": "https://menu.alsafir.sa",
+          "active": false,
+          "icon": "🍽️"
         }
       ]
     },
@@ -61,29 +65,23 @@
       "id": "card-ceo-99",
       "title": "بطاقة الأعمال التنفيذية - م. عبد العزيز الشمري",
       "slug": "ceo-card",
+      "mode": "profile",
       "actionType": "profile",
       "destinationUrl": "",
       "isActive": true,
-      "scanCount": 113,
-      "lastScannedAt": "2026-10-25T17:46:43.975Z",
+      "scanCount": 119,
+      "lastScannedAt": "2026-10-25T18:03:49.782Z",
       "createdAt": "2026-10-25T16:00:00.000Z",
-      "updatedAt": "2026-10-25T20:20:00.000Z",
+      "updatedAt": "2026-10-25T20:45:00.000Z",
       "pinCode": "",
-      "timeRouting": {
-        "enabled": false,
-        "morningUrl": "",
-        "morningLabel": "",
-        "eveningUrl": "",
-        "eveningLabel": "",
-        "switchHour": 16
-      },
       "savedTargets": [],
       "profile": {
         "fullName": "م. عبد العزيز الشمري",
         "jobTitle": "الرئيس التنفيذي والشريك المؤسس",
         "company": "مجموعة الحلول الذكية القابضة",
         "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-        "bio": "مستثمر تقني وخبير بأنظمة التحول الرقمي وإنترنت الأشياء (IoT). نسعى لتمكين الشركات بتقنيات المستقبل.",
+        "coverImage": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+        "bio": "مستثمر تقني ورائد أعمال، متخصص في تمكين حلول إنترنت الأشياء (IoT) والتحول الرقمي بالشرق الأوسط.",
         "phone": "+966501234567",
         "whatsapp": "+966501234567",
         "email": "ceo@smartholdings.sa",
@@ -114,23 +112,90 @@
       }
     },
     {
+      "id": "card-alsafir-hub",
+      "title": "مطعم السفير - المنيو والكتالوج الذكي",
+      "slug": "alsafir-hub",
+      "mode": "catalog",
+      "actionType": "catalog",
+      "destinationUrl": "",
+      "isActive": true,
+      "scanCount": 88,
+      "lastScannedAt": "2026-10-25T18:03:49.793Z",
+      "createdAt": "2026-10-25T16:30:00.000Z",
+      "updatedAt": "2026-10-25T20:45:00.000Z",
+      "pinCode": "",
+      "savedTargets": [],
+      "catalog": {
+        "businessName": "مطعم وكافيه السفير الفاخر",
+        "tagline": "أشهى المأكولات الشرقية والغربية والقهوة المختصة",
+        "wifiSsid": "AlSafir_Guest",
+        "wifiPassword": "alsafir_wifi_2026",
+        "googleReviewUrl": "https://maps.google.com/?cid=123456789",
+        "whatsappPhone": "+966501234567",
+        "callPhone": "+966501234567",
+        "locationUrl": "https://maps.google.com/?q=AlSafir+Restaurant+Riyadh",
+        "items": [
+          {
+            "title": "مشروب القهوة المختصة V60",
+            "description": "بن إثيوبي فاخر محمص بعناية مع إيحاءات التوت والياسمين",
+            "price": "24 ر.س",
+            "badge": "الأكثر طلباً 🔥",
+            "image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80"
+          },
+          {
+            "title": "ستيك لحم أنجوس مشوي بصوص الترافل",
+            "description": "قطعة تندرلوين طازجة تقدم مع خضار مشوية وبطاطس مهروسة",
+            "price": "115 ر.س",
+            "badge": "شيف سبيشال ⭐",
+            "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"
+          },
+          {
+            "title": "باستا فيتوتشيني ألفريدو مع الدجاج",
+            "description": "باستا إيطالية أصيلة بصلصة الكريمة الغنية وجبن البارميزان",
+            "price": "58 ر.س",
+            "badge": "",
+            "image": "https://images.unsplash.com/photo-1621996346565-e3d5d6281b37?auto=format&fit=crop&w=300&q=80"
+          },
+          {
+            "title": "كيكة الشوكولاتة البلجيكية الذائبة",
+            "description": "كعكة دافئة محشوة بالشوكولاتة البلجيكية تقدم مع آيس كريم الفانيليا",
+            "price": "36 ر.س",
+            "badge": "حلوى مميزة 🍰",
+            "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=300&q=80"
+          }
+        ]
+      }
+    },
+    {
       "id": "card-lounge-01",
       "title": "كافيه دي برستيج - القائمة الذكية المجدولة",
       "slug": "lounge-menu",
+      "mode": "conditional",
       "actionType": "direct",
       "destinationUrl": "https://menu.prestigecafe.sa/morning-specials",
       "isActive": true,
-      "scanCount": 236,
-      "lastScannedAt": "2026-10-25T17:46:43.985Z",
+      "scanCount": 243,
+      "lastScannedAt": "2026-10-25T18:03:49.800Z",
       "createdAt": "2026-10-25T15:30:00.000Z",
       "updatedAt": "2026-10-25T20:30:00.000Z",
       "pinCode": "",
+      "conditional": {
+        "type": "time",
+        "time": {
+          "enabled": true,
+          "morningUrl": "https://menu.prestigecafe.sa/morning-specials",
+          "morningLabel": "قائمة الإفطار والقهوة المختصة (06:00 - 15:59)",
+          "eveningUrl": "https://menu.prestigecafe.sa/evening-lounge",
+          "eveningLabel": "قائمة العشاء والحلويات واللاونج (16:00 - 05:59)",
+          "switchHour": 16
+        }
+      },
       "timeRouting": {
         "enabled": true,
         "morningUrl": "https://menu.prestigecafe.sa/morning-specials",
         "morningLabel": "قائمة الإفطار والقهوة المختصة (06:00 - 15:59)",
         "eveningUrl": "https://menu.prestigecafe.sa/evening-lounge",
-        "eveningLabel": "قائمة العشاء والحلويات والمشروبات (16:00 - 05:59)",
+        "eveningLabel": "قائمة العشاء والحلويات واللاونج (16:00 - 05:59)",
         "switchHour": 16
       },
       "savedTargets": [
@@ -145,34 +210,24 @@
           "label": "قائمة العشاء واللاونج المسائية",
           "url": "https://menu.prestigecafe.sa/evening-lounge",
           "active": false
-        },
-        {
-          "id": "tm3",
-          "label": "موقع الكافيه (خرائط جوجل)",
-          "url": "https://maps.google.com/?q=Prestige+Cafe+Riyadh",
-          "active": false
         }
       ]
     },
     {
       "id": "card-vip-77",
-      "title": "ملفات كبار الشخصيات VIP (محمية برمز PIN)",
+      "title": "ملفات كبار الشخصيات VIP (محمية بـ PIN)",
       "slug": "vip-vault",
+      "mode": "conditional",
       "actionType": "direct",
       "destinationUrl": "https://drive.google.com/drive/folders/vip-private-docs",
       "isActive": true,
-      "scanCount": 38,
+      "scanCount": 41,
       "lastScannedAt": "2026-10-25T19:12:00.000Z",
       "createdAt": "2026-10-25T14:00:00.000Z",
       "updatedAt": "2026-10-25T19:30:00.000Z",
       "pinCode": "2026",
-      "timeRouting": {
-        "enabled": false,
-        "morningUrl": "",
-        "morningLabel": "",
-        "eveningUrl": "",
-        "eveningLabel": "",
-        "switchHour": 16
+      "conditional": {
+        "type": "pin"
       },
       "savedTargets": [
         {
@@ -180,11 +235,42 @@
           "label": "المجلد السحابي المشفر",
           "url": "https://drive.google.com/drive/folders/vip-private-docs",
           "active": true
+        }
+      ]
+    },
+    {
+      "id": "card-app-route",
+      "title": "رابط تحميل التطبيق الذكي (حسب نوع الجوال)",
+      "slug": "app-smart-route",
+      "mode": "conditional",
+      "actionType": "direct",
+      "destinationUrl": "https://dynamic-nfc-tag-manager.com/app",
+      "isActive": true,
+      "scanCount": 96,
+      "lastScannedAt": "2026-10-25T18:03:49.824Z",
+      "createdAt": "2026-10-25T13:00:00.000Z",
+      "updatedAt": "2026-10-25T18:30:00.000Z",
+      "pinCode": "",
+      "conditional": {
+        "type": "device",
+        "device": {
+          "enabled": true,
+          "iosUrl": "https://apps.apple.com/app/id123456789",
+          "androidUrl": "https://play.google.com/store/apps/details?id=com.smartnfc.app",
+          "defaultUrl": "https://dynamic-nfc-tag-manager.com/app"
+        }
+      },
+      "savedTargets": [
+        {
+          "id": "ta1",
+          "label": "متجر Apple App Store",
+          "url": "https://apps.apple.com/app/id123456789",
+          "active": false
         },
         {
-          "id": "tv2",
-          "label": "بوابة المستثمرين المعتمدين",
-          "url": "https://portal.smartholdings.sa/investors",
+          "id": "ta2",
+          "label": "متجر Google Play",
+          "url": "https://play.google.com/store/apps/details?id=com.smartnfc.app",
           "active": false
         }
       ]
@@ -192,44 +278,1864 @@
   ],
   "scans": [
     {
-      "id": "scan-f6062b95",
+      "id": "scan-60974c18",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-25T18:03:49.824Z",
+      "deviceType": "Android",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::1"
+    },
+    {
+      "id": "scan-40b80e3a",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-25T18:03:49.815Z",
+      "deviceType": "iPhone",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::1"
+    },
+    {
+      "id": "scan-2244a731",
       "cardId": "card-lounge-01",
       "slug": "lounge-menu",
-      "timestamp": "2026-10-25T17:46:43.985Z",
+      "timestamp": "2026-10-25T18:03:49.800Z",
       "deviceType": "Desktop",
       "browser": "Unknown Browser",
       "referrer": "NFC Tag Tap",
       "ip": "::1"
     },
     {
-      "id": "scan-25d85147",
+      "id": "scan-08b2ee78",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-25T18:03:49.793Z",
+      "deviceType": "Desktop",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::1"
+    },
+    {
+      "id": "scan-70cb9df6",
       "cardId": "card-ceo-99",
       "slug": "ceo-card",
-      "timestamp": "2026-10-25T17:46:43.975Z",
+      "timestamp": "2026-10-25T18:03:49.782Z",
       "deviceType": "Desktop",
       "browser": "Unknown Browser",
       "referrer": "NFC Tag Tap",
       "ip": "::1"
     },
     {
-      "id": "scan-149d589a",
+      "id": "scan-e12dc8d5",
       "cardId": "card-ksnjv",
       "slug": "card-ksnjv",
-      "timestamp": "2026-10-25T17:46:43.968Z",
+      "timestamp": "2026-10-25T18:03:49.774Z",
       "deviceType": "Desktop",
       "browser": "Unknown Browser",
       "referrer": "NFC Tag Tap",
       "ip": "::1"
     },
     {
-      "id": "scan-dfc92898",
+      "id": "scan-00b3f87e",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-25T17:42:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.126"
+    },
+    {
+      "id": "scan-a8620d58",
       "cardId": "card-ksnjv",
       "slug": "card-ksnjv",
-      "timestamp": "2026-10-25T17:46:43.960Z",
-      "deviceType": "Desktop",
-      "browser": "Unknown Browser",
+      "timestamp": "2026-10-25T14:24:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
       "referrer": "NFC Tag Tap",
-      "ip": "::1"
+      "ip": "192.168.1.143"
+    },
+    {
+      "id": "scan-12c1a7df",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-25T14:01:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.183"
+    },
+    {
+      "id": "scan-a1b09ba0",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-25T10:31:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.88"
+    },
+    {
+      "id": "scan-c6f4691f",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-25T08:18:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.39"
+    },
+    {
+      "id": "scan-8eb5ee93",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-25T05:09:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.189"
+    },
+    {
+      "id": "scan-08f576eb",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-25T02:22:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.144"
+    },
+    {
+      "id": "scan-df87c073",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-25T00:38:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.102"
+    },
+    {
+      "id": "scan-4023e5d8",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-25T00:01:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.72"
+    },
+    {
+      "id": "scan-afd6ef50",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-24T23:39:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.180"
+    },
+    {
+      "id": "scan-c98c3116",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-24T22:57:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.82"
+    },
+    {
+      "id": "scan-6f09b6b3",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-24T22:01:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.32"
+    },
+    {
+      "id": "scan-c71e8141",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-24T20:16:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.206"
+    },
+    {
+      "id": "scan-bdc5d104",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-24T19:55:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.88"
+    },
+    {
+      "id": "scan-a099dd6a",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T19:45:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.81"
+    },
+    {
+      "id": "scan-0079a67d",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-24T19:18:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.144"
+    },
+    {
+      "id": "scan-4c3c7107",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-24T19:01:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.137"
+    },
+    {
+      "id": "scan-a1b4f1d8",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T17:52:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.47"
+    },
+    {
+      "id": "scan-b6329ff5",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-24T13:33:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.194"
+    },
+    {
+      "id": "scan-596c066b",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T13:30:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.11"
+    },
+    {
+      "id": "scan-3fae6311",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T12:00:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.195"
+    },
+    {
+      "id": "scan-f937aa47",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-24T11:35:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.196"
+    },
+    {
+      "id": "scan-ab5c73fd",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-24T09:37:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.115"
+    },
+    {
+      "id": "scan-2cab596c",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-24T08:18:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.42"
+    },
+    {
+      "id": "scan-93e2d6ec",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-24T07:53:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.36"
+    },
+    {
+      "id": "scan-1b8c47b1",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-24T07:36:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.59"
+    },
+    {
+      "id": "scan-31dd27be",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T06:58:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.189"
+    },
+    {
+      "id": "scan-7872f3f6",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-24T05:34:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.199"
+    },
+    {
+      "id": "scan-3cab6660",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-24T05:32:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.164"
+    },
+    {
+      "id": "scan-bf247ab2",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-24T04:30:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.36"
+    },
+    {
+      "id": "scan-3dee77e2",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-24T03:31:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.84"
+    },
+    {
+      "id": "scan-53fa4319",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-24T03:00:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.73"
+    },
+    {
+      "id": "scan-c3d295ea",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-23T23:42:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.60"
+    },
+    {
+      "id": "scan-2ce20373",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-23T20:32:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.186"
+    },
+    {
+      "id": "scan-29b21348",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-23T20:26:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.44"
+    },
+    {
+      "id": "scan-6a11234c",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-23T20:23:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.81"
+    },
+    {
+      "id": "scan-c9a35510",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-23T17:51:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.77"
+    },
+    {
+      "id": "scan-41448eda",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-23T17:29:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.122"
+    },
+    {
+      "id": "scan-02e11b66",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-23T16:48:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.171"
+    },
+    {
+      "id": "scan-45f86671",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-23T16:12:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.36"
+    },
+    {
+      "id": "scan-fe9a99ad",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-23T15:51:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.160"
+    },
+    {
+      "id": "scan-40ff5f03",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-23T14:39:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.80"
+    },
+    {
+      "id": "scan-a8fbcaf3",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-23T11:40:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.159"
+    },
+    {
+      "id": "scan-01042875",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-23T11:39:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.133"
+    },
+    {
+      "id": "scan-571c027c",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-23T10:01:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.205"
+    },
+    {
+      "id": "scan-acdf123c",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-23T08:47:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.23"
+    },
+    {
+      "id": "scan-73ba37ed",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-23T08:46:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.164"
+    },
+    {
+      "id": "scan-b5ab88ed",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-23T07:00:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.49"
+    },
+    {
+      "id": "scan-807f9cd8",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-23T06:18:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.117"
+    },
+    {
+      "id": "scan-d0c83f41",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-23T05:41:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.183"
+    },
+    {
+      "id": "scan-547e0f3e",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-23T04:38:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.204"
+    },
+    {
+      "id": "scan-2efabde1",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-23T03:54:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.20"
+    },
+    {
+      "id": "scan-0f17e2e5",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-23T03:51:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.176"
+    },
+    {
+      "id": "scan-ec5cb631",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-23T03:23:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.188"
+    },
+    {
+      "id": "scan-1c65ad11",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-23T02:28:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.103"
+    },
+    {
+      "id": "scan-8274cb60",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-23T02:21:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.205"
+    },
+    {
+      "id": "scan-790e2e8f",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-23T01:18:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.182"
+    },
+    {
+      "id": "scan-c80a38d2",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T22:51:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.119"
+    },
+    {
+      "id": "scan-06368045",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-22T21:58:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.58"
+    },
+    {
+      "id": "scan-6e01b1ae",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-22T19:26:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.200"
+    },
+    {
+      "id": "scan-7c4be637",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T19:23:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.198"
+    },
+    {
+      "id": "scan-c9392c68",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T18:58:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.65"
+    },
+    {
+      "id": "scan-bceadfa8",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T18:36:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.90"
+    },
+    {
+      "id": "scan-5f2afbb5",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T18:33:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.162"
+    },
+    {
+      "id": "scan-fd7050e1",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-22T18:15:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.110"
+    },
+    {
+      "id": "scan-a9aa6cea",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T17:18:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.50"
+    },
+    {
+      "id": "scan-f6560ebd",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T16:56:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.111"
+    },
+    {
+      "id": "scan-1591651f",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-22T16:45:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.100"
+    },
+    {
+      "id": "scan-1c54bcd5",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T16:20:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.127"
+    },
+    {
+      "id": "scan-748fee3b",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T16:11:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.166"
+    },
+    {
+      "id": "scan-ea6a91ee",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T15:27:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.142"
+    },
+    {
+      "id": "scan-2e36f509",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-22T15:05:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.62"
+    },
+    {
+      "id": "scan-aa0031cd",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T14:42:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.146"
+    },
+    {
+      "id": "scan-22afa160",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-22T14:03:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.86"
+    },
+    {
+      "id": "scan-4f773482",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-22T12:25:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.120"
+    },
+    {
+      "id": "scan-1e1fb7af",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-22T11:17:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.129"
+    },
+    {
+      "id": "scan-ea0611f8",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T09:55:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.167"
+    },
+    {
+      "id": "scan-39f0a299",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T09:01:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.188"
+    },
+    {
+      "id": "scan-14e51885",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T08:30:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.92"
+    },
+    {
+      "id": "scan-6f971d62",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T08:08:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.105"
+    },
+    {
+      "id": "scan-12705fdb",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T08:06:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.50"
+    },
+    {
+      "id": "scan-e04a0c71",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-22T06:19:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.153"
+    },
+    {
+      "id": "scan-cd784e8c",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-22T06:05:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.52"
+    },
+    {
+      "id": "scan-1fd87081",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-22T01:57:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.87"
+    },
+    {
+      "id": "scan-c18051e4",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T01:41:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.54"
+    },
+    {
+      "id": "scan-2f7d5ff8",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-22T01:20:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.42"
+    },
+    {
+      "id": "scan-aa080bee",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-22T00:04:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.90"
+    },
+    {
+      "id": "scan-0b710406",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-21T23:56:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.97"
+    },
+    {
+      "id": "scan-bf46a5f4",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-21T23:41:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.188"
+    },
+    {
+      "id": "scan-79930f0b",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-21T22:33:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.91"
+    },
+    {
+      "id": "scan-b5e8e356",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T22:03:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.26"
+    },
+    {
+      "id": "scan-7dbfa9e7",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-21T21:06:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.147"
+    },
+    {
+      "id": "scan-ebc12684",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T20:46:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.99"
+    },
+    {
+      "id": "scan-2b891de1",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-21T20:24:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.79"
+    },
+    {
+      "id": "scan-5e32168b",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T19:47:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.39"
+    },
+    {
+      "id": "scan-a639acc3",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T19:16:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.206"
+    },
+    {
+      "id": "scan-3024dc2b",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T18:31:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.49"
+    },
+    {
+      "id": "scan-a8de4ba3",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-21T17:46:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.12"
+    },
+    {
+      "id": "scan-c2e9a280",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-21T17:25:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.178"
+    },
+    {
+      "id": "scan-1266f190",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-21T16:12:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.192"
+    },
+    {
+      "id": "scan-c305d6d5",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T15:58:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.23"
+    },
+    {
+      "id": "scan-f7448806",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-21T15:26:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.205"
+    },
+    {
+      "id": "scan-454587e4",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T15:17:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.154"
+    },
+    {
+      "id": "scan-4c572905",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-21T14:36:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.125"
+    },
+    {
+      "id": "scan-7bb7c912",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-21T13:30:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.72"
+    },
+    {
+      "id": "scan-6762817b",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-21T12:59:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.103"
+    },
+    {
+      "id": "scan-80d6fc89",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-21T12:25:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.83"
+    },
+    {
+      "id": "scan-31865d2f",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T12:12:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.37"
+    },
+    {
+      "id": "scan-d8ae2b63",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T10:05:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.42"
+    },
+    {
+      "id": "scan-6749f8d8",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-21T08:30:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.46"
+    },
+    {
+      "id": "scan-02fa18b6",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T08:23:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.198"
+    },
+    {
+      "id": "scan-92a940d7",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T08:03:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.53"
+    },
+    {
+      "id": "scan-b750d3f4",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T07:49:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.124"
+    },
+    {
+      "id": "scan-150866b7",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T07:46:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.53"
+    },
+    {
+      "id": "scan-4f479fd9",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T07:46:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.138"
+    },
+    {
+      "id": "scan-7b35e5d3",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-21T07:38:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.200"
+    },
+    {
+      "id": "scan-f60ae5d0",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-21T07:05:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.43"
+    },
+    {
+      "id": "scan-ad3b8e70",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-21T05:12:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.18"
+    },
+    {
+      "id": "scan-7579dc04",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-21T05:05:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.154"
+    },
+    {
+      "id": "scan-d956f4ed",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-21T02:04:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.33"
+    },
+    {
+      "id": "scan-22d72307",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-21T01:43:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.63"
+    },
+    {
+      "id": "scan-c15eb326",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-20T23:07:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.23"
+    },
+    {
+      "id": "scan-25bd2edb",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-20T22:54:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.120"
+    },
+    {
+      "id": "scan-c79ef715",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-20T21:35:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.56"
+    },
+    {
+      "id": "scan-579dd880",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-20T20:39:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.204"
+    },
+    {
+      "id": "scan-f69b2837",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T20:08:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.155"
+    },
+    {
+      "id": "scan-8948b615",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-20T19:56:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.148"
+    },
+    {
+      "id": "scan-aac7dd10",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T19:56:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.196"
+    },
+    {
+      "id": "scan-ffb1b00f",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T19:44:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.183"
+    },
+    {
+      "id": "scan-0796905b",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T19:24:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.186"
+    },
+    {
+      "id": "scan-d8ba6342",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T14:34:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.50"
+    },
+    {
+      "id": "scan-415c21ae",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T14:29:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.173"
+    },
+    {
+      "id": "scan-55e8abdd",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-20T14:25:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.18"
+    },
+    {
+      "id": "scan-2b8a9572",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-20T11:43:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.179"
+    },
+    {
+      "id": "scan-38f1cfb1",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-20T11:31:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.110"
+    },
+    {
+      "id": "scan-b11272db",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T10:09:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.92"
+    },
+    {
+      "id": "scan-832db89f",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T07:25:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.27"
+    },
+    {
+      "id": "scan-0830df96",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-20T06:45:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.132"
+    },
+    {
+      "id": "scan-f312852f",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T06:31:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.10"
+    },
+    {
+      "id": "scan-ff89f13f",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T05:48:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.198"
+    },
+    {
+      "id": "scan-a31450f9",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T05:05:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.64"
+    },
+    {
+      "id": "scan-fcc0603b",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-20T04:50:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.36"
+    },
+    {
+      "id": "scan-7d83e8c1",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-20T03:48:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.11"
+    },
+    {
+      "id": "scan-4a28122d",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-20T03:05:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.150"
+    },
+    {
+      "id": "scan-3d2f934e",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-20T01:07:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.138"
+    },
+    {
+      "id": "scan-8cc8b8be",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-20T00:47:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.144"
+    },
+    {
+      "id": "scan-c82c7fe8",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-20T00:41:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.158"
+    },
+    {
+      "id": "scan-bfbb766d",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-20T00:28:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.177"
+    },
+    {
+      "id": "scan-d11c480b",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-19T21:07:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.42"
+    },
+    {
+      "id": "scan-4b9f05c2",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T20:38:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.123"
+    },
+    {
+      "id": "scan-6767d34a",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T18:16:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.172"
+    },
+    {
+      "id": "scan-7950aa85",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-19T17:40:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.55"
+    },
+    {
+      "id": "scan-e7bbb1fc",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T17:22:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.47"
+    },
+    {
+      "id": "scan-c904dcc7",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-19T15:39:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.44"
+    },
+    {
+      "id": "scan-9d0c1c23",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-19T14:39:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.24"
+    },
+    {
+      "id": "scan-d1cef210",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T13:36:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.49"
+    },
+    {
+      "id": "scan-bd16c5b4",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T13:13:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.111"
+    },
+    {
+      "id": "scan-dd0fb530",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T12:51:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.149"
+    },
+    {
+      "id": "scan-883d94fb",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T11:38:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.203"
+    },
+    {
+      "id": "scan-7e8538a4",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T11:19:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.159"
+    },
+    {
+      "id": "scan-271d7e5d",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-19T10:42:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.184"
+    },
+    {
+      "id": "scan-9852e455",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-19T08:57:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.23"
+    },
+    {
+      "id": "scan-ce975b19",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T07:15:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.199"
+    },
+    {
+      "id": "scan-301b9ff7",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T06:31:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.50"
+    },
+    {
+      "id": "scan-11838da7",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-19T05:26:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.128"
+    },
+    {
+      "id": "scan-f9132738",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-19T05:06:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.134"
+    },
+    {
+      "id": "scan-fd2d4e38",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T05:00:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.195"
+    },
+    {
+      "id": "scan-482676ab",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-19T04:06:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.12"
+    },
+    {
+      "id": "scan-248777d8",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-19T02:09:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.193"
+    },
+    {
+      "id": "scan-c4721361",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-19T00:58:30.646Z",
+      "deviceType": "iPad",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.151"
+    },
+    {
+      "id": "scan-45688ebc",
+      "cardId": "card-vip-77",
+      "slug": "vip-vault",
+      "timestamp": "2026-10-19T00:55:30.646Z",
+      "deviceType": "Android",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.55"
+    },
+    {
+      "id": "scan-cb5d0d6c",
+      "cardId": "card-app-route",
+      "slug": "app-smart-route",
+      "timestamp": "2026-10-19T00:42:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.79"
+    },
+    {
+      "id": "scan-f22f8fcc",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-18T23:18:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.59"
+    },
+    {
+      "id": "scan-92d3106b",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-18T21:26:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.10"
+    },
+    {
+      "id": "scan-0e19c8c7",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-18T20:52:30.646Z",
+      "deviceType": "Android",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.67"
+    },
+    {
+      "id": "scan-d0947f4e",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-18T20:48:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.118"
+    },
+    {
+      "id": "scan-22a2271a",
+      "cardId": "card-ceo-99",
+      "slug": "ceo-card",
+      "timestamp": "2026-10-18T20:40:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Samsung Internet",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.10"
+    },
+    {
+      "id": "scan-d364ad7b",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-18T20:26:30.646Z",
+      "deviceType": "Windows",
+      "browser": "Chrome",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.137"
+    },
+    {
+      "id": "scan-a134bb52",
+      "cardId": "card-lounge-01",
+      "slug": "lounge-menu",
+      "timestamp": "2026-10-18T19:10:30.646Z",
+      "deviceType": "iPhone",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.19"
+    },
+    {
+      "id": "scan-27174740",
+      "cardId": "card-alsafir-hub",
+      "slug": "alsafir-hub",
+      "timestamp": "2026-10-18T18:39:30.646Z",
+      "deviceType": "Android",
+      "browser": "Safari",
+      "referrer": "NFC Tag Tap",
+      "ip": "192.168.1.15"
     }
   ]
 }

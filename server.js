@@ -40,7 +40,7 @@ function parseUserAgent(ua = '') {
   return { deviceType, browser };
 }
 
-// Generate vCard string helper (RFC 6350 / vCard 3.0)
+// Generate vCard string helper (RFC 6350 / vCard 3.0) with UTF-8 support
 function generateVCard(profile = {}, title = '') {
   const name = profile.fullName || title || 'جهة اتصال NFC';
   const phone = profile.phone || profile.whatsapp || '';
@@ -199,26 +199,44 @@ function handleDynamicRedirect(req, res, slug) {
     ip: String(ip).split(',')[0].trim()
   });
 
-  // 3. Action Type: Digital Business Card Profile
-  if (card.actionType === 'profile') {
+  const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
+
+  // 3. MODE 2: Digital Business Card Profile
+  if (mode === 'profile') {
     return res.sendFile(path.join(__dirname, 'public', 'landing.html'));
   }
 
-  // 4. Time-based Routing Resolution
+  // 4. MODE 3: Smart Mini-Menu / Links Hub
+  if (mode === 'catalog') {
+    return res.sendFile(path.join(__dirname, 'public', 'catalog.html'));
+  }
+
+  // 5. MODE 4 / Conditional Routing (Device & Time)
   let targetUrl = (card.destinationUrl || '').trim();
-  if (card.timeRouting && card.timeRouting.enabled) {
-    // Saudi Arabia / UTC+3 standard or server local hour
+
+  // Device-based routing
+  if (card.conditional?.device?.enabled) {
+    if (deviceType === 'iPhone' || deviceType === 'iPad') {
+      if (card.conditional.device.iosUrl) targetUrl = card.conditional.device.iosUrl.trim();
+    } else if (deviceType === 'Android') {
+      if (card.conditional.device.androidUrl) targetUrl = card.conditional.device.androidUrl.trim();
+    } else if (card.conditional.device.defaultUrl) {
+      targetUrl = card.conditional.device.defaultUrl.trim();
+    }
+  }
+
+  // Time-based routing
+  const tr = card.timeRouting || card.conditional?.time;
+  if (tr && tr.enabled) {
     const d = new Date();
     const utcHours = d.getUTCHours();
     const ksaHour = (utcHours + 3) % 24; // KSA Local Hour
-    const switchHour = Number(card.timeRouting.switchHour) || 16; // default 4:00 PM
+    const switchHour = Number(tr.switchHour) || 16; // default 4:00 PM
 
     if (ksaHour >= 6 && ksaHour < switchHour) {
-      // Morning Slot
-      targetUrl = (card.timeRouting.morningUrl || targetUrl).trim();
+      targetUrl = (tr.morningUrl || targetUrl).trim();
     } else {
-      // Evening Slot
-      targetUrl = (card.timeRouting.eveningUrl || targetUrl).trim();
+      targetUrl = (tr.eveningUrl || targetUrl).trim();
     }
   }
 
@@ -320,7 +338,7 @@ app.get(['/c/:slug/vcard', '/go/:slug/vcard'], (req, res) => {
   return res.send(vcardText);
 });
 
-// API to get public profile data for a card
+// API to get public profile/catalog data for a card
 app.get('/api/public/card/:slug', (req, res) => {
   const { slug } = req.params;
   const card = db.getCardBySlug(slug);
@@ -333,9 +351,11 @@ app.get('/api/public/card/:slug', (req, res) => {
     card: {
       title: card.title,
       slug: card.slug,
+      mode: card.mode,
       actionType: card.actionType,
       isActive: card.isActive,
-      profile: card.profile || {}
+      profile: card.profile || {},
+      catalog: card.catalog || {}
     }
   });
 });
@@ -387,8 +407,8 @@ app.post('/api/auth/change-password', requireAuth, (req, res) => {
   if (!db.verifyAdmin(currentPassword)) {
     return res.status(401).json({ success: false, error: 'كلمة المرور الحالية غير صحيحة' });
   }
-  if (newPassword.length < 6) {
-    return res.status(400).json({ success: false, error: 'كلمة المرور الجديدة يجب ألا تقل عن 6 خانات' });
+  if (newPassword.length < 4) {
+    return res.status(400).json({ success: false, error: 'كلمة المرور الجديدة يجب ألا تقل عن 4 خانات' });
   }
 
   db.updateAdminPassword(newPassword);
@@ -486,9 +506,9 @@ app.post('/api/cards/:id/switch-target', requireAuth, (req, res) => {
 // Add saved target
 app.post('/api/cards/:id/targets', requireAuth, (req, res) => {
   try {
-    const { label, url } = req.body;
+    const { label, url, icon } = req.body;
     if (!url) return res.status(400).json({ success: false, error: 'الرابط مطلوب' });
-    const result = db.addSavedTarget(req.params.id, label, url);
+    const result = db.addSavedTarget(req.params.id, label, url, icon);
     res.json({ success: true, card: result.card, newTarget: result.newTarget, message: 'تمت إضافة الرابط لقائمة المحفوظات' });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });

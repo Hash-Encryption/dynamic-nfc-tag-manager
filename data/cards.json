@@ -3,46 +3,50 @@
     "id": "card-ksnjv",
     "title": "بطاقة تقييم جوجل الذكية - مطعم السفير",
     "slug": "card-ksnjv",
+    "mode": "direct",
     "actionType": "direct",
     "destinationUrl": "https://maps.google.com/?cid=123456789",
     "isActive": true,
-    "scanCount": 49,
-    "lastScannedAt": "2026-10-25T17:46:43.968Z",
+    "scanCount": 55,
+    "lastScannedAt": "2026-10-25T18:03:49.774Z",
     "createdAt": "2026-10-25T17:25:00.000Z",
-    "updatedAt": "2026-10-25T20:30:00.000Z",
+    "updatedAt": "2026-10-25T20:50:00.000Z",
     "pinCode": "",
-    "timeRouting": {
-      "enabled": false,
-      "morningUrl": "",
-      "morningLabel": "",
-      "eveningUrl": "",
-      "eveningLabel": "",
-      "switchHour": 16
-    },
     "savedTargets": [
       {
         "id": "t1",
         "label": "تقييم جوجل (فرع العليا)",
         "url": "https://maps.google.com/?cid=123456789",
-        "active": true
+        "active": true,
+        "icon": "⭐"
       },
       {
         "id": "t2",
         "label": "تقييم جوجل (فرع الملقا)",
         "url": "https://maps.google.com/?cid=987654321",
-        "active": false
+        "active": false,
+        "icon": "📍"
       },
       {
         "id": "t3",
-        "label": "قائمة الطعام الرقمية (المنيو)",
-        "url": "https://menu.alsafir.sa",
-        "active": false
+        "label": "واتساب الحجوزات والطلبات",
+        "url": "https://wa.me/966501234567?text=مرحباً، أود حجز طاولة",
+        "active": false,
+        "icon": "💬"
       },
       {
         "id": "t4",
         "label": "حساب انستغرام الرسمي",
         "url": "https://instagram.com/alsafir_restaurant",
-        "active": false
+        "active": false,
+        "icon": "📸"
+      },
+      {
+        "id": "t5",
+        "label": "المنيو الرقمي والأسعار",
+        "url": "https://menu.alsafir.sa",
+        "active": false,
+        "icon": "🍽️"
       }
     ]
   },
@@ -50,29 +54,23 @@
     "id": "card-ceo-99",
     "title": "بطاقة الأعمال التنفيذية - م. عبد العزيز الشمري",
     "slug": "ceo-card",
+    "mode": "profile",
     "actionType": "profile",
     "destinationUrl": "",
     "isActive": true,
-    "scanCount": 113,
-    "lastScannedAt": "2026-10-25T17:46:43.975Z",
+    "scanCount": 119,
+    "lastScannedAt": "2026-10-25T18:03:49.782Z",
     "createdAt": "2026-10-25T16:00:00.000Z",
-    "updatedAt": "2026-10-25T20:20:00.000Z",
+    "updatedAt": "2026-10-25T20:45:00.000Z",
     "pinCode": "",
-    "timeRouting": {
-      "enabled": false,
-      "morningUrl": "",
-      "morningLabel": "",
-      "eveningUrl": "",
-      "eveningLabel": "",
-      "switchHour": 16
-    },
     "savedTargets": [],
     "profile": {
       "fullName": "م. عبد العزيز الشمري",
       "jobTitle": "الرئيس التنفيذي والشريك المؤسس",
       "company": "مجموعة الحلول الذكية القابضة",
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      "bio": "مستثمر تقني وخبير بأنظمة التحول الرقمي وإنترنت الأشياء (IoT). نسعى لتمكين الشركات بتقنيات المستقبل.",
+      "coverImage": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+      "bio": "مستثمر تقني ورائد أعمال، متخصص في تمكين حلول إنترنت الأشياء (IoT) والتحول الرقمي بالشرق الأوسط.",
       "phone": "+966501234567",
       "whatsapp": "+966501234567",
       "email": "ceo@smartholdings.sa",
@@ -103,23 +101,90 @@
     }
   },
   {
+    "id": "card-alsafir-hub",
+    "title": "مطعم السفير - المنيو والكتالوج الذكي",
+    "slug": "alsafir-hub",
+    "mode": "catalog",
+    "actionType": "catalog",
+    "destinationUrl": "",
+    "isActive": true,
+    "scanCount": 88,
+    "lastScannedAt": "2026-10-25T18:03:49.793Z",
+    "createdAt": "2026-10-25T16:30:00.000Z",
+    "updatedAt": "2026-10-25T20:45:00.000Z",
+    "pinCode": "",
+    "savedTargets": [],
+    "catalog": {
+      "businessName": "مطعم وكافيه السفير الفاخر",
+      "tagline": "أشهى المأكولات الشرقية والغربية والقهوة المختصة",
+      "wifiSsid": "AlSafir_Guest",
+      "wifiPassword": "alsafir_wifi_2026",
+      "googleReviewUrl": "https://maps.google.com/?cid=123456789",
+      "whatsappPhone": "+966501234567",
+      "callPhone": "+966501234567",
+      "locationUrl": "https://maps.google.com/?q=AlSafir+Restaurant+Riyadh",
+      "items": [
+        {
+          "title": "مشروب القهوة المختصة V60",
+          "description": "بن إثيوبي فاخر محمص بعناية مع إيحاءات التوت والياسمين",
+          "price": "24 ر.س",
+          "badge": "الأكثر طلباً 🔥",
+          "image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "title": "ستيك لحم أنجوس مشوي بصوص الترافل",
+          "description": "قطعة تندرلوين طازجة تقدم مع خضار مشوية وبطاطس مهروسة",
+          "price": "115 ر.س",
+          "badge": "شيف سبيشال ⭐",
+          "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "title": "باستا فيتوتشيني ألفريدو مع الدجاج",
+          "description": "باستا إيطالية أصيلة بصلصة الكريمة الغنية وجبن البارميزان",
+          "price": "58 ر.س",
+          "badge": "",
+          "image": "https://images.unsplash.com/photo-1621996346565-e3d5d6281b37?auto=format&fit=crop&w=300&q=80"
+        },
+        {
+          "title": "كيكة الشوكولاتة البلجيكية الذائبة",
+          "description": "كعكة دافئة محشوة بالشوكولاتة البلجيكية تقدم مع آيس كريم الفانيليا",
+          "price": "36 ر.س",
+          "badge": "حلوى مميزة 🍰",
+          "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=300&q=80"
+        }
+      ]
+    }
+  },
+  {
     "id": "card-lounge-01",
     "title": "كافيه دي برستيج - القائمة الذكية المجدولة",
     "slug": "lounge-menu",
+    "mode": "conditional",
     "actionType": "direct",
     "destinationUrl": "https://menu.prestigecafe.sa/morning-specials",
     "isActive": true,
-    "scanCount": 236,
-    "lastScannedAt": "2026-10-25T17:46:43.985Z",
+    "scanCount": 243,
+    "lastScannedAt": "2026-10-25T18:03:49.800Z",
     "createdAt": "2026-10-25T15:30:00.000Z",
     "updatedAt": "2026-10-25T20:30:00.000Z",
     "pinCode": "",
+    "conditional": {
+      "type": "time",
+      "time": {
+        "enabled": true,
+        "morningUrl": "https://menu.prestigecafe.sa/morning-specials",
+        "morningLabel": "قائمة الإفطار والقهوة المختصة (06:00 - 15:59)",
+        "eveningUrl": "https://menu.prestigecafe.sa/evening-lounge",
+        "eveningLabel": "قائمة العشاء والحلويات واللاونج (16:00 - 05:59)",
+        "switchHour": 16
+      }
+    },
     "timeRouting": {
       "enabled": true,
       "morningUrl": "https://menu.prestigecafe.sa/morning-specials",
       "morningLabel": "قائمة الإفطار والقهوة المختصة (06:00 - 15:59)",
       "eveningUrl": "https://menu.prestigecafe.sa/evening-lounge",
-      "eveningLabel": "قائمة العشاء والحلويات والمشروبات (16:00 - 05:59)",
+      "eveningLabel": "قائمة العشاء والحلويات واللاونج (16:00 - 05:59)",
       "switchHour": 16
     },
     "savedTargets": [
@@ -134,34 +199,24 @@
         "label": "قائمة العشاء واللاونج المسائية",
         "url": "https://menu.prestigecafe.sa/evening-lounge",
         "active": false
-      },
-      {
-        "id": "tm3",
-        "label": "موقع الكافيه (خرائط جوجل)",
-        "url": "https://maps.google.com/?q=Prestige+Cafe+Riyadh",
-        "active": false
       }
     ]
   },
   {
     "id": "card-vip-77",
-    "title": "ملفات كبار الشخصيات VIP (محمية برمز PIN)",
+    "title": "ملفات كبار الشخصيات VIP (محمية بـ PIN)",
     "slug": "vip-vault",
+    "mode": "conditional",
     "actionType": "direct",
     "destinationUrl": "https://drive.google.com/drive/folders/vip-private-docs",
     "isActive": true,
-    "scanCount": 38,
+    "scanCount": 41,
     "lastScannedAt": "2026-10-25T19:12:00.000Z",
     "createdAt": "2026-10-25T14:00:00.000Z",
     "updatedAt": "2026-10-25T19:30:00.000Z",
     "pinCode": "2026",
-    "timeRouting": {
-      "enabled": false,
-      "morningUrl": "",
-      "morningLabel": "",
-      "eveningUrl": "",
-      "eveningLabel": "",
-      "switchHour": 16
+    "conditional": {
+      "type": "pin"
     },
     "savedTargets": [
       {
@@ -169,11 +224,42 @@
         "label": "المجلد السحابي المشفر",
         "url": "https://drive.google.com/drive/folders/vip-private-docs",
         "active": true
+      }
+    ]
+  },
+  {
+    "id": "card-app-route",
+    "title": "رابط تحميل التطبيق الذكي (حسب نوع الجوال)",
+    "slug": "app-smart-route",
+    "mode": "conditional",
+    "actionType": "direct",
+    "destinationUrl": "https://dynamic-nfc-tag-manager.com/app",
+    "isActive": true,
+    "scanCount": 96,
+    "lastScannedAt": "2026-10-25T18:03:49.824Z",
+    "createdAt": "2026-10-25T13:00:00.000Z",
+    "updatedAt": "2026-10-25T18:30:00.000Z",
+    "pinCode": "",
+    "conditional": {
+      "type": "device",
+      "device": {
+        "enabled": true,
+        "iosUrl": "https://apps.apple.com/app/id123456789",
+        "androidUrl": "https://play.google.com/store/apps/details?id=com.smartnfc.app",
+        "defaultUrl": "https://dynamic-nfc-tag-manager.com/app"
+      }
+    },
+    "savedTargets": [
+      {
+        "id": "ta1",
+        "label": "متجر Apple App Store",
+        "url": "https://apps.apple.com/app/id123456789",
+        "active": false
       },
       {
-        "id": "tv2",
-        "label": "بوابة المستثمرين المعتمدين",
-        "url": "https://portal.smartholdings.sa/investors",
+        "id": "ta2",
+        "label": "متجر Google Play",
+        "url": "https://play.google.com/store/apps/details?id=com.smartnfc.app",
         "active": false
       }
     ]
