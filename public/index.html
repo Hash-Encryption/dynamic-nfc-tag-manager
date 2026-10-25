@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>مدير بطاقات NFC الذكية PRO | Mobile PWA</title>
+  <title>TapLink | إدارة بطاقات NFC الذكية - شركة MUHAB</title>
   
   <!-- PWA & Mobile Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="بطاقات NFC">
-  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-title" content="TapLink">
+  <meta name="theme-color" content="#050806">
   <meta name="format-detection" content="telephone=no">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
@@ -32,12 +32,12 @@
           },
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
             }
           }
         }
@@ -50,18 +50,18 @@
   <!-- QR Code Library -->
   <script src="./js/qrcode.min.js"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white pb-32 antialiased">
+<body class="bg-[#050706] text-white min-h-screen selection:bg-emerald-500 selection:text-black pb-32 antialiased">
 
-  <!-- Background Ambient Glow -->
+  <!-- Background Ambient Glow - Emerald, Black, and White Luxury Palette -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-32 -start-32 w-80 h-80 bg-indigo-600/15 rounded-full blur-3xl"></div>
-    <div class="absolute top-1/3 -end-32 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-32 start-1/3 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute -top-32 -start-32 w-80 h-80 bg-emerald-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -end-32 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 start-1/3 w-80 h-80 bg-emerald-900/20 rounded-full blur-3xl"></div>
   </div>
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container w-11/12 max-w-sm hidden">
-    <div id="toastInner" class="flex items-center gap-3 p-3.5 rounded-2xl shadow-2xl border text-xs font-semibold backdrop-blur-xl">
+    <div id="toastInner" class="flex items-center gap-3 p-3.5 rounded-2xl shadow-2xl border border-emerald-500/30 text-xs font-semibold backdrop-blur-xl bg-black/90 text-white">
       <span id="toastIcon" class="text-base">✨</span>
       <span id="toastMessage" class="flex-1 text-start">تمت العملية بنجاح</span>
     </div>
@@ -70,16 +70,17 @@
   <!-- ========================================== -->
   <!-- ADMIN SECURITY GUARD (OVERLAY LOCK SCREEN) -->
   <!-- ========================================== -->
-  <div id="adminSecurityLock" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-sm bg-slate-900/90 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl text-center space-y-4">
-      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 p-0.5 mx-auto flex items-center justify-center shadow-lg shadow-indigo-600/30">
-        <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-2xl">
+  <div id="adminSecurityLock" class="fixed inset-0 z-50 bg-[#050706]/95 backdrop-blur-2xl flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950/90 border border-emerald-500/20 p-6 sm:p-8 rounded-3xl shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-600 p-0.5 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/30">
+        <div class="w-full h-full bg-[#050706] rounded-[14px] flex items-center justify-center text-2xl">
           🔒
         </div>
       </div>
       <div>
-        <h2 class="text-lg font-black text-white">حماية لوحة التحكم</h2>
-        <p class="text-xs text-slate-400 mt-0.5">أدخل كلمة المرور أو رمز PIN للمدير</p>
+        <h2 class="text-lg font-black text-white">TapLink | حماية لوحة التحكم</h2>
+        <p class="text-xs text-emerald-400 font-semibold mt-0.5">المنظومة التابعة لشركة MUHAB</p>
+        <p class="text-[11px] text-zinc-400 mt-1">أدخل كلمة المرور للمتابعة</p>
       </div>
 
       <div id="lockErrorMsg" class="hidden p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-semibold">
@@ -92,40 +93,40 @@
           id="adminLockPassword" 
           required 
           placeholder="أدخل كلمة المرور (الافتراضية: admin123)"
-          class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-xl px-3.5 py-3 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-500 font-mono"
+          class="w-full bg-zinc-900 border border-zinc-700 text-white text-xs rounded-xl px-3.5 py-3 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-zinc-500 font-mono"
         >
-        <label class="flex items-center justify-center gap-2 text-xs text-slate-300 cursor-pointer pt-1">
-          <input type="checkbox" id="adminRememberMe" checked class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+        <label class="flex items-center justify-center gap-2 text-xs text-zinc-300 cursor-pointer pt-1">
+          <input type="checkbox" id="adminRememberMe" checked class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
           <span>تذكرني على هذا الجهاز (Remember Me)</span>
         </label>
         <button 
           type="submit" 
-          class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all"
+          class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition-all"
         >
           فتح لوحة التحكم 🔓
         </button>
       </form>
-      <p class="text-[10px] text-slate-500 pt-1">نظام الحماية الرقمية &copy; 2026</p>
+      <p class="text-[10px] text-zinc-500 pt-1">منظومة TapLink الذكية &copy; 2026 - شركة MUHAB</p>
     </div>
   </div>
 
   <!-- Top App Bar (Mobile-first Navigation Header) -->
-  <header class="sticky top-0 z-40 glass-nav border-b border-slate-800/80 px-4 py-3">
+  <header class="sticky top-0 z-40 glass-nav border-b border-emerald-500/15 px-4 py-3">
     <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
       
       <!-- Brand & Cloud Status -->
       <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 p-0.5 flex items-center justify-center shadow-lg shadow-indigo-600/30">
-          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-600 p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+          <div class="w-full h-full bg-[#050706] rounded-[14px] flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
           </div>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-extrabold text-white tracking-wide">مدير NFC الذكي</h1>
-            <span class="px-1.5 py-0.5 text-[9px] font-black bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">PRO 2.0</span>
+            <h1 class="text-sm font-black text-white tracking-wider font-mono">TapLink</h1>
+            <span class="px-1.5 py-0.5 text-[9px] font-black bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 tracking-tight">شركة MUHAB</span>
           </div>
           <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold" id="topCloudStatusText">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-active"></span>
@@ -136,13 +137,13 @@
 
       <!-- Action Icons -->
       <div class="flex items-center gap-1.5">
-        <button id="btnQuickSearchToggle" class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-all active:scale-95" title="بحث سريع">
+        <button id="btnQuickSearchToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95" title="بحث سريع">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </button>
-        <button id="btnThemeToggle" class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all active:scale-95" title="تبديل المظهر">
+        <button id="btnThemeToggle" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95" title="تبديل المظهر">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
         </button>
-        <button id="btnLockAdmin" class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" title="قفل لوحة التحكم">
+        <button id="btnLockAdmin" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" title="قفل لوحة التحكم">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         </button>
       </div>
@@ -150,15 +151,15 @@
     </div>
 
     <!-- Collapsible Search Bar -->
-    <div id="searchBarSection" class="hidden mt-3 max-w-5xl mx-auto pt-2 border-t border-slate-800/80">
+    <div id="searchBarSection" class="hidden mt-3 max-w-5xl mx-auto pt-2 border-t border-zinc-800/80">
       <div class="relative">
         <input 
           type="text" 
           id="searchInput" 
           placeholder="ابحث بالاسم، المعرف slug، أو الرابط الهدف..." 
-          class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl ps-10 pe-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-full bg-zinc-900/90 border border-zinc-700/80 rounded-xl ps-10 pe-4 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-zinc-400">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
       </div>
@@ -174,22 +175,22 @@
     <section id="viewHome" class="space-y-5">
       
       <!-- Welcome Hero Banner -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/70 via-slate-900/90 to-purple-950/70 border border-indigo-500/25 p-5 sm:p-7 shadow-2xl">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950/60 via-[#07130b] to-black border border-emerald-500/30 p-5 sm:p-7 shadow-2xl">
         <div class="relative z-10">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-semibold border border-indigo-500/30 mb-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/15 text-emerald-300 rounded-full text-xs font-semibold border border-emerald-500/30 mb-3">
             <span>✨</span>
-            <span>نظام بطاقات NFC الذكية السحابي الموحد</span>
+            <span>منظومة TapLink الذكية • شركة MUHAB</span>
           </div>
-          <h2 class="text-xl sm:text-2xl font-black text-white mb-2">إدارة شاملة لبطاقاتك والروابط الديناميكية</h2>
-          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mb-4">
-            تحكم فوري من هاتفك في جميع البطاقات مع 4 أوضاع ذكية (تحويل مباشر، كرت شخصي رقمي، منيو الأعمال، والتوجيه المشروط).
+          <h2 class="text-xl sm:text-2xl font-black text-white mb-2">إدارة شاملة لبطاقات NFC والروابط الديناميكية</h2>
+          <p class="text-zinc-300 text-xs sm:text-sm leading-relaxed max-w-xl mb-4">
+            تحكم فوري من هاتفك في بطاقات NFC مع 4 أوضاع ذكية (تحويل مباشر، كرت شخصي رقمي، منيو الأعمال، والتوجيه المشروط).
           </p>
           <div class="flex flex-wrap items-center gap-2.5">
-            <button onclick="switchTab('cards')" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-lg shadow-indigo-600/30 flex items-center gap-1.5">
+            <button onclick="switchTab('cards')" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl text-xs font-bold transition-all active:scale-95 shadow-lg shadow-emerald-600/30 flex items-center gap-1.5">
               <span>عرض البطاقات والتبديل السريع</span>
               <svg class="w-3.5 h-3.5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </button>
-            <button onclick="openAddCardDrawer()" class="px-4 py-2.5 bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5">
+            <button onclick="openAddCardDrawer()" class="px-4 py-2.5 bg-zinc-900/90 hover:bg-zinc-800 text-white border border-zinc-700/80 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5">
               <span>+ إضافة بطاقة جديدة</span>
             </button>
           </div>
@@ -199,96 +200,96 @@
       <!-- Quick Stats Counters Grid -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <!-- Stat 1: Total Cards -->
-        <div class="bg-slate-900/80 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-xl">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
+        <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
+          <div class="flex items-center justify-between text-zinc-400 mb-1">
             <span class="text-xs font-semibold">إجمالي البطاقات</span>
-            <span class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-sm">💳</span>
+            <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">💳</span>
           </div>
           <div class="text-2xl font-black text-white" id="statTotalCards">0</div>
-          <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+          <div class="text-[10px] text-zinc-400 mt-0.5 flex items-center gap-1">
             <span class="text-emerald-400 font-bold" id="statActiveCards">0</span>
             <span>بطاقة نشطة للعمل</span>
           </div>
         </div>
 
         <!-- Stat 2: Total Scans -->
-        <div class="bg-slate-900/80 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-xl">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
+        <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
+          <div class="flex items-center justify-between text-zinc-400 mb-1">
             <span class="text-xs font-semibold">إجمالي المسحات</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">📡</span>
           </div>
           <div class="text-2xl font-black text-emerald-400" id="statTotalScans">0</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">مسح لاسلكي موثق</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5">مسح لاسلكي موثق</div>
         </div>
 
         <!-- Stat 3: Top Device -->
-        <div class="bg-slate-900/80 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-xl">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
+        <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
+          <div class="flex items-center justify-between text-zinc-400 mb-1">
             <span class="text-xs font-semibold">الجهاز الأكثر استخداماً</span>
-            <span class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-sm">📱</span>
+            <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">📱</span>
           </div>
-          <div class="text-2xl font-black text-blue-400" id="statTopDevice">-</div>
-          <div class="text-[10px] text-slate-400 mt-0.5" id="statTopDeviceLabel">بانتظار أول مسحة</div>
+          <div class="text-2xl font-black text-white" id="statTopDevice">-</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5" id="statTopDeviceLabel">بانتظار أول مسحة</div>
         </div>
 
         <!-- Stat 4: Top Card -->
-        <div class="bg-slate-900/80 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-xl">
-          <div class="flex items-center justify-between text-slate-400 mb-1">
+        <div class="bg-zinc-950/80 border border-zinc-800/80 hover:border-emerald-500/30 p-4 rounded-2xl backdrop-blur-xl transition-all">
+          <div class="flex items-center justify-between text-zinc-400 mb-1">
             <span class="text-xs font-semibold">الأكثر نشاطاً</span>
-            <span class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm">🔥</span>
+            <span class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">🔥</span>
           </div>
-          <div class="text-xs font-bold text-amber-300 truncate" id="statTopCardTitle">-</div>
-          <div class="text-[10px] text-slate-400 mt-0.5" id="statTopCardScans">-</div>
+          <div class="text-xs font-bold text-emerald-300 truncate" id="statTopCardTitle">-</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5" id="statTopCardScans">-</div>
         </div>
       </div>
 
       <!-- Quick Action Shortcuts -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <button onclick="openAddCardDrawer()" class="p-3.5 bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 rounded-2xl text-start transition-all active:scale-95 group">
-          <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+        <button onclick="openAddCardDrawer()" class="p-3.5 bg-zinc-950/70 hover:bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 rounded-2xl text-start transition-all active:scale-95 group">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
           </div>
           <div class="text-xs font-bold text-white">إضافة بطاقة جديدة</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">توليد slug واختيار النمط</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5">توليد slug واختيار النمط</div>
         </button>
 
-        <button onclick="openSmartLinkGenModal()" class="p-3.5 bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 rounded-2xl text-start transition-all active:scale-95 group">
-          <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+        <button onclick="openSmartLinkGenModal()" class="p-3.5 bg-zinc-950/70 hover:bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 rounded-2xl text-start transition-all active:scale-95 group">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             🪄
           </div>
           <div class="text-xs font-bold text-white">مولد الروابط الذكي</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">واتساب، تقييم جوجل، خرائط</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5">واتساب، تقييم جوجل، خرائط</div>
         </button>
 
-        <button onclick="switchTab('stats')" class="p-3.5 bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 rounded-2xl text-start transition-all active:scale-95 group">
+        <button onclick="switchTab('stats')" class="p-3.5 bg-zinc-950/70 hover:bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 rounded-2xl text-start transition-all active:scale-95 group">
           <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             📊
           </div>
           <div class="text-xs font-bold text-white">إحصائيات المسح</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">تقارير ونسب الهواتف</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5">تقارير ونسب الهواتف</div>
         </button>
 
-        <button onclick="exportJsonBackup()" class="p-3.5 bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 rounded-2xl text-start transition-all active:scale-95 group">
-          <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+        <button onclick="exportJsonBackup()" class="p-3.5 bg-zinc-950/70 hover:bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 rounded-2xl text-start transition-all active:scale-95 group">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             💾
           </div>
           <div class="text-xs font-bold text-white">نسخة احتياطية JSON</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">حفظ وتصدير بياناتك</div>
+          <div class="text-[10px] text-zinc-400 mt-0.5">حفظ وتصدير بياناتك</div>
         </button>
       </div>
 
       <!-- Live Recent Activity Feed -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-active"></span>
             <h3 class="text-sm font-bold text-white">سجل آخر عمليات المسح المباشرة</h3>
           </div>
-          <button onclick="switchTab('stats')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold">عرض التحليلات &larr;</button>
+          <button onclick="switchTab('stats')" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold">عرض التحليلات &larr;</button>
         </div>
         <div id="homeRecentScansList" class="space-y-2">
           <!-- Filled dynamically by JavaScript -->
-          <div class="text-center py-6 text-slate-500 text-xs">جاري تحميل أحدث النشاطات...</div>
+          <div class="text-center py-6 text-zinc-500 text-xs">جاري تحميل أحدث النشاطات...</div>
         </div>
       </div>
 
@@ -303,9 +304,9 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 class="text-lg font-black text-white">إدارة البطاقات الذكية والتحكم الفوري</h2>
-          <p class="text-xs text-slate-400">بدّل الروابط بضغطة زر واحدة (1-Tap Switch) دون إعادة برمجة البطاقة</p>
+          <p class="text-xs text-zinc-400">بدّل الروابط بضغطة زر واحدة (1-Tap Switch) دون إعادة برمجة البطاقة</p>
         </div>
-        <button onclick="openAddCardDrawer()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5 transition-all self-start sm:self-auto">
+        <button onclick="openAddCardDrawer()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition-all self-start sm:self-auto">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
           <span>إضافة بطاقة NFC جديدة</span>
         </button>
@@ -314,8 +315,8 @@
       <!-- Cards Grid -->
       <div id="cardsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Rendered dynamically by app.js -->
-        <div class="col-span-full py-16 text-center text-slate-500 text-xs">
-          <div class="w-8 h-8 border-3 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3"></div>
+        <div class="col-span-full py-16 text-center text-zinc-500 text-xs">
+          <div class="w-8 h-8 border-3 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-3"></div>
           جاري تحميل بطاقاتك الذكية...
         </div>
       </div>
@@ -329,48 +330,46 @@
       
       <div>
         <h2 class="text-lg font-black text-white">تحليلات وإحصائيات المسح</h2>
-        <p class="text-xs text-slate-400">تقارير دقيقة ومفصلة عن تفاعل العملاء مع بطاقات الـ NFC</p>
+        <p class="text-xs text-zinc-400">تقارير دقيقة ومفصلة عن تفاعل العملاء مع بطاقات الـ NFC</p>
       </div>
 
       <!-- Devices Breakdown Meter -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl">
         <h3 class="text-sm font-bold text-white mb-3">توزيع الأجهزة (iOS مقابل Android)</h3>
         
         <div class="space-y-3" id="analyticsDeviceBars">
           <div class="space-y-1">
             <div class="flex justify-between text-xs">
-              <span class="text-slate-300 font-medium">هواتف iPhone (iOS)</span>
-              <span class="text-indigo-400 font-bold" id="devPercentIPhone">0%</span>
+              <span class="text-zinc-300 font-medium">هواتف iPhone (iOS)</span>
+              <span class="text-emerald-400 font-bold" id="devPercentIPhone">0%</span>
             </div>
-            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div id="devBarIPhone" class="bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-          </div>
-
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs">
-              <span class="text-slate-300 font-medium">هواتف Android (سامسونج، شاومي، هواوي)</span>
-              <span class="text-emerald-400 font-bold" id="devPercentAndroid">0%</span>
-            </div>
-            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div id="devBarAndroid" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden">
+              <div id="devBarIPhone" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
 
           <div class="space-y-1">
             <div class="flex justify-between text-xs">
-              <span class="text-slate-300 font-medium">أجهزة أخرى (كمبيوتر / تابلت)</span>
-              <span class="text-purple-400 font-bold" id="devPercentOther">0%</span>
+              <span class="text-zinc-300 font-medium">هواتف Android (سامسونج، شاومي، هواوي)</span>
+              <span class="text-green-300 font-bold" id="devPercentAndroid">0%</span>
             </div>
-            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-              <div id="devBarOther" class="bg-purple-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden">
+              <div id="devBarAndroid" class="bg-green-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-zinc-300 font-medium">أجهزة أخرى (كمبيوتر / تابلت)</span>
+              <span class="text-zinc-300 font-bold" id="devPercentOther">0%</span>
+            </div>
+            <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden">
+              <div id="devBarOther" class="bg-zinc-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
         </div>
-      </div>
-
       <!-- Scans by Card Rank -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl">
         <h3 class="text-sm font-bold text-white mb-3">ترتيب البطاقات حسب عدد مرات المسح</h3>
         <div id="analyticsTopCardsList" class="space-y-2.5">
           <!-- Filled dynamically -->
@@ -408,11 +407,11 @@
       
       <div>
         <h2 class="text-lg font-black text-white">إعدادات النظام والمزامنة السحابية</h2>
-        <p class="text-xs text-slate-400">تحكم بربط السحابة وحماية لوحة التحكم ودليل برمجة الـ NFC</p>
+        <p class="text-xs text-zinc-400">منظومة TapLink الذكية - التابعة لشركة MUHAB</p>
       </div>
 
       <!-- Real-Time Cloud Sync Panel -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-4">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">☁️</div>
@@ -421,13 +420,13 @@
               <p class="text-[11px] text-emerald-400 font-semibold" id="cloudStatusLabel">🟢 متصل بالسحابة - التحديثات فورية لكل الهواتف</p>
             </div>
           </div>
-          <button onclick="syncWithCloudDatabase(true)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-[11px] font-bold border border-slate-700 transition-all active:scale-95">
+          <button onclick="syncWithCloudDatabase(true)" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 transition-all active:scale-95">
             مزامنة الآن 🔄
           </button>
         </div>
 
-        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-2xl text-xs space-y-2 text-slate-300">
-          <p class="text-[11px] text-slate-400">
+        <div class="p-3 bg-[#050806] border border-zinc-800 rounded-2xl text-xs space-y-2 text-zinc-300">
+          <p class="text-[11px] text-zinc-400">
             النظام مرتبط افتراضياً بقاعدة بيانات المستودع على GitHub لضمان قراءة أي هاتف لأحدث الروابط. إذا رغبت بربط قاعدة بيانات JSONBin سحابية مخصصة، يمكنك إدخال الرابط بالأسفل:
           </p>
           <div class="flex items-center gap-2 pt-1">
@@ -436,9 +435,9 @@
               id="inpCustomCloudEndpoint" 
               placeholder="https://api.jsonbin.io/v3/b/YOUR_BIN_ID أو اتركها افتراضية"
               dir="ltr"
-              class="flex-1 bg-slate-900 border border-slate-700 text-indigo-300 font-mono text-[11px] rounded-xl px-3 py-2 text-start focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="flex-1 bg-zinc-900 border border-zinc-700 text-emerald-300 font-mono text-[11px] rounded-xl px-3 py-2 text-start focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-            <button onclick="saveCustomCloudEndpoint()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">
+            <button onclick="saveCustomCloudEndpoint()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl active:scale-95 transition-all shadow-md shadow-emerald-600/30">
               حفظ
             </button>
           </div>
@@ -446,41 +445,41 @@
       </div>
 
       <!-- Admin Password Change -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-base">🔑</div>
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">🔑</div>
           <div>
             <h3 class="text-sm font-bold text-white">تغيير رمز حماية لوحة التحكم</h3>
-            <p class="text-[11px] text-slate-400">كلمة المرور الحالية الافتراضية هي: <code class="text-indigo-300">admin123</code></p>
+            <p class="text-[11px] text-zinc-400">كلمة المرور الحالية الافتراضية هي: <code class="text-emerald-400">admin123</code></p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-          <input type="password" id="inpCurrentAdminPass" placeholder="كلمة المرور الحالية" class="bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
-          <input type="password" id="inpNewAdminPass" placeholder="كلمة المرور الجديدة" class="bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+          <input type="password" id="inpCurrentAdminPass" placeholder="كلمة المرور الحالية" class="bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          <input type="password" id="inpNewAdminPass" placeholder="كلمة المرور الجديدة" class="bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
-        <button onclick="changeAdminPasswordHandler()" class="py-2 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl border border-slate-700 active:scale-95 transition-all">
+        <button onclick="changeAdminPasswordHandler()" class="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 hover:border-emerald-500/40 text-white font-bold text-xs rounded-xl border border-zinc-700 active:scale-95 transition-all">
           تحديث كلمة المرور
         </button>
       </div>
 
       <!-- Backup & Restore Box -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-base">💾</div>
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">💾</div>
           <div>
-            <h3 class="text-sm font-bold text-white">النسخ الاحتياطي والاستعادة</h3>
-            <p class="text-[11px] text-slate-400">تصدير قاعدة بياناتك بالكامل كملف JSON أو استعادتها</p>
+            <h3 class="text-sm font-bold text-white">النسخ الاحتياطي والاستعادة (TapLink Backup)</h3>
+            <p class="text-[11px] text-zinc-400">تصدير قاعدة بياناتك بالكامل كملف JSON أو استعادتها</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <button onclick="exportJsonBackup()" class="p-3 bg-slate-800 hover:bg-slate-750 text-white rounded-xl text-xs font-bold border border-slate-700 flex items-center justify-center gap-2 active:scale-95 transition-all">
-            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <button onclick="exportJsonBackup()" class="p-3 bg-zinc-900 hover:bg-zinc-850 hover:border-emerald-500/40 text-white rounded-xl text-xs font-bold border border-zinc-700 flex items-center justify-center gap-2 active:scale-95 transition-all">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             <span>تصدير نسخة احتياطية (JSON)</span>
           </button>
           
-          <label class="p-3 bg-slate-800 hover:bg-slate-750 text-white rounded-xl text-xs font-bold border border-slate-700 flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer">
+          <label class="p-3 bg-zinc-900 hover:bg-zinc-850 hover:border-emerald-500/40 text-white rounded-xl text-xs font-bold border border-zinc-700 flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer">
             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"></path></svg>
             <span>استيراد نسخة احتياطية</span>
             <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="importJsonBackup(event)">
@@ -489,37 +488,37 @@
       </div>
 
       <!-- NFC Tools Step-by-Step Programming Guide -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-4">
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-4">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-base">📡</div>
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">📡</div>
           <div>
             <h3 class="text-sm font-bold text-white">دليل كتابة الرابط على شريحة NFC</h3>
-            <p class="text-[11px] text-slate-400">تتم كتابة الرابط على الشريحة مرة واحدة فقط في العمر!</p>
+            <p class="text-[11px] text-zinc-400">تتم كتابة الرابط على الشريحة مرة واحدة فقط في العمر!</p>
           </div>
         </div>
 
-        <div class="space-y-3 text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+        <div class="space-y-3 text-xs text-zinc-300 leading-relaxed bg-[#050806] p-4 rounded-2xl border border-zinc-800">
           <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
             <div>
               <p class="font-bold text-white">حمّل تطبيق NFC Tools على هاتفك</p>
-              <p class="text-[11px] text-slate-400">متوفر مجاناً على متجر App Store (لآيفون) ومتجر Google Play (للأندرويد).</p>
+              <p class="text-[11px] text-zinc-400">متوفر مجاناً على متجر App Store (لآيفون) ومتجر Google Play (للأندرويد).</p>
             </div>
           </div>
 
           <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
             <div>
               <p class="font-bold text-white">انسخ الرابط الثابت للبطاقة</p>
-              <p class="text-[11px] text-slate-400">من تبويب "بطاقاتي"، اضغط زر "نسخ الرابط" (مثال: <code class="text-indigo-300">.../c/card-ksnjv</code>).</p>
+              <p class="text-[11px] text-zinc-400">من تبويب "بطاقاتي"، اضغط زر "نسخ الرابط" (مثال: <code class="text-emerald-300">.../c/card-ksnjv</code>).</p>
             </div>
           </div>
 
           <div class="flex items-start gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+            <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
             <div>
               <p class="font-bold text-white">اكتب الرابط داخل الشريحة</p>
-              <p class="text-[11px] text-slate-400">افتح تطبيق NFC Tools &larr; اختر <strong>Write</strong> &larr; <strong>Add a record</strong> &larr; <strong>Custom URL / URI</strong> &larr; الصق الرابط &larr; اضغط <strong>Write</strong> وقرّب الشريحة من ظهر الهاتف.</p>
+              <p class="text-[11px] text-zinc-400">افتح تطبيق NFC Tools &larr; اختر <strong>Write</strong> &larr; <strong>Add a record</strong> &larr; <strong>Custom URL / URI</strong> &larr; الصق الرابط &larr; اضغط <strong>Write</strong> وقرّب الشريحة من ظهر الهاتف.</p>
             </div>
           </div>
 
@@ -527,7 +526,7 @@
             <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">✓</span>
             <div>
               <p class="font-bold text-emerald-300">تمت البرمجة بنجاح!</p>
-              <p class="text-[11px] text-slate-400">الآن عند مسح الشريحة ستفتح الرابط دائماً، ويمكنك تغيير الوجهة من هنا متى شئت!</p>
+              <p class="text-[11px] text-zinc-400">الآن عند مسح الشريحة ستفتح الرابط دائماً، ويمكنك تغيير الوجهة من هنا متى شئت!</p>
             </div>
           </div>
         </div>
@@ -540,7 +539,7 @@
   <!-- ========================================== -->
   <!-- FIXED BOTTOM NAVIGATION BAR (Mobile-First) -->
   <!-- ========================================== -->
-  <nav class="fixed bottom-0 inset-x-0 z-40 glass-nav border-t border-slate-800/80 px-2 py-1.5 safe-bottom">
+  <nav class="fixed bottom-0 inset-x-0 z-40 glass-nav border-t border-emerald-500/15 px-2 py-1.5 safe-bottom">
     <div class="max-w-md mx-auto flex items-center justify-around relative">
       
       <!-- Tab 1: الرئيسية -->
@@ -564,10 +563,10 @@
         <button 
           id="fabAddCard" 
           onclick="openAddCardDrawer()" 
-          class="w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 text-white flex items-center justify-center shadow-2xl fab-elevated active:scale-90 transition-transform cursor-pointer border-2 border-slate-950" 
+          class="w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-emerald-500 via-emerald-400 to-green-500 text-slate-950 flex items-center justify-center shadow-2xl fab-elevated active:scale-90 transition-transform cursor-pointer border-2 border-black" 
           title="إضافة بطاقة جديدة"
         >
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+          <svg class="w-7 h-7 font-black stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
         </button>
       </div>
 
@@ -593,30 +592,30 @@
   <!-- ========================================== -->
   <!-- DRAWER 1: ADD / EDIT CARD (THE 4 MODES) -->
   <!-- ========================================== -->
-  <div id="drawerCardEditor" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-slate-950/80 backdrop-blur-sm flex items-end justify-center">
-    <div class="bottom-sheet-content bg-slate-900 border-t border-slate-800 rounded-t-3xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+  <div id="drawerCardEditor" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-black/80 backdrop-blur-sm flex items-end justify-center">
+    <div class="bottom-sheet-content bg-zinc-950 border-t border-emerald-500/20 rounded-t-3xl w-full max-w-xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       
       <!-- Drawer Pull Handle -->
       <div class="pt-3 pb-2 px-6 shrink-0 text-center">
-        <div class="w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto cursor-pointer" onclick="closeCardEditorDrawer()"></div>
+        <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto cursor-pointer" onclick="closeCardEditorDrawer()"></div>
       </div>
 
       <!-- Drawer Header -->
-      <div class="px-6 py-3 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+      <div class="px-6 py-3 border-b border-zinc-800 flex items-center justify-between shrink-0">
         <div>
           <h3 id="cardDrawerTitle" class="text-base font-bold text-white">إضافة بطاقة NFC جديدة</h3>
-          <p class="text-xs text-slate-400">اختر من بين 4 أوضاع ذكية متطورة</p>
+          <p class="text-xs text-zinc-400">اختر من بين 4 أوضاع ذكية متطورة</p>
         </div>
-        <button onclick="closeCardEditorDrawer()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+        <button onclick="closeCardEditorDrawer()" class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center">✕</button>
       </div>
 
       <!-- Drawer Sub-tabs -->
-      <div class="px-6 pt-3 flex gap-2 border-b border-slate-800/80 overflow-x-auto text-xs font-semibold shrink-0">
-        <button type="button" onclick="switchEditorTab('basic')" id="edTabBtnBasic" class="pb-2 px-2 text-indigo-400 border-b-2 border-indigo-500 whitespace-nowrap">الأساسية والنمط</button>
-        <button type="button" onclick="switchEditorTab('presets')" id="edTabBtnPresets" class="pb-2 px-2 text-slate-400 whitespace-nowrap">الروابط المحفوظة</button>
-        <button type="button" onclick="switchEditorTab('conditional')" id="edTabBtnConditional" class="pb-2 px-2 text-slate-400 whitespace-nowrap">التوجيه المشروط</button>
-        <button type="button" onclick="switchEditorTab('catalog')" id="edTabBtnCatalog" class="pb-2 px-2 text-slate-400 whitespace-nowrap">المنيو والكتالوج</button>
-        <button type="button" onclick="switchEditorTab('profile')" id="edTabBtnProfile" class="pb-2 px-2 text-slate-400 whitespace-nowrap">الكرت الشخصي</button>
+      <div class="px-6 pt-3 flex gap-2 border-b border-zinc-800 overflow-x-auto text-xs font-semibold shrink-0">
+        <button type="button" onclick="switchEditorTab('basic')" id="edTabBtnBasic" class="pb-2 px-2 text-emerald-400 border-b-2 border-emerald-500 whitespace-nowrap">الأساسية والنمط</button>
+        <button type="button" onclick="switchEditorTab('presets')" id="edTabBtnPresets" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">الروابط المحفوظة</button>
+        <button type="button" onclick="switchEditorTab('conditional')" id="edTabBtnConditional" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">التوجيه المشروط</button>
+        <button type="button" onclick="switchEditorTab('catalog')" id="edTabBtnCatalog" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">المنيو والكتالوج</button>
+        <button type="button" onclick="switchEditorTab('profile')" id="edTabBtnProfile" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">الكرت الشخصي</button>
       </div>
 
       <!-- Drawer Body / Form -->
@@ -626,61 +625,61 @@
         <!-- SUB-TAB 1: BASIC & 4 MODES -->
         <div id="edTabBasic" class="space-y-4">
           <div>
-            <label class="block font-semibold text-slate-200 mb-1.5">اسم البطاقة (تسمية توضيحية)</label>
-            <input type="text" id="inpCardTitle" required placeholder="مثال: بطاقة تقييم فرع العليا، منيو المطعم..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+            <label class="block font-semibold text-zinc-200 mb-1.5">اسم البطاقة (تسمية توضيحية)</label>
+            <input type="text" id="inpCardTitle" required placeholder="مثال: بطاقة تقييم فرع العليا، منيو المطعم..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs">
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="font-semibold text-slate-200">المعرف الفريد الثابت (Slug)</label>
-              <button type="button" onclick="generateRandomSlug()" class="text-indigo-400 hover:text-indigo-300 text-[11px] font-semibold flex items-center gap-1">
+              <label class="font-semibold text-zinc-200">المعرف الفريد الثابت (Slug)</label>
+              <button type="button" onclick="generateRandomSlug()" class="text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold flex items-center gap-1">
                 <span>توليد عشوائي 🎲</span>
               </button>
             </div>
             <div class="relative flex items-center">
-              <span class="absolute start-3 text-slate-500 font-mono text-xs select-none">/c/</span>
-              <input type="text" id="inpCardSlug" required pattern="[a-zA-Z0-9-_]+" placeholder="card-123" class="w-full bg-slate-800 border border-slate-700 text-white font-mono rounded-xl ps-10 pe-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs" dir="ltr">
+              <span class="absolute start-3 text-zinc-500 font-mono text-xs select-none">/c/</span>
+              <input type="text" id="inpCardSlug" required pattern="[a-zA-Z0-9-_]+" placeholder="card-123" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl ps-10 pe-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs" dir="ltr">
             </div>
           </div>
 
           <!-- THE 4 SMART MODES SELECTION -->
           <div>
-            <label class="block font-semibold text-slate-200 mb-2">اختر نمط عمل البطاقة الذكية (4 Smart Modes):</label>
+            <label class="block font-semibold text-zinc-200 mb-2">اختر نمط عمل البطاقة الذكية (4 Smart Modes):</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               
               <!-- Mode 1: Direct -->
-              <label class="p-3 bg-slate-800/80 border border-slate-700 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all flex items-start gap-2.5">
-                <input type="radio" name="inpCardMode" value="direct" checked class="mt-1 text-indigo-600 focus:ring-indigo-500">
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="direct" checked class="mt-1 text-emerald-600 focus:ring-emerald-500">
                 <div>
                   <div class="font-black text-white text-xs">1. تحويل مباشر فوري 🚀</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">تحويل صامت أو سريع مع روابط سريعة محفوظة</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5">تحويل صامت أو سريع مع روابط سريعة محفوظة</div>
                 </div>
               </label>
 
               <!-- Mode 2: Profile -->
-              <label class="p-3 bg-slate-800/80 border border-slate-700 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all flex items-start gap-2.5">
-                <input type="radio" name="inpCardMode" value="profile" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="profile" class="mt-1 text-emerald-600 focus:ring-emerald-500">
                 <div>
                   <div class="font-black text-white text-xs">2. كرت شخصي رقمي 👤</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">ملف تعريفي فخم مع حفظ vCard في الهاتف</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5">ملف تعريفي فخم مع حفظ vCard في الهاتف</div>
                 </div>
               </label>
 
               <!-- Mode 3: Catalog -->
-              <label class="p-3 bg-slate-800/80 border border-slate-700 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all flex items-start gap-2.5">
-                <input type="radio" name="inpCardMode" value="catalog" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="catalog" class="mt-1 text-emerald-600 focus:ring-emerald-500">
                 <div>
                   <div class="font-black text-white text-xs">3. منيو وكتالوج ذكي 🍽️</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">نسخ واي فاي، تقييم 5 نجوم، وقائمة طعام وخدمات</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5">نسخ واي فاي، تقييم 5 نجوم، وقائمة طعام وخدمات</div>
                 </div>
               </label>
 
               <!-- Mode 4: Conditional -->
-              <label class="p-3 bg-slate-800/80 border border-slate-700 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all flex items-start gap-2.5">
-                <input type="radio" name="inpCardMode" value="conditional" class="mt-1 text-indigo-600 focus:ring-indigo-500">
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="conditional" class="mt-1 text-emerald-600 focus:ring-emerald-500">
                 <div>
                   <div class="font-black text-white text-xs">4. توجيه مشروط ذكي 🔀</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">جدولة زمنية، توجيه حسب الجوال، أو قفل PIN</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5">جدولة زمنية، توجيه حسب الجوال، أو قفل PIN</div>
                 </div>
               </label>
 
@@ -690,41 +689,41 @@
           <!-- Destination URL & Smart Link Generator Trigger -->
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="font-semibold text-slate-200">الرابط الهدف الحالي (Destination URL)</label>
-              <button type="button" onclick="openSmartLinkGenModal()" class="text-amber-400 hover:text-amber-300 font-bold text-[11px] flex items-center gap-1">
+              <label class="font-semibold text-zinc-200">الرابط الهدف الحالي (Destination URL)</label>
+              <button type="button" onclick="openSmartLinkGenModal()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[11px] flex items-center gap-1">
                 <span>🪄 مولد الروابط الذكي</span>
               </button>
             </div>
-            <input type="url" id="inpDestinationUrl" placeholder="https://maps.google.com/... أو رابط متجرك" class="w-full bg-slate-800 border border-slate-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs text-start" dir="ltr">
+            <input type="url" id="inpDestinationUrl" placeholder="https://maps.google.com/... أو رابط متجرك" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs text-start" dir="ltr">
           </div>
 
-          <div class="flex items-center justify-between p-3 bg-slate-800/60 rounded-xl border border-slate-700">
+          <div class="flex items-center justify-between p-3 bg-zinc-900 rounded-xl border border-zinc-700">
             <div>
               <span class="font-bold text-white block">حالة تفعيل البطاقة</span>
-              <span class="text-[10px] text-slate-400">تكون نشطة وجاهزة للعمل فور مسحها بالهاتف</span>
+              <span class="text-[10px] text-zinc-400">تكون نشطة وجاهزة للعمل فور مسحها بالهاتف</span>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" id="inpIsActive" checked class="sr-only peer">
-              <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
             </label>
           </div>
         </div>
 
         <!-- SUB-TAB 2: SAVED PRESETS (1-TAP SWITCHER) -->
         <div id="edTabPresets" class="hidden space-y-4">
-          <div class="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl text-indigo-300 text-xs">
+          <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-emerald-300 text-xs">
             💡 <strong>الروابط السريعة (Quick Presets):</strong> أضف روابطك المحفوظة هنا لتتمكن من تبديل وجهة البطاقة بلمسة واحدة مباشرة من الكرت دون كتابة!
           </div>
 
           <!-- Add Preset Mini Form -->
-          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700 space-y-2">
+          <div class="p-3 bg-zinc-900 rounded-xl border border-zinc-700 space-y-2">
             <span class="font-bold text-white block">إضافة رابط جديد لقائمة المحفوظات</span>
             <div class="grid grid-cols-4 gap-2">
-              <input type="text" id="inpNewPresetLabel" placeholder="اسم الرابط (مثلاً: فرع العليا)" class="col-span-3 bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
-              <input type="text" id="inpNewPresetIcon" placeholder="الأيقونة ⭐" value="⭐" class="col-span-1 bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-2 text-center text-xs">
+              <input type="text" id="inpNewPresetLabel" placeholder="اسم الرابط (مثلاً: فرع العليا)" class="col-span-3 bg-[#050806] border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <input type="text" id="inpNewPresetIcon" placeholder="الأيقونة ⭐" value="⭐" class="col-span-1 bg-[#050806] border border-zinc-700 text-white rounded-lg px-2 py-2 text-center text-xs">
             </div>
-            <input type="url" id="inpNewPresetUrl" placeholder="https://..." dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-            <button type="button" onclick="handleAddPresetItem()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-bold text-xs transition-all">
+            <input type="url" id="inpNewPresetUrl" placeholder="https://..." dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+            <button type="button" onclick="handleAddPresetItem()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold text-xs transition-all border border-zinc-700">
               + إضافة إلى قائمة الروابط السريعة
             </button>
           </div>
@@ -734,22 +733,22 @@
 
         <!-- SUB-TAB 3: CONDITIONAL ROUTING -->
         <div id="edTabConditional" class="hidden space-y-4">
-          <div class="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl text-purple-300 text-xs">
+          <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-emerald-300 text-xs">
             🔀 <strong>التوجيه المشروط:</strong> يمكنك توجيه الزائر حسب ساعات اليوم، أو حسب نوع جواله (آيفون مقابل أندرويد)، أو حماية الرابط بـ PIN.
           </div>
 
           <!-- 1. Time-based Routing -->
-          <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-3">
+          <div class="p-3 bg-zinc-900 rounded-2xl border border-zinc-700 space-y-3">
             <div class="flex items-center justify-between">
               <span class="font-bold text-white block">1. الجدولة الزمنية (صباحي / مسائي)</span>
-              <input type="checkbox" id="inpTimeRoutingEnabled" class="rounded border-slate-700 text-indigo-600">
+              <input type="checkbox" id="inpTimeRoutingEnabled" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
             </div>
             <div class="space-y-2">
-              <input type="url" id="inpMorningUrl" placeholder="رابط الصباح: https://menu.com/breakfast" dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-              <input type="url" id="inpEveningUrl" placeholder="رابط المساء: https://menu.com/dinner" dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-              <div class="flex items-center justify-between text-xs text-slate-300">
+              <input type="url" id="inpMorningUrl" placeholder="رابط الصباح: https://menu.com/breakfast" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="url" id="inpEveningUrl" placeholder="رابط المساء: https://menu.com/dinner" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <div class="flex items-center justify-between text-xs text-zinc-300">
                 <span>ساعة التبديل للمساء:</span>
-                <select id="inpSwitchHour" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1 text-xs">
+                <select id="inpSwitchHour" class="bg-[#050806] border border-zinc-700 text-white rounded-lg px-2 py-1 text-xs">
                   <option value="12">12:00 ظهراً</option>
                   <option value="16" selected>04:00 عصراً (الافتراضي)</option>
                   <option value="18">06:00 مساءً</option>
@@ -759,101 +758,101 @@
           </div>
 
           <!-- 2. Device-based Routing -->
-          <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-3">
+          <div class="p-3 bg-zinc-900 rounded-2xl border border-zinc-700 space-y-3">
             <div class="flex items-center justify-between">
               <span class="font-bold text-white block">2. التوجيه حسب نوع الجوال (iOS vs Android)</span>
-              <input type="checkbox" id="inpDeviceRoutingEnabled" class="rounded border-slate-700 text-indigo-600">
+              <input type="checkbox" id="inpDeviceRoutingEnabled" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
             </div>
             <div class="space-y-2">
-              <input type="url" id="inpIosUrl" placeholder="رابط مستخدمي iPhone (مثلاً: App Store)" dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-              <input type="url" id="inpAndroidUrl" placeholder="رابط مستخدمي Android (مثلاً: Google Play)" dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="url" id="inpIosUrl" placeholder="رابط مستخدمي iPhone (مثلاً: App Store)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="url" id="inpAndroidUrl" placeholder="رابط مستخدمي Android (مثلاً: Google Play)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
 
           <!-- 3. PIN Lock Protection -->
-          <div class="p-3 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-2">
+          <div class="p-3 bg-zinc-900 rounded-2xl border border-zinc-700 space-y-2">
             <span class="font-bold text-white block">3. قفل الرابط برمز سري (PIN Lock)</span>
-            <input type="password" id="inpPinCode" maxlength="8" placeholder="رمز سري مكون من 4 أرقام (مثال: 2026)" class="w-full bg-slate-900 border border-slate-700 text-white font-mono text-center tracking-widest text-base rounded-lg px-3 py-2">
+            <input type="password" id="inpPinCode" maxlength="8" placeholder="رمز سري مكون من 4 أرقام (مثال: 2026)" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono text-center tracking-widest text-base rounded-lg px-3 py-2">
           </div>
         </div>
 
         <!-- SUB-TAB 4: CATALOG & MENU -->
         <div id="edTabCatalog" class="hidden space-y-3">
-          <p class="text-xs text-slate-400">إعدادات المنيو والكتالوج الذكي للمطاعم والمتاجر:</p>
+          <p class="text-xs text-zinc-400">إعدادات المنيو والكتالوج الذكي للمطاعم والمتاجر:</p>
           
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">اسم المنشأة / النشاط</label>
-            <input type="text" id="inpCatBusinessName" placeholder="اسم المتجر أو النشاط التجاري" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+            <label class="block text-zinc-300 font-semibold mb-1">اسم المنشأة / النشاط</label>
+            <input type="text" id="inpCatBusinessName" placeholder="اسم المتجر أو النشاط التجاري" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">الوصف المختصر</label>
-            <input type="text" id="inpCatTagline" placeholder="وصف مختصر للنشاط أو الخدمات" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+            <label class="block text-zinc-300 font-semibold mb-1">الوصف المختصر</label>
+            <input type="text" id="inpCatTagline" placeholder="وصف مختصر للنشاط أو الخدمات" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">اسم شبكة الواي فاي</label>
-              <input type="text" id="inpCatWifiSsid" placeholder="مثال: Guest_WiFi" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1">اسم شبكة الواي فاي</label>
+              <input type="text" id="inpCatWifiSsid" placeholder="مثال: Guest_WiFi" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">كلمة سر الواي فاي</label>
-              <input type="text" id="inpCatWifiPass" placeholder="كلمة مرور الشبكة (اختياري)" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1">كلمة سر الواي فاي</label>
+              <input type="text" id="inpCatWifiPass" placeholder="كلمة مرور الشبكة (اختياري)" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
           </div>
 
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">رابط تقييم Google Maps</label>
-            <input type="url" id="inpCatGoogleReview" placeholder="https://maps.google.com/..." dir="ltr" class="w-full bg-slate-800 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+            <label class="block text-zinc-300 font-semibold mb-1">رابط تقييم Google Maps</label>
+            <input type="url" id="inpCatGoogleReview" placeholder="https://maps.google.com/..." dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
           </div>
         </div>
 
         <!-- SUB-TAB 5: DIGITAL PROFILE (vCard) -->
         <div id="edTabProfile" class="hidden space-y-3">
-          <p class="text-xs text-slate-400">بيانات بطاقة الأعمال الرقمية وملف جهة الاتصال vCard:</p>
+          <p class="text-xs text-zinc-400">بيانات بطاقة الأعمال الرقمية وملف جهة الاتصال vCard:</p>
           
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">الاسم الكامل</label>
-              <input type="text" id="inpProfFullName" placeholder="م. عبد العزيز الشمري" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1">الاسم الكامل</label>
+              <input type="text" id="inpProfFullName" placeholder="م. عبد العزيز الشمري" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">المسمى الوظيفي</label>
-              <input type="text" id="inpProfJobTitle" placeholder="الرئيس التنفيذي" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1">المسمى الوظيفي</label>
+              <input type="text" id="inpProfJobTitle" placeholder="الرئيس التنفيذي" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">اسم الشركة</label>
-              <input type="text" id="inpProfCompany" placeholder="مجموعة الحلول الذكية" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1">اسم الشركة</label>
+              <input type="text" id="inpProfCompany" placeholder="مجموعة الحلول الذكية" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">رابط الصورة الشخصية</label>
-              <input type="url" id="inpProfAvatar" placeholder="https://..." dir="ltr" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1">رابط الصورة الشخصية</label>
+              <input type="url" id="inpProfAvatar" placeholder="https://..." dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
 
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">نبذة تعريفية (Bio)</label>
-            <textarea id="inpProfBio" rows="2" placeholder="نبذة مختصرة عن نشاطك..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-xs"></textarea>
+            <label class="block text-zinc-300 font-semibold mb-1">نبذة تعريفية (Bio)</label>
+            <textarea id="inpProfBio" rows="2" placeholder="نبذة مختصرة عن نشاطك..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">رقم الهاتف (vCard)</label>
-              <input type="tel" id="inpProfPhone" placeholder="+966501234567" dir="ltr" class="w-full bg-slate-800 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1">رقم الهاتف (vCard)</label>
+              <input type="tel" id="inpProfPhone" placeholder="+966501234567" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">رقم الواتساب</label>
-              <input type="tel" id="inpProfWhatsapp" placeholder="+966501234567" dir="ltr" class="w-full bg-slate-800 border border-slate-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1">رقم الواتساب</label>
+              <input type="tel" id="inpProfWhatsapp" placeholder="+966501234567" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
         </div>
 
         <!-- Submit Button -->
         <div class="pt-2">
-          <button type="submit" id="btnSaveCard" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 text-xs transition-all">
+          <button type="submit" id="btnSaveCard" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all">
             حفظ ونشر البطاقة فوراً 💾
           </button>
         </div>
@@ -865,41 +864,66 @@
   <!-- ========================================== -->
   <!-- MODAL: SMART LINK GENERATOR (مولد الروابط) -->
   <!-- ========================================== -->
-  <div id="modalSmartLinkGen" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-slate-950/85 backdrop-blur-md flex items-end justify-center">
-    <div class="bottom-sheet-content bg-slate-900 border-t border-slate-800 rounded-t-3xl w-full max-w-md p-6 space-y-4">
-      <div class="w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto cursor-pointer" onclick="closeSmartLinkGenModal()"></div>
+  <div id="modalSmartLinkGen" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-black/80 backdrop-blur-md flex items-end justify-center">
+    <div class="bottom-sheet-content bg-zinc-950 border-t border-emerald-500/20 rounded-t-3xl w-full max-w-md p-6 space-y-4">
+      <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto cursor-pointer" onclick="closeSmartLinkGenModal()"></div>
 
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-base font-black text-white flex items-center gap-1.5">
-            <span>🪄 مولد الروابط الذكي</span>
+            <span>🪄 مولد الروابط الذكي (TapLink)</span>
           </h3>
-          <p class="text-xs text-slate-400">أنشئ روابط احترافية بضغطة زر واحدة</p>
+          <p class="text-xs text-zinc-400">أنشئ روابط احترافية بضغطة زر واحدة</p>
         </div>
-        <button onclick="closeSmartLinkGenModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs">✕</button>
+        <button onclick="closeSmartLinkGenModal()" class="w-7 h-7 rounded-full bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
       <!-- Gen Tabs -->
-      <div class="flex gap-2 border-b border-slate-800 pb-2 text-xs font-bold">
+      <div class="flex gap-2 border-b border-zinc-800 pb-2 text-xs font-bold">
         <button type="button" onclick="switchGenTab('wa')" id="genTabBtnWa" class="px-2.5 py-1 text-emerald-400 border-b-2 border-emerald-500">واتساب 💬</button>
-        <button type="button" onclick="switchGenTab('maps')" id="genTabBtnMaps" class="px-2.5 py-1 text-slate-400">تقييم جوجل ⭐</button>
-        <button type="button" onclick="switchGenTab('phone')" id="genTabBtnPhone" class="px-2.5 py-1 text-slate-400">اتصال / إيميل 📞</button>
+        <button type="button" onclick="switchGenTab('maps')" id="genTabBtnMaps" class="px-2.5 py-1 text-zinc-400">تقييم جوجل ⭐</button>
+        <button type="button" onclick="switchGenTab('phone')" id="genTabBtnPhone" class="px-2.5 py-1 text-zinc-400">اتصال / إيميل 📞</button>
       </div>
 
       <!-- Gen Tab 1: WhatsApp -->
       <div id="genTabWa" class="space-y-3">
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">رقم الجوال (مع كود الدولة أو محلي)</label>
-          <input type="tel" id="genWaPhone" placeholder="0501234567 أو +966..." dir="ltr" class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs text-start">
+          <label class="block text-zinc-300 font-semibold mb-1">رقم الجوال (مع كود الدولة أو محلي)</label>
+          <input type="tel" id="genWaPhone" placeholder="0501234567 أو +966..." dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
         </div>
         <div>
-          <label class="block text-slate-300 font-semibold mb-1">رسالة الترحيب التلقائية</label>
-          <input type="text" id="genWaMsg" placeholder="مرحباً، أود الاستفسار عن خدماتكم..." class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+          <label class="block text-zinc-300 font-semibold mb-1">رسالة الترحيب التلقائية</label>
+          <input type="text" id="genWaMsg" placeholder="مرحباً، أود الاستفسار عن خدماتكم..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
-        <button type="button" onclick="applyGeneratedLink('wa')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">
+        <button type="button" onclick="applyGeneratedLink('wa')" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">
           توليد وتعيين رابط واتساب ✓
         </button>
       </div>
+
+      <!-- Gen Tab 2: Google Maps Review -->
+      <div id="genTabMaps" class="hidden space-y-3">
+        <div>
+          <label class="block text-zinc-300 font-semibold mb-1">اسم المحل أو رابط خرائط جوجل</label>
+          <input type="text" id="genMapsQuery" placeholder="مثال: مطعم أو متجر بالرياض أو رابط الخريطة" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <button type="button" onclick="applyGeneratedLink('maps')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">
+          توليد وتعيين رابط التقييم ⭐
+        </button>
+      </div>
+
+      <!-- Gen Tab 3: Phone / Mail -->
+      <div id="genTabPhone" class="hidden space-y-3">
+        <div>
+          <label class="block text-zinc-300 font-semibold mb-1">رقم الهاتف المباشر</label>
+          <input type="tel" id="genCallNumber" placeholder="+966501234567" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <button type="button" onclick="applyGeneratedLink('tel')" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 hover:border-emerald-500/40 text-white font-bold rounded-xl text-xs border border-zinc-700">
+          توليد وتعيين رابط الاتصال المباشر 📞
+        </button>
+      </div>
+
+    </div>
+  </div>
 
       <!-- Gen Tab 2: Google Maps Review -->
       <div id="genTabMaps" class="hidden space-y-3">
@@ -974,26 +998,26 @@
   <!-- ========================================== -->
   <!-- DRAWER 3: QR STUDIO & WEB NFC WRITER -->
   <!-- ========================================== -->
-  <div id="drawerNfcProgrammer" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-slate-950/85 backdrop-blur-md flex items-end justify-center">
-    <div class="bottom-sheet-content bg-slate-900 border-t border-slate-800 rounded-t-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden p-6 text-center space-y-4">
+  <div id="drawerNfcProgrammer" class="fixed inset-0 z-50 bottom-sheet-backdrop bg-black/85 backdrop-blur-md flex items-end justify-center">
+    <div class="bottom-sheet-content bg-zinc-950 border-t border-emerald-500/20 rounded-t-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden p-6 text-center space-y-4">
       
-      <div class="w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto cursor-pointer" onclick="closeNfcProgrammerDrawer()"></div>
+      <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto cursor-pointer" onclick="closeNfcProgrammerDrawer()"></div>
 
       <div>
         <h3 class="text-base font-bold text-white" id="nfcModalCardTitle">استوديو QR Code وبرمجة NFC</h3>
-        <p class="text-xs text-slate-400 mt-0.5">تخصيص ألوان QR Code وكتابة الشريحة مباشرة</p>
+        <p class="text-xs text-emerald-400 font-medium mt-0.5">منظومة TapLink - شركة MUHAB</p>
       </div>
 
       <!-- QR Code Canvas Display -->
-      <div class="p-3 bg-white rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg" id="nfcQrCodeWrapper">
+      <div class="p-3 bg-white rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg border border-zinc-700" id="nfcQrCodeWrapper">
         <!-- QR Code rendered here -->
       </div>
 
       <!-- Color Customizer -->
-      <div class="flex items-center justify-center gap-4 text-xs text-slate-300">
+      <div class="flex items-center justify-center gap-4 text-xs text-zinc-300">
         <label class="flex items-center gap-1.5">
           <span>لون الرمز:</span>
-          <input type="color" id="qrColorDark" value="#090d16" class="w-7 h-7 rounded-lg bg-transparent cursor-pointer" onchange="regenerateCustomQr()">
+          <input type="color" id="qrColorDark" value="#050806" class="w-7 h-7 rounded-lg bg-transparent cursor-pointer" onchange="regenerateCustomQr()">
         </label>
         <label class="flex items-center gap-1.5">
           <span>الخلفية:</span>
@@ -1003,18 +1027,18 @@
 
       <!-- Download QR Button -->
       <div>
-        <button id="btnDownloadQr" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-750 text-white rounded-xl text-xs font-semibold border border-slate-700 inline-flex items-center gap-1.5 active:scale-95 transition-all">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <button id="btnDownloadQr" class="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-850 hover:border-emerald-500/40 text-white rounded-xl text-xs font-semibold border border-zinc-700 inline-flex items-center gap-1.5 active:scale-95 transition-all">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           <span>تحميل رمز QR عالي الدقة (PNG)</span>
         </button>
       </div>
 
       <!-- Copy Fixed URL Box -->
-      <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-start space-y-2">
-        <label class="text-[11px] font-semibold text-slate-400 block">الرابط الثابت للبرمجة (Copy for NFC Tools):</label>
+      <div class="p-3 bg-[#050806] rounded-xl border border-zinc-800 text-start space-y-2">
+        <label class="text-[11px] font-semibold text-zinc-400 block">الرابط الثابت للبرمجة (Copy for NFC Tools):</label>
         <div class="flex items-center gap-2">
-          <input type="text" id="inpModalFixedUrl" readonly dir="ltr" class="flex-1 bg-slate-900 border border-slate-800 text-indigo-300 font-mono text-xs rounded-lg px-2.5 py-2 select-all text-start">
-          <button id="btnCopyModalUrl" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg active:scale-95 transition-all">
+          <input type="text" id="inpModalFixedUrl" readonly dir="ltr" class="flex-1 bg-zinc-900 border border-zinc-800 text-emerald-300 font-mono text-xs rounded-lg px-2.5 py-2 select-all text-start">
+          <button id="btnCopyModalUrl" class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-lg active:scale-95 transition-all shadow-md shadow-emerald-600/30">
             نسخ
           </button>
         </div>
@@ -1022,11 +1046,11 @@
 
       <!-- Direct Web NFC Write Button (Android Chrome) -->
       <div>
-        <button id="btnDirectWebNfcWrite" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all">
+        <button id="btnDirectWebNfcWrite" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
           <span>كتابة مباشرة على الشريحة الآن (Web NFC)</span>
         </button>
-        <p class="text-[10px] text-slate-500 mt-1.5" id="webNfcSupportNote">مدعوم مباشرة على متصفح Chrome لأجهزة الأندرويد</p>
+        <p class="text-[10px] text-zinc-500 mt-1.5" id="webNfcSupportNote">مدعوم مباشرة على متصفح Chrome لأجهزة الأندرويد</p>
       </div>
 
     </div>

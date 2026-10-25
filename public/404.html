@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>جاري تحويل بطاقة NFC...</title>
+  <title>TapLink | جاري تحويل البطاقة... - شركة MUHAB</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,41 +24,44 @@
     }
   </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white antialiased">
+<body class="bg-[#050806] text-white min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black antialiased">
 
   <!-- Background Ambient Glow -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-40 -start-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute -top-40 -start-40 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl"></div>
   </div>
 
   <!-- Loading State (Instant sub-second visual) -->
   <div id="redirectLoadingBox" class="text-center p-6 max-w-sm w-full">
     <div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-      <div class="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping"></div>
-      <div class="relative w-14 h-14 bg-gradient-to-tr from-indigo-600 to-indigo-400 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+      <div class="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+      <div class="relative w-14 h-14 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
         </svg>
       </div>
     </div>
+    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold mb-2">
+      <span>TapLink • شركة MUHAB</span>
+    </div>
     <h3 class="text-base font-extrabold text-white mb-1">تم مسح الشريحة الذكية 📡</h3>
-    <p class="text-xs text-indigo-300 font-mono mb-3" id="loadingSlugText">جاري التحويل للوجهة...</p>
-    <div class="w-7 h-7 border-3 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
+    <p class="text-xs text-emerald-400 font-mono mb-3" id="loadingSlugText">جاري التحويل للوجهة...</p>
+    <div class="w-7 h-7 border-3 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto"></div>
   </div>
 
   <!-- PIN Entry Screen (Mode 4: Conditional PIN) -->
-  <div id="pinBox" class="hidden w-full max-w-sm bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl text-center shadow-2xl">
-    <div class="w-16 h-16 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/10">
+  <div id="pinBox" class="hidden w-full max-w-sm bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl p-6 sm:p-8 rounded-3xl text-center shadow-2xl">
+    <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/10">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
       </svg>
     </div>
-    <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold mb-2">
+    <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mb-2">
       رابط محمي برمز PIN
     </span>
     <h2 class="text-lg font-bold mb-1 text-white" id="pinCardTitle">بطاقة محمية</h2>
-    <p class="text-slate-400 text-xs mb-5">أدخل رمز الحماية السري للمتابعة إلى الوجهة</p>
+    <p class="text-zinc-400 text-xs mb-5">أدخل رمز الحماية السري للمتابعة إلى الوجهة</p>
 
     <div class="space-y-3">
       <input 
@@ -69,57 +72,57 @@
         maxlength="8" 
         autofocus 
         placeholder="••••" 
-        class="w-full text-center tracking-[0.8em] text-2xl font-mono py-2.5 bg-slate-800 border border-slate-700 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-full text-center tracking-[0.8em] text-2xl font-mono py-2.5 bg-zinc-900 border border-zinc-700 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
       >
       <button 
         id="btnSubmitPin" 
-        class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/30 text-xs"
+        class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/30 text-xs"
       >
         فتح الرابط السري 🔓
       </button>
     </div>
   </div>
 
-  <!-- Unregistered / Activation Screen (Shown only if slug is genuinely unknown) -->
-  <main id="notFoundBox" class="hidden w-full max-w-md bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
-    <div class="relative w-16 h-16 bg-gradient-to-tr from-amber-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30 mx-auto mb-4">
+  <!-- Unregistered / Activation Screen -->
+  <main id="notFoundBox" class="hidden w-full max-w-md bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+    <div class="relative w-16 h-16 bg-gradient-to-tr from-emerald-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mx-auto mb-4">
       <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
       </svg>
     </div>
 
-    <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold mb-2">
+    <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mb-2">
       بطاقة NFC جديدة تحتاج تفعيل
     </span>
 
     <h1 class="text-xl font-bold mb-1 text-white">هذه الشريحة غير مربوطة برابط بعد</h1>
     
-    <p class="text-slate-400 text-xs leading-relaxed mb-4">
-      معرف الشريحة: <code id="displaySlugCode" class="text-indigo-300 font-mono bg-slate-800 px-2 py-0.5 rounded-lg">card-xxx</code>
+    <p class="text-zinc-400 text-xs leading-relaxed mb-4">
+      معرف الشريحة: <code id="displaySlugCode" class="text-emerald-300 font-mono bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded-lg">card-xxx</code>
       <br>
       إذا كنت صاحب هذه الشريحة، يمكنك تعيين رابط الوجهة الهدف فوراً:
     </p>
 
     <!-- Quick On-the-spot Activation Form -->
-    <div class="p-4 bg-slate-800/60 border border-slate-700/60 rounded-2xl mb-5 text-start space-y-3">
-      <label class="block text-xs font-semibold text-slate-200">الرابط الهدف (Target Destination URL):</label>
+    <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl mb-5 text-start space-y-3">
+      <label class="block text-xs font-semibold text-zinc-200">الرابط الهدف (Target Destination URL):</label>
       <input 
         type="url" 
         id="quickDestinationInput" 
         dir="ltr"
         placeholder="https://maps.google.com/... أو رابط متجرك" 
-        class="w-full bg-slate-900 border border-slate-700 text-white text-xs font-mono rounded-xl px-3 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-full bg-[#050806] border border-zinc-700 text-white text-xs font-mono rounded-xl px-3 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500"
       >
       <button 
         id="quickActivateBtn" 
-        class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-indigo-600/30 flex items-center justify-center gap-1.5"
+        class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5"
       >
         <span>حفظ وتفعيل التحويل فوراً 🚀</span>
       </button>
     </div>
 
-    <a href="./index.html" class="block w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium rounded-xl transition-all border border-slate-700">
-      الدخول إلى لوحة التحكم الرئيسية
+    <a href="./index.html" class="block w-full py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium rounded-xl transition-all border border-zinc-700">
+      الدخول إلى لوحة التحكم الرئيسية (TapLink)
     </a>
   </main>
 

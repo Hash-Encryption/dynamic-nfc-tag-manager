@@ -1,41 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4f46e5"/>
-      <stop offset="50%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+    <linearGradient id="bgBlackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a120d"/>
+      <stop offset="50%" stop-color="#050806"/>
+      <stop offset="100%" stop-color="#020403"/>
     </linearGradient>
-    <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#fbbf24"/>
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#4f46e5" flood-opacity="0.4"/>
+    <linearGradient id="goldChipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="emeraldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#10b981" flood-opacity="0.45"/>
     </filter>
   </defs>
   
   <!-- Outer Rounded Square App Icon -->
-  <rect width="512" height="512" rx="128" fill="#090d16"/>
-  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#bgGrad)" filter="url(#shadow)" opacity="0.95"/>
+  <rect width="512" height="512" rx="128" fill="#040605"/>
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="url(#bgBlackGrad)" stroke="#10b981" stroke-width="3" stroke-opacity="0.3"/>
   
-  <!-- NFC Radio Waves -->
-  <g fill="none" stroke="#ffffff" stroke-linecap="round">
+  <!-- Ambient Inner Glow -->
+  <circle cx="256" cy="256" r="180" fill="#10b981" opacity="0.08" filter="blur(40px)"/>
+  
+  <!-- NFC Radio Waves in Emerald & White -->
+  <g fill="none" stroke-linecap="round">
+    <!-- Inner Wave -->
+    <path d="M 235 180 A 95 95 0 0 1 235 332" stroke="url(#emeraldGrad)" stroke-width="26" filter="url(#emeraldGlow)"/>
     <!-- Center Wave -->
-    <path d="M 230 180 A 100 100 0 0 1 230 332" stroke-width="26" opacity="0.95"/>
+    <path d="M 285 140 A 155 155 0 0 1 285 372" stroke="#ffffff" stroke-width="24" opacity="0.95"/>
     <!-- Outer Wave -->
-    <path d="M 280 140 A 160 160 0 0 1 280 372" stroke-width="26" opacity="0.8"/>
-    <!-- Far Outer Wave -->
-    <path d="M 330 100 A 220 220 0 0 1 330 412" stroke-width="26" opacity="0.6"/>
+    <path d="M 335 100 A 215 215 0 0 1 335 412" stroke="url(#emeraldGrad)" stroke-width="22" opacity="0.75"/>
   </g>
   
-  <!-- Smart Chip Icon -->
-  <rect x="120" y="210" width="72" height="92" rx="16" fill="url(#chipGrad)"/>
-  <rect x="132" y="222" width="48" height="68" rx="8" fill="none" stroke="#92400e" stroke-width="4"/>
-  <line x1="120" y1="240" x2="132" y2="240" stroke="#92400e" stroke-width="4"/>
-  <line x1="120" y1="272" x2="132" y2="272" stroke="#92400e" stroke-width="4"/>
-  <line x1="180" y1="240" x2="192" y2="240" stroke="#92400e" stroke-width="4"/>
-  <line x1="180" y1="272" x2="192" y2="272" stroke="#92400e" stroke-width="4"/>
+  <!-- Smart Gold Chip Graphic -->
+  <rect x="110" y="206" width="76" height="100" rx="18" fill="url(#goldChipGrad)" filter="url(#emeraldGlow)"/>
+  <rect x="122" y="218" width="52" height="76" rx="10" fill="none" stroke="#854d0e" stroke-width="4"/>
+  <line x1="110" y1="238" x2="122" y2="238" stroke="#854d0e" stroke-width="4"/>
+  <line x1="110" y1="274" x2="122" y2="274" stroke="#854d0e" stroke-width="4"/>
+  <line x1="174" y1="238" x2="186" y2="238" stroke="#854d0e" stroke-width="4"/>
+  <line x1="174" y1="274" x2="186" y2="274" stroke="#854d0e" stroke-width="4"/>
   
-  <!-- Sparkle dot -->
-  <circle cx="390" cy="120" r="12" fill="#38bdf8"/>
+  <!-- TapLink & MUHAB Text in SVG for Crisp Icon View -->
+  <text x="256" y="458" font-family="'Cairo', sans-serif" font-size="28" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">TapLink</text>
+  <text x="256" y="482" font-family="'Cairo', sans-serif" font-size="16" font-weight="700" fill="#10b981" text-anchor="middle" letter-spacing="2">MUHAB</text>
+  
+  <!-- Glowing Sparkle Dot -->
+  <circle cx="390" cy="115" r="14" fill="#34d399" filter="url(#emeraldGlow)"/>
 </svg>

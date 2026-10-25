@@ -1,13 +1,13 @@
 {
-  "name": "مدير بطاقات NFC الذكية",
-  "short_name": "NFC Manager",
-  "description": "تطبيق متكامل لإدارة بطاقات NFC الذكية والروابط الديناميكية",
+  "name": "TapLink - شركة MUHAB",
+  "short_name": "TapLink",
+  "description": "منظومة TapLink الذكية لإدارة بطاقات NFC والروابط الديناميكية - شركة MUHAB",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#090d16",
-  "theme_color": "#090d16",
+  "background_color": "#050806",
+  "theme_color": "#050806",
   "dir": "rtl",
   "lang": "ar",
   "icons": [

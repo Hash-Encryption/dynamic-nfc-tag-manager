@@ -30,7 +30,7 @@ const initialData = {
     createdAt: new Date().toISOString()
   },
   settings: {
-    siteTitle: 'Dynamic NFC Tag Manager',
+    siteTitle: 'TapLink - شركة MUHAB',
     baseUrl: '',
     theme: 'dark'
   },

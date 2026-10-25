@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>الملف التعريفي الرقمي</title>
+  <title>TapLink | الملف التعريفي الذكي - شركة MUHAB</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="./css/style.css">
   
   <script>
     tailwind.config = {
@@ -22,10 +22,10 @@
           },
           colors: {
             brand: {
-              50: '#eef2ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
             }
           }
         }
@@ -33,18 +33,18 @@
     }
   </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white pb-12 antialiased">
+<body class="bg-[#050706] text-white min-h-screen selection:bg-emerald-500 selection:text-black pb-12 antialiased">
 
   <!-- Background decorative gradients -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-32 start-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-gradient-to-b from-indigo-600/25 to-purple-600/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 start-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl"></div>
+    <div class="absolute -top-32 start-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-gradient-to-b from-emerald-600/20 to-green-600/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 start-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"></div>
   </div>
 
   <!-- Loading State -->
   <div id="loadingState" class="min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-    <p class="text-slate-400 text-sm font-medium">جاري تحميل البطاقة الذكية...</p>
+    <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin mb-4"></div>
+    <p class="text-neutral-400 text-sm font-medium">جاري تحميل بطاقة TapLink الذكية...</p>
   </div>
 
   <!-- Main Profile Card Container -->
@@ -70,14 +70,14 @@
     </div>
 
     <!-- Main Card Body -->
-    <div class="bg-slate-900/85 border border-slate-800 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl relative">
+    <div class="bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl relative">
       
       <!-- Card Cover Banner -->
-      <div class="h-28 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 relative">
-        <div class="absolute inset-0 bg-black/10"></div>
-        <div class="absolute bottom-2 end-3 flex items-center gap-1 text-[10px] text-white/70 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-full">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          <span>NFC Tap Verified</span>
+      <div class="h-28 bg-gradient-to-r from-neutral-950 via-emerald-950 to-black relative border-b border-emerald-500/20">
+        <div class="absolute inset-0 bg-emerald-500/5"></div>
+        <div class="absolute bottom-2 end-3 flex items-center gap-1.5 text-[10px] text-emerald-400 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-emerald-500/30">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <span class="font-bold">TapLink • NFC Verified</span>
         </div>
       </div>
 
@@ -85,38 +85,38 @@
       <div class="px-6 pb-6 pt-0 relative">
         <div class="flex justify-between items-end -mt-14 mb-4">
           <div class="relative">
-            <img id="profileAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Avatar" class="w-24 h-24 rounded-2xl object-cover border-4 border-slate-900 bg-slate-800 shadow-xl">
-            <div class="absolute -bottom-1 -end-1 bg-emerald-500 w-5 h-5 rounded-full border-2 border-slate-900 flex items-center justify-center" title="متاح للتواصل">
+            <img id="profileAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Avatar" class="w-24 h-24 rounded-2xl object-cover border-4 border-[#0b100d] bg-neutral-900 shadow-xl">
+            <div class="absolute -bottom-1 -end-1 bg-emerald-500 w-5 h-5 rounded-full border-2 border-[#0b100d] flex items-center justify-center" title="متاح للتواصل">
               <span class="w-2 h-2 rounded-full bg-white"></span>
             </div>
           </div>
           
-          <button id="qrModalBtn" class="text-xs bg-slate-800/90 hover:bg-slate-750 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+          <button id="qrModalBtn" class="text-xs bg-black/50 hover:bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
             <span>رمز QR للبطاقة</span>
           </button>
         </div>
 
         <!-- Name & Titles -->
         <h1 id="profileName" class="text-2xl font-bold text-white mb-1 leading-tight">اسم جهة الاتصال</h1>
-        <p id="profileJob" class="text-indigo-400 font-medium text-sm mb-1">المسمى الوظيفي</p>
-        <p id="profileCompany" class="text-slate-400 text-xs mb-3 flex items-center gap-1">
-          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <p id="profileJob" class="text-emerald-400 font-semibold text-sm mb-1">المسمى الوظيفي</p>
+        <p id="profileCompany" class="text-neutral-400 text-xs mb-3 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
           <span id="companyText">الشركة</span>
         </p>
 
         <!-- Bio -->
-        <p id="profileBio" class="text-slate-300 text-xs leading-relaxed bg-slate-800/40 border border-slate-750 p-3.5 rounded-2xl mb-5">
+        <p id="profileBio" class="text-neutral-300 text-xs leading-relaxed bg-black/40 border border-emerald-500/15 p-3.5 rounded-2xl mb-5">
           نبذة تعريفية...
         </p>
 
         <!-- PRIMARY CALL TO ACTION: Download vCard -->
         <div class="mb-5">
-          <a id="vcardDownloadBtn" href="#" class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-600 active:scale-[0.98] text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2.5 text-sm group">
-            <svg class="w-5 h-5 text-indigo-200 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <a id="vcardDownloadBtn" href="#" class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] text-black font-extrabold rounded-2xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 text-sm group">
+            <svg class="w-5 h-5 text-black group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             <span>حفظ جهة الاتصال في الهاتف (.vcf)</span>
           </a>
-          <p class="text-[10px] text-center text-slate-400 mt-1.5">يضيف الاسم والرقم والبريد مباشرة إلى جهات اتصال جوالك</p>
+          <p class="text-[10px] text-center text-neutral-400 mt-1.5">يضيف الاسم والرقم والبريد مباشرة إلى جهات اتصال جوالك</p>
         </div>
 
         <!-- Quick Direct Contact Actions -->
@@ -167,10 +167,10 @@
         </div>
 
         <!-- Footer / Branding -->
-        <div class="pt-6 text-center border-t border-slate-800/80">
-          <div class="inline-flex items-center gap-1.5 text-xs text-slate-400">
+        <div class="pt-6 text-center border-t border-emerald-500/15">
+          <div class="inline-flex items-center gap-1.5 text-xs text-neutral-400">
             <span>مدعوم بواسطة</span>
-            <span class="font-bold text-indigo-400">Dynamic NFC Manager</span>
+            <span class="font-bold text-emerald-400">TapLink • شركة MUHAB</span>
           </div>
         </div>
 
@@ -378,10 +378,10 @@
         const a = document.createElement('a');
         a.href = l.url.startsWith('http') ? l.url : `https://${l.url}`;
         a.target = '_blank';
-        a.className = 'w-full flex items-center justify-between p-3.5 bg-slate-800/80 hover:bg-slate-750 border border-slate-700/80 rounded-2xl transition-all glow-on-hover text-sm font-medium text-slate-200';
+        a.className = 'w-full flex items-center justify-between p-3.5 bg-neutral-900/80 hover:bg-neutral-800 border border-emerald-500/20 rounded-2xl transition-all glow-on-hover text-sm font-medium text-white';
         a.innerHTML = `
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
             </div>
             <span>${l.title}</span>
