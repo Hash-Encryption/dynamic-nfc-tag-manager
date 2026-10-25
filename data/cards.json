@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "card-ksnjv",
+    "title": "Ø¨Ø·Ø§Ù‚Ø© ØªÙ‚ÙŠÙŠÙ… Ø¬ÙˆØ¬Ù„ Ø§Ù„Ø°ÙƒÙŠØ©",
+    "slug": "card-ksnjv",
+    "actionType": "direct",
+    "destinationUrl": "https://maps.google.com",
+    "isActive": true,
+    "scanCount": 0,
+    "lastScannedAt": null,
+    "createdAt": "2026-10-25T17:25:00.000Z",
+    "updatedAt": "2026-10-25T17:25:00.000Z"
+  }
+]
