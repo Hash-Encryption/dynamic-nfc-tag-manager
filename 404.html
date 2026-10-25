@@ -35,7 +35,7 @@
   <!-- Loading State (Shown while checking cloud database) -->
   <div id="redirectLoadingBox" class="text-center p-8 max-w-sm w-full">
     <div class="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
-      <div class="absolute inset-0 bg-indigo-500/20 rounded-full nfc-wave-1"></div>
+      <div class="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping"></div>
       <div class="relative w-14 h-14 bg-gradient-to-tr from-indigo-600 to-indigo-400 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -47,11 +47,42 @@
     <div class="w-8 h-8 border-3 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mx-auto"></div>
   </div>
 
+  <!-- PIN Entry Screen (Shown if card is password protected) -->
+  <div id="pinBox" class="hidden w-full max-w-sm bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl text-center shadow-2xl">
+    <div class="w-16 h-16 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/10">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+      </svg>
+    </div>
+    <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold mb-2">
+      رابط محمي برمز PIN
+    </span>
+    <h2 class="text-lg font-bold mb-1 text-white" id="pinCardTitle">بطاقة محمية</h2>
+    <p class="text-slate-400 text-xs mb-5">أدخل رمز الحماية السري للمتابعة إلى الوجهة</p>
+
+    <div class="space-y-3">
+      <input 
+        type="password" 
+        id="pinInput" 
+        inputmode="numeric" 
+        pattern="[0-9]*" 
+        maxlength="8" 
+        autofocus 
+        placeholder="••••" 
+        class="w-full text-center tracking-[0.8em] text-2xl font-mono py-2.5 bg-slate-800 border border-slate-700 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+      <button 
+        id="btnSubmitPin" 
+        class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/30 text-xs"
+      >
+        فتح الرابط السري 🔓
+      </button>
+    </div>
+  </div>
+
   <!-- Unregistered / Activation Screen (Shown only if slug is genuinely not configured) -->
   <main id="notFoundBox" class="hidden w-full max-w-md bg-slate-900/90 border border-slate-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
-    
     <div class="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
-      <div class="absolute inset-0 bg-amber-500/15 rounded-full nfc-wave-1"></div>
       <div class="relative w-14 h-14 bg-gradient-to-tr from-amber-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -104,23 +135,23 @@
   <script>
     const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
 
-    // Extract slug from URL path: /c/:slug or /dynamic-nfc-tag-manager/c/:slug
+    // Extract slug from URL path: /c/:slug or /go/:slug or query parameter ?c= or ?slug=
     function extractSlug() {
       const path = window.location.pathname;
-      const match = path.match(/\/c\/([a-zA-Z0-9-_]+)/i);
+      const match = path.match(/\/(?:c|go)\/([a-zA-Z0-9-_]+)/i);
       if (match && match[1]) {
         return match[1].toLowerCase();
       }
-      // Check query parameter ?c=slug or ?slug=slug
       const urlParams = new URLSearchParams(window.location.search);
       return (urlParams.get('c') || urlParams.get('slug') || '').toLowerCase();
     }
 
     const currentSlug = extractSlug();
+    let matchedCard = null;
 
     async function handleSmartRedirect() {
       if (!currentSlug) {
-        showNotFound('لم يتم العثور على معرف الشريحة في الرابط');
+        showNotFound();
         return;
       }
 
@@ -129,7 +160,7 @@
 
       let card = null;
 
-      // 1. First, check Central Cloud Database on GitHub
+      // 1. Fetch Central Cloud Database on GitHub
       try {
         const cloudRes = await fetch(`${CLOUD_DB_URL}?_nocache=${Date.now()}`);
         if (cloudRes.ok) {
@@ -142,7 +173,7 @@
         console.warn('Cloud DB fetch error, checking localStorage fallback:', err);
       }
 
-      // 2. Second, check localStorage as local fallback
+      // 2. Check localStorage fallback
       if (!card) {
         try {
           const raw = localStorage.getItem('nfc_cards_db');
@@ -157,32 +188,78 @@
 
       // 3. If card found!
       if (card) {
+        matchedCard = card;
+
         if (!card.isActive) {
           window.location.replace('./inactive.html');
           return;
         }
 
-        // Action: Profile vs Direct
-        if (card.actionType === 'profile') {
-          window.location.replace(`./landing.html?slug=${encodeURIComponent(currentSlug)}`);
+        // Check PIN protection
+        if (card.pinCode && card.pinCode.trim().length > 0) {
+          showPinPrompt(card);
           return;
         }
 
-        let target = (card.destinationUrl || '').trim();
-        if (target) {
-          if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
-          // FAST INSTANT REDIRECT
-          window.location.replace(target);
-          return;
+        executeCardAction(card);
+        return;
+      }
+
+      // 4. Not found
+      showNotFound();
+    }
+
+    function executeCardAction(card) {
+      // Action: Digital Profile vs Direct Redirect
+      if (card.actionType === 'profile') {
+        window.location.replace(`./landing.html?slug=${encodeURIComponent(currentSlug)}`);
+        return;
+      }
+
+      // Time-based routing check
+      let target = (card.destinationUrl || '').trim();
+      if (card.timeRouting && card.timeRouting.enabled) {
+        const ksaHour = (new Date().getUTCHours() + 3) % 24;
+        const switchH = Number(card.timeRouting.switchHour) || 16;
+        if (ksaHour >= 6 && ksaHour < switchH) {
+          target = (card.timeRouting.morningUrl || target).trim();
+        } else {
+          target = (card.timeRouting.eveningUrl || target).trim();
         }
       }
 
-      // 4. Not found in cloud or local
+      if (target) {
+        if (!/^https?:\/\//i.test(target) && !/^(tel|mailto):/i.test(target)) {
+          target = 'https://' + target;
+        }
+        window.location.replace(target);
+        return;
+      }
+
       showNotFound();
+    }
+
+    function showPinPrompt(card) {
+      document.getElementById('redirectLoadingBox').classList.add('hidden');
+      document.getElementById('notFoundBox').classList.add('hidden');
+      document.getElementById('pinCardTitle').textContent = card.title;
+      document.getElementById('pinBox').classList.remove('hidden');
+
+      document.getElementById('btnSubmitPin').onclick = () => {
+        const pinInp = document.getElementById('pinInput');
+        if (pinInp.value.trim() === String(card.pinCode).trim()) {
+          executeCardAction(card);
+        } else {
+          alert('رمز PIN غير صحيح، حاول مجدداً');
+          pinInp.value = '';
+          pinInp.focus();
+        }
+      };
     }
 
     function showNotFound() {
       document.getElementById('redirectLoadingBox').classList.add('hidden');
+      document.getElementById('pinBox').classList.add('hidden');
       document.getElementById('notFoundBox').classList.remove('hidden');
     }
 
@@ -211,7 +288,6 @@
         updatedAt: new Date().toISOString()
       };
 
-      // Save to localStorage
       try {
         let cards = [];
         const raw = localStorage.getItem('nfc_cards_db');
@@ -221,7 +297,6 @@
         localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
       } catch (e) {}
 
-      // Immediately redirect to destination
       window.location.replace(target);
     });
 

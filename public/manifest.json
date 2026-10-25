@@ -1,0 +1,21 @@
+{
+  "name": "مدير بطاقات NFC الذكية",
+  "short_name": "NFC Manager",
+  "description": "تطبيق متكامل لإدارة بطاقات NFC الذكية والروابط الديناميكية",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
