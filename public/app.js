@@ -15,7 +15,12 @@ let currentFilterMode = 'all';
 let tempSavedPresets = [];
 
 const DEFAULT_ADMIN_PASS = 'admin123';
+const PRIMARY_CLOUD_DB = "https://api.npoint.io/6d3e9c78f9fac9e8db1e";
+const PRIMARY_CLOUD_WRITE = "https://www.npoint.io/documents/6d3e9c78f9fac9e8db1e";
+const BACKUP_CLOUD_DB = "https://api.npoint.io/556564d7073a07a6d7a3";
+const BACKUP_CLOUD_WRITE = "https://www.npoint.io/documents/556564d7073a07a6d7a3";
 const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
+const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-manager@main/data/cards.json";
 
 // i18n Translation Helper
 const t = (key, fallback) => (window.I18N ? window.I18N.t(key, fallback) : (fallback || key));
@@ -382,14 +387,56 @@ function getLocalCards() {
   ];
 }
 
-function saveLocalCards(cards) {
+// Asynchronous Real-Time Cloud Synchronization
+async function syncPushToCloudDatabase(cards) {
+  if (!Array.isArray(cards)) return;
+  const payload = JSON.stringify({ contents: JSON.stringify(cards) });
+  const targets = [PRIMARY_CLOUD_WRITE, BACKUP_CLOUD_WRITE];
+  
+  const statusEl = document.getElementById('topCloudStatusText');
+  if (statusEl) {
+    statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span><span>' + t('cloud_status_syncing', 'Syncing to global cloud...') + '</span>';
+  }
+
+  const promises = targets.map(async (url) => {
+    try {
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      return res.ok;
+    } catch (e) {
+      try {
+        const res2 = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PATCH' },
+          body: payload
+        });
+        return res2.ok;
+      } catch (err) {
+        return false;
+      }
+    }
+  });
+
   try {
-    localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
+    const results = await Promise.allSettled(promises);
+    const anySuccess = results.some(r => r.status === 'fulfilled' && r.value === true);
+    if (anySuccess && statusEl) {
+      statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-active"></span><span data-i18n="cloud_status_connected">🌐 Global Cloud Active - Synced on all devices</span>';
+    }
   } catch (e) {}
 }
 
-// Real-time Cloud Sync
-const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-manager@main/data/cards.json";
+function saveLocalCards(cards, skipCloudPush = false) {
+  try {
+    localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
+  } catch (e) {}
+  if (!skipCloudPush) {
+    syncPushToCloudDatabase(cards);
+  }
+}
 
 async function syncWithCloudDatabase(showNotification = false) {
   const customUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
@@ -398,6 +445,8 @@ async function syncWithCloudDatabase(showNotification = false) {
     repoBase = '/dynamic-nfc-tag-manager';
   }
   const endpoints = [
+    `${PRIMARY_CLOUD_DB}?t=${Date.now()}`,
+    `${BACKUP_CLOUD_DB}?t=${Date.now()}`,
     `${repoBase}/data/cards.json?_nocache=${Date.now()}`,
     `${CLOUD_DB_URL}?_nocache=${Date.now()}`,
     `${CDN_DB_URL}?_nocache=${Date.now()}`
@@ -411,10 +460,10 @@ async function syncWithCloudDatabase(showNotification = false) {
         const cloudCards = await res.json();
         if (Array.isArray(cloudCards) && cloudCards.length > 0) {
           cardsList = cloudCards;
-          saveLocalCards(cloudCards);
+          saveLocalCards(cloudCards, true); // Save locally without echoing back to cloud
           renderCardsGrid();
           loadLocalStats();
-          if (showNotification) showToast(t('toast_cloud_synced', 'Real-time cloud sync complete 🟢'), 'success');
+          if (showNotification) showToast(t('toast_cloud_synced', 'Real-time global cloud sync complete 🟢'), 'success');
           return;
         }
       }

@@ -151,6 +151,15 @@
       // Real, pre-bundled fallback cards for sub-10ms instant offline/static redirect
       const BUNDLED_FALLBACK_CARDS = [
         {
+          id: "card-hoomi",
+          title: "بطاقة هومي الذكية - Hoomi Card",
+          slug: "card-hoomi",
+          mode: "direct",
+          actionType: "direct",
+          destinationUrl: "https://maps.google.com",
+          isActive: true
+        },
+        {
           id: "card-ksnjv",
           title: "بطاقة تقييم جوجل الذكية",
           slug: "card-ksnjv",
@@ -170,6 +179,8 @@
         }
       ];
 
+      const PRIMARY_CLOUD_DB = "https://api.npoint.io/6d3e9c78f9fac9e8db1e";
+      const BACKUP_CLOUD_DB = "https://api.npoint.io/556564d7073a07a6d7a3";
       const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
       const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-manager@main/data/cards.json";
 
@@ -206,6 +217,8 @@
 
           const customCloudUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
           const promises = [
+            fetchWithTimeout(`${PRIMARY_CLOUD_DB}?t=${Date.now()}`, 600),
+            fetchWithTimeout(`${BACKUP_CLOUD_DB}?t=${Date.now()}`, 600),
             fetchWithTimeout(`${repoBase}/data/cards.json?_nocache=${Date.now()}`, 500),
             fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 700),
             fetchWithTimeout(`${CDN_DB_URL}?_nocache=${Date.now()}`, 700)

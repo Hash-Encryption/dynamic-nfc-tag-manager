@@ -1,32 +1,13 @@
 [
   {
-    "id": "card-ksnjv",
-    "title": "بطاقة تقييم جوجل الذكية",
-    "slug": "card-ksnjv",
+    "id": "card-hoomi",
+    "title": "بطاقة هومي الذكية - Hoomi Card",
+    "slug": "card-hoomi",
     "mode": "direct",
     "actionType": "direct",
     "destinationUrl": "https://maps.google.com",
     "isActive": true,
-    "scanCount": 6,
-    "lastScannedAt": "2026-10-26T14:18:12.412Z",
-    "createdAt": "2026-10-25T17:25:00.000Z",
-    "updatedAt": "2026-10-26T13:53:22.789Z",
-    "pinCode": "",
-    "savedTargets": [],
-    "managePin": "1234"
-  },
-  {
-    "id": "card-b62374ed",
-    "title": "Google Reviews Smart Card - cardtest",
-    "slug": "cardtest",
-    "mode": "direct",
-    "actionType": "direct",
-    "destinationUrl": "https://maps.google.com",
-    "isActive": true,
-    "createdAt": "2026-10-26T14:08:02.307Z",
-    "updatedAt": "2026-10-26T14:08:02.307Z",
-    "scanCount": 3,
-    "lastScannedAt": "2026-10-26T14:32:34.303Z",
+    "scanCount": 1,
     "pinCode": "",
     "managePin": "1234",
     "savedTargets": [
@@ -39,15 +20,71 @@
       }
     ],
     "timeRouting": {
-      "enabled": false,
-      "morningUrl": "",
-      "morningLabel": "فترة الصباح",
-      "eveningUrl": "",
-      "eveningLabel": "فترة المساء",
-      "switchHour": 16
+      "enabled": false
     },
     "conditional": null,
     "profile": null,
-    "catalog": null
+    "catalog": null,
+    "createdAt": "2026-10-26T14:56:47.316Z",
+    "updatedAt": "2026-10-26T14:56:47.317Z",
+    "lastScannedAt": "2026-10-26T15:02:17.921Z"
+  },
+  {
+    "id": "card-ksnjv",
+    "title": "بطاقة تقييم جوجل الذكية",
+    "slug": "card-ksnjv",
+    "mode": "direct",
+    "actionType": "direct",
+    "destinationUrl": "https://maps.google.com",
+    "isActive": true,
+    "scanCount": 6,
+    "pinCode": "",
+    "managePin": "1234",
+    "savedTargets": [
+      {
+        "id": "t-google",
+        "label": "Google Reviews 5-Star",
+        "url": "https://maps.google.com",
+        "active": true,
+        "icon": "⭐"
+      }
+    ],
+    "timeRouting": {
+      "enabled": false
+    },
+    "conditional": null,
+    "profile": null,
+    "catalog": null,
+    "createdAt": "2026-10-25T17:25:00.000Z",
+    "updatedAt": "2026-10-26T14:56:47.317Z"
+  },
+  {
+    "id": "card-b62374ed",
+    "title": "Google Reviews Smart Card - cardtest",
+    "slug": "cardtest",
+    "mode": "direct",
+    "actionType": "direct",
+    "destinationUrl": "https://maps.google.com",
+    "isActive": true,
+    "scanCount": 3,
+    "pinCode": "",
+    "managePin": "1234",
+    "savedTargets": [
+      {
+        "id": "t-google",
+        "label": "Google Reviews 5-Star",
+        "url": "https://maps.google.com",
+        "active": true,
+        "icon": "⭐"
+      }
+    ],
+    "timeRouting": {
+      "enabled": false
+    },
+    "conditional": null,
+    "profile": null,
+    "catalog": null,
+    "createdAt": "2026-10-26T14:08:02.307Z",
+    "updatedAt": "2026-10-26T14:56:47.317Z"
   }
 ]
