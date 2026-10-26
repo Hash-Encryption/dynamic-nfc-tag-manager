@@ -79,7 +79,8 @@ const initialData = {
     theme: 'dark'
   },
   cards: seedCards,
-  scans: [] // 100% Real scans only, zero fake data
+  scans: [], // 100% Real scans only, zero fake data
+  leads: [] // CRM Leads captured from card scans
 };
 
 class Database {
@@ -106,6 +107,7 @@ class Database {
           });
         }
         if (!this.data.scans) this.data.scans = [];
+        if (!this.data.leads) this.data.leads = [];
         if (!this.data.admin) this.data.admin = initialData.admin;
         if (!this.data.settings) this.data.settings = initialData.settings;
       }
@@ -223,7 +225,12 @@ class Database {
       },
       conditional: cardData.conditional || null,
       profile: mode === 'profile' ? (cardData.profile || {}) : null,
-      catalog: mode === 'catalog' ? (cardData.catalog || {}) : null
+      catalog: mode === 'catalog' ? (cardData.catalog || {}) : null,
+      wifi: mode === 'wifi' ? (cardData.wifi || {}) : (cardData.wifi || null),
+      sos: mode === 'sos' ? (cardData.sos || {}) : (cardData.sos || null),
+      leadCapture: cardData.leadCapture || { enabled: false, required: false, title: '', subtitle: '' },
+      limits: cardData.limits || { maxScans: 0, expiresAt: null, fallbackUrl: '', expiredMessage: '' },
+      category: cardData.category || 'general'
     };
 
     this.data.cards.push(newCard);
@@ -276,6 +283,11 @@ class Database {
     }
     if (updateData.profile !== undefined) currentCard.profile = updateData.profile;
     if (updateData.catalog !== undefined) currentCard.catalog = updateData.catalog;
+    if (updateData.wifi !== undefined) currentCard.wifi = updateData.wifi;
+    if (updateData.sos !== undefined) currentCard.sos = updateData.sos;
+    if (updateData.leadCapture !== undefined) currentCard.leadCapture = updateData.leadCapture;
+    if (updateData.limits !== undefined) currentCard.limits = updateData.limits;
+    if (updateData.category !== undefined) currentCard.category = updateData.category;
 
     currentCard.updatedAt = new Date().toISOString();
     this.save();
@@ -515,14 +527,114 @@ class Database {
     if (Array.isArray(backupData.scans)) {
       this.data.scans = backupData.scans;
     }
+    if (Array.isArray(backupData.leads)) {
+      this.data.leads = backupData.leads;
+    }
     if (backupData.settings) {
       this.data.settings = { ...this.data.settings, ...backupData.settings };
     }
     this.save();
     return {
       cardsCount: this.data.cards.length,
-      scansCount: this.data.scans.length
+      scansCount: this.data.scans.length,
+      leadsCount: (this.data.leads || []).length
     };
+  }
+
+  // --- Lead Capture & CRM Methods ---
+  getAllLeads() {
+    return (this.data.leads || []).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
+
+  addLead(leadData = {}) {
+    const name = (leadData.visitorName || leadData.name || '').trim();
+    const phone = (leadData.visitorPhone || leadData.phone || '').trim();
+    const note = (leadData.visitorNote || leadData.note || '').trim();
+    if (!name && !phone) {
+      throw new Error('الاسم أو رقم الجوال مطلوب');
+    }
+    const newLead = {
+      id: leadData.id || ('lead-' + crypto.randomUUID().slice(0, 8)),
+      cardId: leadData.cardId || '',
+      cardTitle: (leadData.cardTitle || '').trim(),
+      cardSlug: (leadData.cardSlug || '').trim(),
+      visitorName: name,
+      name: name || 'زائر بدون اسم',
+      visitorPhone: phone,
+      phone: phone || '',
+      visitorNote: note,
+      note: note || '',
+      capturedAt: leadData.capturedAt || new Date().toISOString(),
+      timestamp: leadData.capturedAt || new Date().toISOString()
+    };
+    if (!this.data.leads) this.data.leads = [];
+    this.data.leads.unshift(newLead);
+    if (this.data.leads.length > 5000) {
+      this.data.leads = this.data.leads.slice(0, 5000);
+    }
+    this.save();
+    return newLead;
+  }
+
+  deleteLead(id) {
+    if (!this.data.leads) return false;
+    const initialLen = this.data.leads.length;
+    this.data.leads = this.data.leads.filter(l => l.id !== id);
+    if (this.data.leads.length !== initialLen) {
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  clearLeads() {
+    this.data.leads = [];
+    this.save();
+    return true;
+  }
+
+  // --- Bulk Card Actions ---
+  bulkUpdateDestinationUrl(cardIds = [], newUrl = '') {
+    if (!Array.isArray(cardIds) || cardIds.length === 0) return 0;
+    const cleanUrl = sanitizeUrl(newUrl);
+    let updatedCount = 0;
+    this.data.cards.forEach(card => {
+      if (cardIds.includes(card.id)) {
+        card.destinationUrl = cleanUrl;
+        if (Array.isArray(card.savedTargets)) {
+          const active = card.savedTargets.find(t => t.active);
+          if (active) active.url = cleanUrl;
+        }
+        card.updatedAt = new Date().toISOString();
+        updatedCount++;
+      }
+    });
+    if (updatedCount > 0) this.save();
+    return updatedCount;
+  }
+
+  bulkUpdateStatus(cardIds = [], isActive = true) {
+    if (!Array.isArray(cardIds) || cardIds.length === 0) return 0;
+    let updatedCount = 0;
+    this.data.cards.forEach(card => {
+      if (cardIds.includes(card.id)) {
+        card.isActive = Boolean(isActive);
+        card.updatedAt = new Date().toISOString();
+        updatedCount++;
+      }
+    });
+    if (updatedCount > 0) this.save();
+    return updatedCount;
+  }
+
+  bulkDeleteCards(cardIds = []) {
+    if (!Array.isArray(cardIds) || cardIds.length === 0) return 0;
+    const initialCount = this.data.cards.length;
+    this.data.cards = this.data.cards.filter(c => !cardIds.includes(c.id));
+    this.data.scans = this.data.scans.filter(s => !cardIds.includes(s.cardId));
+    const deletedCount = initialCount - this.data.cards.length;
+    if (deletedCount > 0) this.save();
+    return deletedCount;
   }
 }
 

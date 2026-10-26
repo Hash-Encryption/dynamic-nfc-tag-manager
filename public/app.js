@@ -12,7 +12,13 @@ let currentActiveCardForSim = null;
 let isOfflineOrStatic = false;
 let currentEditorSubTab = 'basic';
 let currentFilterMode = 'all';
+let currentFolderFilter = 'all';
 let tempSavedPresets = [];
+let leadsList = [];
+let selectedCardIds = new Set();
+let isBulkMode = false;
+let qpCurrentIndex = 0;
+let qpMaxContrast = false;
 
 const DEFAULT_ADMIN_PASS = 'admin123';
 const ADMIN_SALT = '::taplink_salt_2026';
@@ -743,6 +749,7 @@ function switchTab(tab) {
   const views = {
     home: document.getElementById('viewHome'),
     cards: document.getElementById('viewCards'),
+    leads: document.getElementById('viewLeads'),
     stats: document.getElementById('viewStats'),
     settings: document.getElementById('viewSettings')
   };
@@ -750,6 +757,7 @@ function switchTab(tab) {
   const navBtns = {
     home: document.getElementById('tabBtnHome'),
     cards: document.getElementById('tabBtnCards'),
+    leads: document.getElementById('tabBtnLeads'),
     stats: document.getElementById('tabBtnStats'),
     settings: document.getElementById('tabBtnSettings')
   };
@@ -772,6 +780,7 @@ function switchTab(tab) {
 
   if (tab === 'stats') renderAnalytics();
   if (tab === 'cards') renderCardsGrid();
+  if (tab === 'leads') loadLeads();
 }
 
 // ==========================================
@@ -811,8 +820,24 @@ function showToast(message, type = 'info', icon = '✨') {
 }
 
 // ==========================================
-// 5. CARDS GRID & FILTERING
+// 5. CARDS GRID & SMART FOLDERS FILTERING
 // ==========================================
+function filterCardsByFolder(folder) {
+  currentFolderFilter = folder;
+  const folderButtons = ['All', 'Restaurant', 'Personal', 'Wifi', 'Sos', 'Vip'];
+  folderButtons.forEach(f => {
+    const btn = document.getElementById(`folderBtn${f}`);
+    if (btn) {
+      if (f.toLowerCase() === folder.toLowerCase()) {
+        btn.className = 'folder-pill active px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap font-bold shadow-sm';
+      } else {
+        btn.className = 'folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap';
+      }
+    }
+  });
+  renderCardsGrid();
+}
+
 function filterCardsByMode(mode) {
   currentFilterMode = mode;
   const filterButtons = ['All', 'Active', 'Direct', 'Profile', 'Catalog'];
@@ -834,6 +859,23 @@ function renderCardsGrid() {
   if (!container) return;
 
   let displayCards = [...cardsList];
+
+  // 1. Smart Folders Filter
+  if (currentFolderFilter && currentFolderFilter !== 'all') {
+    if (currentFolderFilter === 'restaurant') {
+      displayCards = displayCards.filter(c => c.category === 'restaurant' || c.mode === 'catalog' || c.actionType === 'catalog');
+    } else if (currentFolderFilter === 'personal') {
+      displayCards = displayCards.filter(c => c.category === 'personal' || c.mode === 'profile' || c.actionType === 'profile');
+    } else if (currentFolderFilter === 'wifi') {
+      displayCards = displayCards.filter(c => c.category === 'wifi' || c.mode === 'wifi');
+    } else if (currentFolderFilter === 'sos') {
+      displayCards = displayCards.filter(c => c.category === 'sos' || c.mode === 'sos');
+    } else if (currentFolderFilter === 'vip') {
+      displayCards = displayCards.filter(c => c.category === 'vip');
+    }
+  }
+
+  // 2. Mode Filters
   if (currentFilterMode === 'active') {
     displayCards = displayCards.filter(c => c.isActive);
   } else if (currentFilterMode === 'direct') {
@@ -866,6 +908,8 @@ function renderCardsGrid() {
     const isProfile = (mode === 'profile');
     const isCatalog = (mode === 'catalog');
     const isConditional = (mode === 'conditional');
+    const isWifi = (mode === 'wifi');
+    const isSos = (mode === 'sos');
     const savedTargets = Array.isArray(card.savedTargets) ? card.savedTargets : [];
 
     const themeClasses = [
@@ -877,7 +921,7 @@ function renderCardsGrid() {
 
     // Quick Presets Pills HTML
     let presetsHtml = '';
-    if (savedTargets.length > 0 && !isProfile && !isCatalog) {
+    if (savedTargets.length > 0 && !isProfile && !isCatalog && !isWifi && !isSos) {
       presetsHtml = `
         <div class="mt-3 pt-3 border-t border-zinc-800/80">
           <div class="flex items-center justify-between text-[11px] mb-2">
@@ -908,10 +952,27 @@ function renderCardsGrid() {
     if (isProfile) modeBadge = `${t('card_mode_profile', 'Digital Profile')} 👤`;
     else if (isCatalog) modeBadge = `${t('card_mode_catalog', 'Menu & Catalog')} 🍽️`;
     else if (isConditional) modeBadge = `${t('card_mode_conditional', 'Smart Routing')} 🔀`;
+    else if (isWifi) modeBadge = `Wi-Fi 📶`;
+    else if (isSos) modeBadge = `Lost & Found 🆘`;
+
+    const leadBadge = card.leadCapture?.enabled ? `<span class="text-[10px] bg-purple-500/30 text-purple-200 px-1.5 py-0.5 rounded font-bold border border-purple-500/30">📥 Leads</span>` : '';
+    const limitBadge = (card.limits?.maxScans || card.limits?.expiresAt) ? `<span class="text-[10px] bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded font-bold border border-amber-500/30">⏳ Limits</span>` : '';
+
+    const bulkSelectHtml = isBulkMode ? `
+      <div class="p-2.5 bg-zinc-900/90 border border-emerald-500/40 rounded-2xl flex items-center justify-between shadow-sm">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" onchange="toggleCardSelection('${escapeHtml(card.id)}')" ${selectedCardIds.has(card.id) ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-zinc-950 border-zinc-700">
+          <span class="text-xs font-bold text-emerald-300">Select for Bulk Actions</span>
+        </label>
+        <span class="text-[10px] text-zinc-400 font-mono">/c/${escapeHtml(card.slug)}</span>
+      </div>
+    ` : '';
 
     return `
       <div class="bg-zinc-950/80 border border-zinc-800 hover:border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
         
+        ${bulkSelectHtml}
+
         <!-- 3D Realistic Smart NFC Card Header Component -->
         <div class="${themeClasses} p-4 sm:p-5 text-white flex flex-col justify-between min-h-[145px] relative">
           
@@ -937,6 +998,8 @@ function renderCardsGrid() {
             <div class="flex flex-wrap items-center gap-1.5 mt-1">
               <span class="text-[10px] bg-black/50 px-2 py-0.5 rounded font-mono text-emerald-300 font-semibold border border-emerald-500/20" dir="ltr">/c/${escapeHtml(card.slug)}</span>
               <span class="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded">${modeBadge}</span>
+              ${leadBadge}
+              ${limitBadge}
               ${card.pinCode ? `<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">${t('card_pin_protected', 'PIN Protected')} 🔒</span>` : ''}
             </div>
           </div>
@@ -959,7 +1022,7 @@ function renderCardsGrid() {
         ${presetsHtml}
 
         <!-- Inline URL Editor (For Direct / Conditional modes) -->
-        ${!isProfile && !isCatalog ? `
+        ${!isProfile && !isCatalog && !isWifi && !isSos ? `
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-[11px]">
               <label class="font-bold text-zinc-300">${t('card_target_label', 'Target Destination URL:')}</label>
@@ -1012,12 +1075,45 @@ function renderCardsGrid() {
           </div>
         ` : ''}
 
+        ${isWifi ? `
+          <div class="p-3 bg-sky-950/20 border border-sky-500/30 rounded-2xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-sky-300 block">Smart Wi-Fi Active 📶</span>
+              <span class="text-[11px] text-zinc-400">SSID: ${escapeHtml(card.wifi?.ssid || 'Network')}</span>
+            </div>
+            <button onclick="openQuickPassModal('${card.id}')" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
+              Pass / QR 📲
+            </button>
+          </div>
+        ` : ''}
+
+        ${isSos ? `
+          <div class="p-3 bg-rose-950/20 border border-rose-500/30 rounded-2xl flex items-center justify-between text-xs">
+            <div>
+              <span class="font-bold text-rose-300 block">Lost & Found / SOS Active 🆘</span>
+              <span class="text-[11px] text-zinc-400">${escapeHtml(card.sos?.ownerName || 'Emergency')} (${escapeHtml(card.sos?.phone || '')})</span>
+            </div>
+            <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
+              SOS Page 🆘
+            </a>
+          </div>
+        ` : ''}
+
         <!-- Action Control Buttons Footer -->
-        <div class="grid grid-cols-5 gap-1.5 pt-2 border-t border-zinc-800/80">
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 pt-2 border-t border-zinc-800/80">
           
           <button 
+            onclick="openQuickPassModal('${card.id}')"
+            class="py-2 px-1.5 bg-gradient-to-r from-emerald-600/20 to-green-600/10 hover:bg-emerald-600/30 text-emerald-300 rounded-xl text-[11px] font-bold border border-emerald-500/30 flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm"
+            title="Apple Wallet Quick Pass"
+          >
+            <span>📲</span>
+            <span data-i18n="btn_pass">Pass</span>
+          </button>
+
+          <button 
             onclick="openSimulatorDrawer('${card.id}')"
-            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_test_sim', 'Simulate')}"
           >
             <span>📱</span>
@@ -1026,7 +1122,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="openNfcProgrammerModal('${card.id}')"
-            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_program_nfc', 'Write NFC')}"
           >
             <span>📡</span>
@@ -1035,22 +1131,12 @@ function renderCardsGrid() {
 
           <button 
             onclick="openEditCardDrawer('${card.id}')"
-            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-xl text-[11px] font-bold border border-zinc-700 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-xl text-[11px] font-bold border border-zinc-700 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_edit', 'Edit')}"
           >
             <span>✏️</span>
             <span>${t('btn_edit', 'Edit')}</span>
           </button>
-
-          <a 
-            href="/c/${card.slug}/edit" 
-            target="_blank"
-            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-amber-300 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-amber-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="${t('btn_quick_page', 'Standalone PIN Quick Editor')}"
-          >
-            <span>🔑</span>
-            <span>${t('btn_quick_page_short', 'PIN')}</span>
-          </a>
 
           <button 
             onclick="toggleCardActiveState('${card.id}')"
@@ -1181,6 +1267,32 @@ function openAddCardDrawer() {
   document.getElementById('cardEditorForm').reset();
   document.getElementById('inpIsActive').checked = true;
   if (document.getElementById('inpManagePin')) document.getElementById('inpManagePin').value = '1234';
+
+  // Reset Enterprise Fields
+  if (document.getElementById('inpCardCategory')) document.getElementById('inpCardCategory').value = 'all';
+  if (document.getElementById('inpLeadCaptureEnabled')) document.getElementById('inpLeadCaptureEnabled').checked = false;
+  if (document.getElementById('inpLeadCaptureRequired')) document.getElementById('inpLeadCaptureRequired').checked = false;
+  if (document.getElementById('inpLeadCaptureTitle')) document.getElementById('inpLeadCaptureTitle').value = '';
+  if (document.getElementById('inpLeadCaptureSubtitle')) document.getElementById('inpLeadCaptureSubtitle').value = '';
+  if (document.getElementById('inpMaxScans')) document.getElementById('inpMaxScans').value = '';
+  if (document.getElementById('inpExpiresAt')) document.getElementById('inpExpiresAt').value = '';
+  if (document.getElementById('inpFallbackUrl')) document.getElementById('inpFallbackUrl').value = '';
+  if (document.getElementById('inpExpiredMessage')) document.getElementById('inpExpiredMessage').value = '';
+
+  if (document.getElementById('inpWifiSsid')) document.getElementById('inpWifiSsid').value = '';
+  if (document.getElementById('inpWifiPass')) document.getElementById('inpWifiPass').value = '';
+  if (document.getElementById('inpWifiEncryption')) document.getElementById('inpWifiEncryption').value = 'WPA';
+  if (document.getElementById('inpWifiHidden')) document.getElementById('inpWifiHidden').checked = false;
+
+  if (document.getElementById('inpSosOwnerName')) document.getElementById('inpSosOwnerName').value = '';
+  if (document.getElementById('inpSosReward')) document.getElementById('inpSosReward').value = '';
+  if (document.getElementById('inpSosPhone')) document.getElementById('inpSosPhone').value = '';
+  if (document.getElementById('inpSosWhatsapp')) document.getElementById('inpSosWhatsapp').value = '';
+  if (document.getElementById('inpSosMessage')) document.getElementById('inpSosMessage').value = '';
+
+  const detailsEl = document.getElementById('detailsAdvancedCardSettings');
+  if (detailsEl) detailsEl.open = false;
+
   tempSavedPresets = [];
   renderTempPresetsList();
   switchEditorTab('basic');
@@ -1209,6 +1321,36 @@ function openEditCardDrawer(cardId) {
 
   tempSavedPresets = Array.isArray(card.savedTargets) ? JSON.parse(JSON.stringify(card.savedTargets)) : [];
   renderTempPresetsList();
+
+  // Enterprise Category & Advanced Options
+  if (document.getElementById('inpCardCategory')) document.getElementById('inpCardCategory').value = card.category || 'all';
+
+  const lc = card.leadCapture || {};
+  if (document.getElementById('inpLeadCaptureEnabled')) document.getElementById('inpLeadCaptureEnabled').checked = Boolean(lc.enabled);
+  if (document.getElementById('inpLeadCaptureRequired')) document.getElementById('inpLeadCaptureRequired').checked = Boolean(lc.required);
+  if (document.getElementById('inpLeadCaptureTitle')) document.getElementById('inpLeadCaptureTitle').value = lc.title || '';
+  if (document.getElementById('inpLeadCaptureSubtitle')) document.getElementById('inpLeadCaptureSubtitle').value = lc.subtitle || '';
+
+  const limits = card.limits || {};
+  if (document.getElementById('inpMaxScans')) document.getElementById('inpMaxScans').value = limits.maxScans || '';
+  if (document.getElementById('inpExpiresAt')) document.getElementById('inpExpiresAt').value = limits.expiresAt ? limits.expiresAt.substring(0, 16) : '';
+  if (document.getElementById('inpFallbackUrl')) document.getElementById('inpFallbackUrl').value = limits.fallbackUrl || '';
+  if (document.getElementById('inpExpiredMessage')) document.getElementById('inpExpiredMessage').value = limits.expiredMessage || '';
+
+  // Wi-Fi
+  const wifi = card.wifi || {};
+  if (document.getElementById('inpWifiSsid')) document.getElementById('inpWifiSsid').value = wifi.ssid || '';
+  if (document.getElementById('inpWifiPass')) document.getElementById('inpWifiPass').value = wifi.password || '';
+  if (document.getElementById('inpWifiEncryption')) document.getElementById('inpWifiEncryption').value = wifi.encryption || 'WPA';
+  if (document.getElementById('inpWifiHidden')) document.getElementById('inpWifiHidden').checked = Boolean(wifi.hidden);
+
+  // SOS
+  const sos = card.sos || {};
+  if (document.getElementById('inpSosOwnerName')) document.getElementById('inpSosOwnerName').value = sos.ownerName || '';
+  if (document.getElementById('inpSosReward')) document.getElementById('inpSosReward').value = sos.reward || '';
+  if (document.getElementById('inpSosPhone')) document.getElementById('inpSosPhone').value = sos.phone || '';
+  if (document.getElementById('inpSosWhatsapp')) document.getElementById('inpSosWhatsapp').value = sos.whatsapp || '';
+  if (document.getElementById('inpSosMessage')) document.getElementById('inpSosMessage').value = sos.message || '';
 
   // Conditional Routing
   const tr = card.timeRouting || card.conditional?.time || {};
@@ -1253,7 +1395,7 @@ function closeCardEditorDrawer() {
 
 function switchEditorTab(tab) {
   currentEditorSubTab = tab;
-  const tabs = ['basic', 'presets', 'conditional', 'catalog', 'profile'];
+  const tabs = ['basic', 'wifi', 'sos', 'presets', 'conditional', 'catalog', 'profile'];
   tabs.forEach(t => {
     const el = document.getElementById(`edTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
     const btn = document.getElementById(`edTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
@@ -1367,6 +1509,37 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
     }
   };
 
+  const category = document.getElementById('inpCardCategory')?.value || 'all';
+
+  const leadCapture = {
+    enabled: Boolean(document.getElementById('inpLeadCaptureEnabled')?.checked),
+    required: Boolean(document.getElementById('inpLeadCaptureRequired')?.checked),
+    title: document.getElementById('inpLeadCaptureTitle')?.value.trim() || '',
+    subtitle: document.getElementById('inpLeadCaptureSubtitle')?.value.trim() || ''
+  };
+
+  const limits = {
+    maxScans: Number(document.getElementById('inpMaxScans')?.value) || 0,
+    expiresAt: document.getElementById('inpExpiresAt')?.value || null,
+    fallbackUrl: sanitizeUrl(document.getElementById('inpFallbackUrl')?.value || ''),
+    expiredMessage: document.getElementById('inpExpiredMessage')?.value.trim() || ''
+  };
+
+  const wifi = {
+    ssid: document.getElementById('inpWifiSsid')?.value.trim() || '',
+    password: document.getElementById('inpWifiPass')?.value.trim() || '',
+    encryption: document.getElementById('inpWifiEncryption')?.value || 'WPA',
+    hidden: Boolean(document.getElementById('inpWifiHidden')?.checked)
+  };
+
+  const sos = {
+    ownerName: document.getElementById('inpSosOwnerName')?.value.trim() || '',
+    phone: document.getElementById('inpSosPhone')?.value.trim() || '',
+    whatsapp: document.getElementById('inpSosWhatsapp')?.value.trim() || '',
+    message: document.getElementById('inpSosMessage')?.value.trim() || '',
+    reward: document.getElementById('inpSosReward')?.value.trim() || ''
+  };
+
   const catalog = {
     businessName: document.getElementById('inpCatBusinessName').value.trim() || title,
     tagline: document.getElementById('inpCatTagline').value.trim(),
@@ -1406,6 +1579,11 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
     isActive,
     pinCode,
     managePin,
+    category,
+    leadCapture,
+    limits,
+    wifi,
+    sos,
     conditional,
     timeRouting: conditional.time,
     savedTargets: tempSavedPresets.map(st => ({ ...st, url: sanitizeUrl(st.url) })),
@@ -2122,4 +2300,459 @@ function clearAllDemoCards() {
   loadLocalStats();
 
   showToast(t('toast_demo_cleared', '✅ تم تنظيف وحذف البطاقات التجريبية ومزامنة التحديث لجميع الأجهزة 🧹'), 'success');
+}
+
+// ==========================================
+// ENTERPRISE PRO: LEADS CRM ENGINE
+// ==========================================
+async function loadLeads() {
+  try {
+    const raw = localStorage.getItem('nfc_leads_db') || '[]';
+    leadsList = JSON.parse(raw);
+    if (!Array.isArray(leadsList)) leadsList = [];
+  } catch (e) {
+    leadsList = [];
+  }
+
+  // Sync with server if online
+  if (!isOfflineOrStatic) {
+    try {
+      const res = await fetch('/api/leads');
+      if (res.ok) {
+        const data = await res.json();
+        const serverLeads = Array.isArray(data) ? data : (Array.isArray(data.leads) ? data.leads : []);
+        if (serverLeads.length > 0 || data.success) {
+          const idMap = new Map();
+          [...serverLeads, ...leadsList].forEach(l => {
+            if (l && l.id) idMap.set(l.id, l);
+          });
+          leadsList = Array.from(idMap.values());
+          localStorage.setItem('nfc_leads_db', JSON.stringify(leadsList));
+        }
+      }
+    } catch (e) {}
+  }
+
+  renderLeadsList(leadsList);
+}
+
+function renderLeadsList(listToRender) {
+  const container = document.getElementById('leadsListContainer');
+  const countBadge = document.getElementById('leadsCountBadge');
+  const navBadge = document.getElementById('navLeadsBadge');
+  if (!container) return;
+
+  const count = leadsList.length;
+  if (countBadge) countBadge.textContent = `${count} ${t('leads_count_suffix', 'Leads')}`;
+  if (navBadge) {
+    if (count > 0) navBadge.classList.remove('hidden');
+    else navBadge.classList.add('hidden');
+  }
+
+  if (!listToRender || listToRender.length === 0) {
+    container.innerHTML = `
+      <div class="bg-zinc-950/70 border border-zinc-800 rounded-3xl p-10 text-center space-y-3">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-2xl">📥</div>
+        <h3 class="text-sm font-bold text-white">${t('empty_leads_title', 'No Customer Leads Yet')}</h3>
+        <p class="text-xs text-zinc-400 max-w-sm mx-auto">${t('empty_leads_desc', 'Enable "Lead Capture" in any card settings to automatically collect visitor contact details when they tap.')}</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = listToRender.map(lead => {
+    const cleanPhone = (lead.visitorPhone || '').replace(/[^0-9]/g, '');
+    const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hello ' + (lead.visitorName || '') + ', thank you for contacting us via TapLink!')}`;
+    const dateFormatted = lead.capturedAt ? new Date(lead.capturedAt).toLocaleString() : 'Recent';
+
+    return `
+      <div class="bg-zinc-950/80 border border-zinc-800 hover:border-emerald-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg transition-all">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 text-white font-black flex items-center justify-center text-sm shadow-md shadow-emerald-600/30 shrink-0">
+            ${escapeHtml((lead.visitorName || 'U').charAt(0).toUpperCase())}
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h4 class="text-sm font-bold text-white">${escapeHtml(lead.visitorName || 'Anonymous Visitor')}</h4>
+              <span class="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-mono">${escapeHtml(lead.cardTitle || lead.cardSlug || 'Tag')}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs text-zinc-400 mt-1">
+              <span class="font-mono text-emerald-400 font-semibold" dir="ltr">${escapeHtml(lead.visitorPhone || '')}</span>
+              <span class="text-[10px] text-zinc-500">🕒 ${dateFormatted}</span>
+            </div>
+            ${lead.visitorNote ? `<p class="text-[11px] text-zinc-300 mt-1 bg-zinc-900/60 p-1.5 rounded-lg border border-zinc-800/80">"${escapeHtml(lead.visitorNote)}"</p>` : ''}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+          <a href="${waUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 transition-all shadow-md shadow-emerald-600/30">
+            <span>💬</span>
+            <span>WhatsApp</span>
+          </a>
+          <button onclick="downloadSingleLeadVcfHandler('${lead.id}')" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-300 hover:text-white rounded-xl text-xs font-bold border border-zinc-700 active:scale-95 transition-all" title="Download .vcf contact">
+            <span>📇</span>
+          </button>
+          <button onclick="deleteSingleLeadHandler('${lead.id}')" class="px-2 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all" title="Delete Lead">
+            <span>🗑️</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterLeadsTable() {
+  const query = (document.getElementById('leadSearchInput')?.value || '').toLowerCase().trim();
+  if (!query) {
+    renderLeadsList(leadsList);
+    return;
+  }
+  const filtered = leadsList.filter(l => 
+    (l.visitorName && l.visitorName.toLowerCase().includes(query)) ||
+    (l.visitorPhone && l.visitorPhone.toLowerCase().includes(query)) ||
+    (l.visitorNote && l.visitorNote.toLowerCase().includes(query)) ||
+    (l.cardTitle && l.cardTitle.toLowerCase().includes(query)) ||
+    (l.cardSlug && l.cardSlug.toLowerCase().includes(query))
+  );
+  renderLeadsList(filtered);
+}
+
+function generateVcfString(name, phone, note) {
+  return [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN;CHARSET=UTF-8:${name}`,
+    `TEL;TYPE=CELL:${phone}`,
+    note ? `NOTE;CHARSET=UTF-8:${note}` : '',
+    'END:VCARD'
+  ].filter(Boolean).join('\r\n');
+}
+
+function downloadSingleLeadVcfHandler(leadId) {
+  const lead = leadsList.find(l => l.id === leadId);
+  if (!lead) return;
+  const vcf = generateVcfString(lead.visitorName || 'Contact', lead.visitorPhone || '', lead.visitorNote || '');
+  const blob = new Blob([vcf], { type: 'text/vcard;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lead_${(lead.visitorName || 'contact').replace(/\s+/g, '_')}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportAllLeadsVcf() {
+  if (leadsList.length === 0) {
+    showToast('No leads available to export', 'error');
+    return;
+  }
+  let fullVcf = '';
+  leadsList.forEach(l => {
+    fullVcf += generateVcfString(l.visitorName || 'Contact', l.visitorPhone || '', l.visitorNote || '') + '\r\n';
+  });
+  const blob = new Blob([fullVcf], { type: 'text/vcard;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `taplink_all_leads_${Date.now()}.vcf`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Exported all leads to VCF contacts!', 'success');
+}
+
+function exportLeadsToCsv() {
+  if (leadsList.length === 0) {
+    showToast('No leads available to export', 'error');
+    return;
+  }
+  // Include UTF-8 BOM (\uFEFF) for Arabic display in Microsoft Excel
+  let csv = '\uFEFFName,Phone,Tag Slug,Tag Title,Note,Captured At\n';
+  leadsList.forEach(l => {
+    const row = [
+      `"${(l.visitorName || '').replace(/"/g, '""')}"`,
+      `"${(l.visitorPhone || '').replace(/"/g, '""')}"`,
+      `"${(l.cardSlug || '').replace(/"/g, '""')}"`,
+      `"${(l.cardTitle || '').replace(/"/g, '""')}"`,
+      `"${(l.visitorNote || '').replace(/"/g, '""')}"`,
+      `"${(l.capturedAt || '').replace(/"/g, '""')}"`
+    ];
+    csv += row.join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `taplink_leads_${Date.now()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Exported leads to CSV (Excel)!', 'success');
+}
+
+async function deleteSingleLeadHandler(leadId) {
+  if (!confirm('Are you sure you want to delete this lead?')) return;
+  leadsList = leadsList.filter(l => l.id !== leadId);
+  localStorage.setItem('nfc_leads_db', JSON.stringify(leadsList));
+  renderLeadsList(leadsList);
+  if (!isOfflineOrStatic) {
+    try {
+      fetch(`/api/leads/${leadId}`, { method: 'DELETE' });
+    } catch (e) {}
+  }
+  showToast('Lead deleted', 'success');
+}
+
+async function clearAllLeadsHandler() {
+  if (!confirm('Are you sure you want to delete ALL customer leads? This cannot be undone.')) return;
+  leadsList = [];
+  localStorage.setItem('nfc_leads_db', JSON.stringify([]));
+  renderLeadsList(leadsList);
+  if (!isOfflineOrStatic) {
+    try {
+      fetch('/api/leads', { method: 'DELETE' });
+    } catch (e) {}
+  }
+  showToast('All leads cleared', 'success');
+}
+
+// ==========================================
+// ENTERPRISE PRO: BULK ACTIONS ENGINE
+// ==========================================
+function toggleBulkSelectionMode(forceState) {
+  isBulkMode = (typeof forceState === 'boolean') ? forceState : !isBulkMode;
+  selectedCardIds.clear();
+  const btn = document.getElementById('btnToggleBulkMode');
+  if (btn) {
+    if (isBulkMode) {
+      btn.classList.add('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+    } else {
+      btn.classList.remove('bg-emerald-500/20', 'border-emerald-500/40', 'text-emerald-300');
+    }
+  }
+  updateBulkActionBar();
+  renderCardsGrid();
+}
+
+function toggleCardSelection(cardId) {
+  if (selectedCardIds.has(cardId)) {
+    selectedCardIds.delete(cardId);
+  } else {
+    selectedCardIds.add(cardId);
+  }
+  updateBulkActionBar();
+}
+
+function updateBulkActionBar() {
+  const bar = document.getElementById('bulkActionBar');
+  const countEl = document.getElementById('bulkSelectedCount');
+  if (!bar) return;
+  const count = selectedCardIds.size;
+  if (countEl) countEl.textContent = `${count} ${t('bulk_selected_suffix', 'Selected')}`;
+
+  if (isBulkMode && count > 0) {
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+  } else {
+    bar.classList.add('hidden');
+    bar.classList.remove('flex');
+  }
+}
+
+function selectAllBulkCards() {
+  cardsList.forEach(c => selectedCardIds.add(c.id));
+  updateBulkActionBar();
+  renderCardsGrid();
+}
+
+function clearBulkSelection() {
+  selectedCardIds.clear();
+  updateBulkActionBar();
+  renderCardsGrid();
+}
+
+function openBulkUrlModal() {
+  if (selectedCardIds.size === 0) return;
+  const modal = document.getElementById('bulkUrlModal');
+  const subtext = document.getElementById('bulkUrlSubtext');
+  if (subtext) subtext.textContent = `Updating ${selectedCardIds.size} selected tags`;
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeBulkUrlModal() {
+  const modal = document.getElementById('bulkUrlModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function executeBulkUrlSave() {
+  const newUrl = sanitizeUrl(document.getElementById('inpBulkTargetUrl')?.value || '');
+  if (!newUrl) {
+    alert('Please enter a valid URL');
+    return;
+  }
+  const ids = Array.from(selectedCardIds);
+  cardsList = cardsList.map(c => {
+    if (selectedCardIds.has(c.id)) {
+      return { ...c, destinationUrl: newUrl, updatedAt: new Date().toISOString() };
+    }
+    return c;
+  });
+  saveLocalCards(cardsList);
+  closeBulkUrlModal();
+  toggleBulkSelectionMode(false);
+  renderCardsGrid();
+  showToast(`Updated destination URL for ${ids.length} tags!`, 'success');
+
+  if (!isOfflineOrStatic) {
+    try {
+      fetch('/api/cards/bulk-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardIds: ids, destinationUrl: newUrl })
+      });
+    } catch (e) {}
+  }
+}
+
+async function executeBulkStatusToggle(isActive) {
+  const ids = Array.from(selectedCardIds);
+  if (ids.length === 0) return;
+  cardsList = cardsList.map(c => {
+    if (selectedCardIds.has(c.id)) {
+      return { ...c, isActive: Boolean(isActive), updatedAt: new Date().toISOString() };
+    }
+    return c;
+  });
+  saveLocalCards(cardsList);
+  toggleBulkSelectionMode(false);
+  renderCardsGrid();
+  loadLocalStats();
+  showToast(`${isActive ? 'Activated' : 'Paused'} ${ids.length} tags!`, 'success');
+
+  if (!isOfflineOrStatic) {
+    try {
+      fetch('/api/cards/bulk-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardIds: ids, isActive: Boolean(isActive) })
+      });
+    } catch (e) {}
+  }
+}
+
+async function executeBulkDelete() {
+  const ids = Array.from(selectedCardIds);
+  if (ids.length === 0) return;
+  if (!confirm(`Are you sure you want to permanently delete ${ids.length} cards? This cannot be undone.`)) return;
+
+  cardsList = cardsList.filter(c => !selectedCardIds.has(c.id));
+  saveLocalCards(cardsList);
+  toggleBulkSelectionMode(false);
+  renderCardsGrid();
+  loadLocalStats();
+  showToast(`Deleted ${ids.length} cards permanently!`, 'success');
+
+  if (!isOfflineOrStatic) {
+    try {
+      fetch('/api/cards/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardIds: ids })
+      });
+    } catch (e) {}
+  }
+}
+
+// ==========================================
+// ENTERPRISE PRO: QUICK PASS (APPLE WALLET MODE)
+// ==========================================
+function openQuickPassModal(cardId) {
+  if (cardsList.length === 0) {
+    showToast('No tags registered to display in Quick Pass', 'error');
+    return;
+  }
+  if (cardId) {
+    const idx = cardsList.findIndex(c => c.id === cardId);
+    if (idx !== -1) qpCurrentIndex = idx;
+    else qpCurrentIndex = 0;
+  } else {
+    qpCurrentIndex = 0;
+  }
+
+  const modal = document.getElementById('quickPassModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  renderQuickPassCurrentCard();
+}
+
+function closeQuickPassModal() {
+  const modal = document.getElementById('quickPassModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function renderQuickPassCurrentCard() {
+  if (cardsList.length === 0) return;
+  if (qpCurrentIndex < 0) qpCurrentIndex = cardsList.length - 1;
+  if (qpCurrentIndex >= cardsList.length) qpCurrentIndex = 0;
+
+  const card = cardsList[qpCurrentIndex];
+  const counter = document.getElementById('qpCardCounter');
+  const badge = document.getElementById('qpCardBadge');
+  const title = document.getElementById('qpCardTitle');
+  const slug = document.getElementById('qpCardSlug');
+  const target = document.getElementById('qpCardTarget');
+  const qrWrap = document.getElementById('qpQrCodeWrapper');
+
+  if (counter) counter.textContent = `Card ${qpCurrentIndex + 1} of ${cardsList.length}`;
+  if (title) title.textContent = card.title || 'TapLink Smart Card';
+  if (slug) slug.textContent = `/c/${card.slug}`;
+  if (target) target.textContent = card.destinationUrl || (card.mode === 'wifi' ? `Wi-Fi: ${card.wifi?.ssid}` : 'Digital Profile');
+  if (badge) badge.textContent = `${(card.mode || 'direct').toUpperCase()} TAG`;
+
+  if (qrWrap && window.QRCode) {
+    qrWrap.innerHTML = '';
+    const bUrl = getBaseUrl();
+    const fixedUrl = `${bUrl}/c/${card.slug}`;
+    new QRCode(qrWrap, {
+      text: fixedUrl,
+      width: 200,
+      height: 200,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+}
+
+function navigateQpCard(direction) {
+  qpCurrentIndex += direction;
+  renderQuickPassCurrentCard();
+}
+
+function toggleQpMaxBrightness() {
+  qpMaxContrast = !qpMaxContrast;
+  const box = document.getElementById('qpQrBox');
+  const cardBox = document.getElementById('qpCardContainer');
+  const btn = document.getElementById('btnQpContrast');
+  if (qpMaxContrast) {
+    if (cardBox) cardBox.classList.add('bg-white', 'text-black');
+    if (box) box.classList.add('scale-105', 'border-black');
+    if (btn) btn.classList.add('bg-amber-400', 'text-black');
+  } else {
+    if (cardBox) cardBox.classList.remove('bg-white', 'text-black');
+    if (box) box.classList.remove('scale-105', 'border-black');
+    if (btn) btn.classList.remove('bg-amber-400', 'text-black');
+  }
+}
+
+function copyQpLink() {
+  if (cardsList.length === 0) return;
+  const card = cardsList[qpCurrentIndex];
+  const bUrl = getBaseUrl();
+  const fixedUrl = `${bUrl}/c/${card.slug}`;
+  copyToClipboard(fixedUrl, t('toast_copied', 'Copied to clipboard!'));
 }

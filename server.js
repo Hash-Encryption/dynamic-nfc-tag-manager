@@ -187,6 +187,322 @@ function renderPinLockPage(card, currentPath, errorMsg = '') {
   `;
 }
 
+// Render Smart Wi-Fi Tag Page
+function renderWifiPage(card) {
+  const wifi = card.wifi || {};
+  const ssid = wifi.ssid || card.title || 'TapLink-WiFi';
+  const pass = wifi.password || '';
+  const enc = wifi.encryption || 'WPA';
+  const qrData = `WIFI:S:${ssid};T:${enc};P:${pass};;`;
+
+  return `
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl" class="dark">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>شبكة واي فاي الذكية | ${card.title}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="/js/qrcode.min.js"></script>
+      <style>body { font-family: 'Tajawal', 'Inter', sans-serif; }</style>
+    </head>
+    <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black">
+      <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute -top-40 -start-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl"></div>
+      </div>
+      <div class="bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl space-y-4">
+        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+        </div>
+        <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold">
+          اتصال واي فاي ذكي • Smart Wi-Fi
+        </span>
+        <h2 class="text-xl font-extrabold text-white">${card.title}</h2>
+        
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-4 text-start space-y-3">
+          <div>
+            <span class="text-[11px] text-zinc-400 block font-medium">اسم الشبكة (SSID)</span>
+            <div class="text-base font-bold text-white font-mono flex items-center justify-between">
+              <span>${ssid}</span>
+              <span class="text-[10px] text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-sans">${enc}</span>
+            </div>
+          </div>
+          ${pass ? `
+          <div>
+            <span class="text-[11px] text-zinc-400 block font-medium">كلمة المرور</span>
+            <div class="flex items-center justify-between gap-2 mt-1">
+              <span class="font-mono text-sm text-emerald-300 font-bold tracking-wider" id="wifiPassText">${pass}</span>
+              <button onclick="copyWifiPass()" id="btnCopyPass" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 text-xs font-bold rounded-xl border border-emerald-500/30 active:scale-95 transition-all flex items-center gap-1">
+                <span>نسخ</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </button>
+            </div>
+          </div>
+          ` : '<p class="text-xs text-emerald-400 font-semibold">الشبكة مفتوحة بدون كلمة مرور</p>'}
+        </div>
+
+        <div class="bg-white p-3 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg" id="wifiQrContainer">
+        </div>
+        <p class="text-[11px] text-zinc-400">امسح الرمز بكاميرا الهاتف للاتصال بالشبكة تلقائياً 📲</p>
+        <p class="text-[10px] text-zinc-500 pt-2">TapLink Smart NFC &copy; 2026 • by MUHAB</p>
+      </div>
+
+      <script>
+        function copyWifiPass() {
+          navigator.clipboard.writeText('${pass}').then(() => {
+            const btn = document.getElementById('btnCopyPass');
+            btn.textContent = 'تم النسخ ✓';
+            setTimeout(() => { btn.textContent = 'نسخ'; }, 2000);
+          });
+        }
+        if (window.QRCode) {
+          new QRCode(document.getElementById('wifiQrContainer'), {
+            text: '${qrData}',
+            width: 170,
+            height: 170,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+// Render Lost & Found / SOS Emergency Page
+function renderSosPage(card) {
+  const sos = card.sos || {};
+  const ownerName = sos.ownerName || card.title || 'صاحب الغرض';
+  const phone = sos.phone || '';
+  const whatsapp = sos.whatsapp || phone || '';
+  const cleanPhone = phone.replace(/[^0-9+]/g, '');
+  const cleanWa = whatsapp.replace(/[^0-9]/g, '');
+  const message = sos.message || 'إذا عثرت على هذا الغرض، أرجو التواصل معي فوراً شاكراً ومقدراً أمانتك وحسن صنيعك.';
+  const reward = sos.rewardText || '';
+
+  return `
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl" class="dark">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>طوارئ ومفقودات | ${card.title}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>body { font-family: 'Tajawal', 'Inter', sans-serif; }</style>
+    </head>
+    <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4 selection:bg-rose-500 selection:text-white">
+      <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute -top-40 -start-40 w-96 h-96 bg-rose-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-amber-600/20 rounded-full blur-3xl"></div>
+      </div>
+      <div class="bg-zinc-950/90 border border-rose-500/30 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl space-y-4">
+        <div class="w-16 h-16 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-rose-500/20 animate-pulse">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <span class="inline-block px-3 py-1 bg-rose-500/10 text-rose-300 border border-rose-500/30 rounded-full text-xs font-bold">
+          🆘 بطاقة مفقودات وطوارئ • SOS Tag
+        </span>
+        <h2 class="text-xl font-black text-white">${card.title}</h2>
+        <p class="text-xs text-zinc-300 bg-zinc-900/90 border border-zinc-800 p-3.5 rounded-2xl text-start leading-relaxed">
+          ${message}
+        </p>
+        ${reward ? `
+          <div class="p-2.5 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5">
+            <span>🎁</span><span>مكافأة مجزية: ${reward}</span>
+          </div>
+        ` : ''}
+
+        <div class="space-y-2.5 pt-2">
+          ${cleanPhone ? `
+          <a href="tel:${cleanPhone}" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-emerald-600/30 text-xs flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+            <span>اتصال هاتفي فوري بالمالك (${ownerName})</span>
+          </a>
+          ` : ''}
+
+          <button onclick="sendLocationWhatsApp()" id="btnSendLocation" class="w-full py-3.5 bg-zinc-900 hover:bg-zinc-850 active:scale-95 text-emerald-400 border border-emerald-500/40 font-extrabold rounded-2xl transition-all text-xs flex items-center justify-center gap-2">
+            <span>📍 إرسال موقع العثور على البطاقة عبر واتساب</span>
+          </button>
+        </div>
+
+        <p class="text-[10px] text-zinc-500 pt-2">TapLink Smart NFC &copy; 2026 • by MUHAB</p>
+      </div>
+
+      <script>
+        function sendLocationWhatsApp() {
+          const btn = document.getElementById('btnSendLocation');
+          btn.innerHTML = '<span>جاري جلب إحداثيات الموقع... ⏳</span>';
+
+          const openWa = (mapUrl) => {
+            const text = encodeURIComponent('السلام عليكم، لقد عثرت على غرضك المرتبط ببطاقة NFC [${card.title}].\\n\\n' + (mapUrl ? 'موقعي الحالي هو: ' + mapUrl : 'أرجو التواصل للتنسيق لتسليمك الغرض.'));
+            window.location.href = 'https://wa.me/${cleanWa}?text=' + text;
+          };
+
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const mapUrl = 'https://maps.google.com/?q=' + lat + ',' + lng;
+                openWa(mapUrl);
+              },
+              (err) => {
+                openWa('');
+              },
+              { timeout: 7000 }
+            );
+          } else {
+            openWa('');
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+// Render Lead Capture Form Page
+function renderLeadCapturePage(card, nextUrl) {
+  const lc = card.leadCapture || {};
+  const title = lc.title || 'تواصل معي • Connect With Me';
+  const sub = lc.subtitle || 'سجل بياناتك للتواصل السريع وتبادل البطاقات الرقمية';
+  const isRequired = Boolean(lc.required);
+
+  return `
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl" class="dark">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>${title} | ${card.title}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>body { font-family: 'Tajawal', 'Inter', sans-serif; }</style>
+    </head>
+    <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black">
+      <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div class="absolute -top-40 -start-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl"></div>
+      </div>
+      <div class="bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl space-y-4">
+        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+        </div>
+        <h2 class="text-xl font-extrabold text-white">${title}</h2>
+        <p class="text-xs text-zinc-400">${sub}</p>
+
+        <form id="leadForm" class="space-y-3 pt-2 text-start">
+          <div>
+            <label class="block text-[11px] font-bold text-zinc-300 mb-1">الاسم الكريم *</label>
+            <input type="text" id="leadName" required placeholder="مثال: محمد العمري" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-zinc-300 mb-1">رقم الجوال / واتساب *</label>
+            <input type="tel" id="leadPhone" required dir="ltr" placeholder="+966 50 000 0000" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-start">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-zinc-300 mb-1">ملاحظة أو استفسار (اختياري)</label>
+            <input type="text" id="leadNote" placeholder="اكتب ملاحظتك هنا..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button type="submit" id="btnSubmitLead" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-extrabold rounded-2xl transition-all shadow-lg shadow-emerald-600/30 text-xs">
+              أرسل وتابع 🚀
+            </button>
+            ${!isRequired ? `
+            <a href="${nextUrl}?captured=1" class="block w-full text-center py-2 text-[11px] text-zinc-400 hover:text-white font-medium">
+              تخطي والمتابعة مباشرة ➔
+            </a>
+            ` : ''}
+          </div>
+        </form>
+        <p class="text-[10px] text-zinc-500 pt-2">TapLink Smart CRM &copy; 2026 • by MUHAB</p>
+      </div>
+
+      <script>
+        document.getElementById('leadForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('btnSubmitLead');
+          btn.textContent = 'جاري الإرسال...';
+          btn.disabled = true;
+
+          const lead = {
+            cardId: '${card.id}',
+            cardTitle: '${card.title}',
+            cardSlug: '${card.slug}',
+            name: document.getElementById('leadName').value.trim(),
+            phone: document.getElementById('leadPhone').value.trim(),
+            note: document.getElementById('leadNote').value.trim()
+          };
+
+          try {
+            await fetch('/api/leads', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(lead)
+            });
+            try {
+              const raw = localStorage.getItem('nfc_leads_db') || '[]';
+              const list = JSON.parse(raw);
+              list.unshift({ ...lead, id: 'lead-' + Date.now(), timestamp: new Date().toISOString() });
+              localStorage.setItem('nfc_leads_db', JSON.stringify(list));
+            } catch(e) {}
+          } catch(err) {}
+
+          btn.textContent = 'تم الإرسال بنجاح ✓';
+          setTimeout(() => {
+            window.location.replace('${nextUrl}?captured=1');
+          }, 400);
+        });
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+// Render Offer Expired / Scan Limit Reached Page
+function renderExpiredPage(card, msg = '') {
+  return `
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl" class="dark">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>انتهت الصلاحية | ${card.title}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>body { font-family: 'Tajawal', sans-serif; }</style>
+    </head>
+    <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4 selection:bg-amber-500 selection:text-black">
+      <div class="bg-zinc-950/90 border border-amber-500/20 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl space-y-4">
+        <div class="w-16 h-16 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-full text-xs font-semibold">
+          العرض غير متاح حالياً
+        </span>
+        <h2 class="text-xl font-bold text-white">${card.title}</h2>
+        <p class="text-xs text-zinc-400 leading-relaxed">${msg || 'انتهت صلاحية هذه البطاقة أو تم استنفاد الحد الأقصى للمسحات المتاحة.'}</p>
+        <p class="text-[10px] text-zinc-500 pt-3">TapLink Smart Ecosystem &copy; 2026 • by MUHAB</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 // ==========================================
 // 1. THE REDIRECT ENGINE (محرك التحويل الذكي)
 // Paths: /c/:slug and /go/:slug
@@ -236,7 +552,44 @@ function handleDynamicRedirect(req, res, slug) {
 
   const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
 
-  // 3. MODE 2: Digital Business Card Profile
+  // 3. Expiration Date Check
+  if (card.limits?.expiresAt) {
+    const expDate = new Date(card.limits.expiresAt);
+    if (!isNaN(expDate.getTime()) && expDate < new Date()) {
+      if (card.limits.fallbackUrl) {
+        return res.redirect(302, db.sanitizeUrl(card.limits.fallbackUrl) || '/');
+      }
+      return res.status(410).send(renderExpiredPage(card, card.limits.expiredMessage || 'انتهت صلاحية العرض أو البطاقة الحالية.'));
+    }
+  }
+
+  // 4. Max Scans Limit Check
+  if (card.limits?.maxScans && Number(card.limits.maxScans) > 0) {
+    if ((card.scanCount || 0) >= Number(card.limits.maxScans)) {
+      if (card.limits.fallbackUrl) {
+        return res.redirect(302, db.sanitizeUrl(card.limits.fallbackUrl) || '/');
+      }
+      return res.status(410).send(renderExpiredPage(card, 'تم استنفاد الحد الأقصى لمسحات هذه البطاقة.'));
+    }
+  }
+
+  // 5. Lead Capture Intercept Check
+  const isCaptured = req.query.captured === '1' || req.cookies[`lead_${card.slug}`];
+  if (card.leadCapture?.enabled && !isCaptured) {
+    return res.send(renderLeadCapturePage(card, `/go/${slug}`));
+  }
+
+  // 6. Smart Wi-Fi Tag Mode
+  if (mode === 'wifi') {
+    return res.send(renderWifiPage(card));
+  }
+
+  // 7. Lost & Found / SOS Emergency Mode
+  if (mode === 'sos') {
+    return res.send(renderSosPage(card));
+  }
+
+  // 8. Digital Business Card Profile
   if (mode === 'profile') {
     return res.sendFile(path.join(__dirname, 'public', 'landing.html'));
   }
@@ -667,6 +1020,72 @@ app.post('/api/backup/import', requireAuth, (req, res) => {
   try {
     const result = db.importBackup(req.body);
     res.json({ success: true, message: `تم استعادة النسخة الاحتياطية بنجاح (${result.cardsCount} بطاقة)`, ...result });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// --- Leads CRM API Endpoints ---
+app.get('/api/leads', (req, res) => {
+  const leads = db.getAllLeads();
+  res.json({ success: true, count: leads.length, leads });
+});
+
+app.post('/api/leads', (req, res) => {
+  try {
+    const lead = db.addLead(req.body);
+    res.cookie(`lead_${req.body.cardSlug || 'tag'}`, '1', { maxAge: 24 * 60 * 60 * 1000, httpOnly: false });
+    res.json({ success: true, lead });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.delete('/api/leads/:id', requireAuth, (req, res) => {
+  const success = db.deleteLead(req.params.id);
+  res.json({ success });
+});
+
+app.delete('/api/leads', requireAuth, (req, res) => {
+  db.clearLeads();
+  res.json({ success: true, message: 'تم مسح سجل العملاء بالكامل' });
+});
+
+// --- Bulk Cards Operations ---
+app.post('/api/cards/bulk-url', requireAuth, (req, res) => {
+  try {
+    const { cardIds, destinationUrl } = req.body;
+    if (!Array.isArray(cardIds) || cardIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'يرجى تحديد بطاقة واحدة على الأقل' });
+    }
+    const updatedCount = db.bulkUpdateDestinationUrl(cardIds, destinationUrl);
+    res.json({ success: true, updatedCount, message: `تم تحديث الرابط لـ ${updatedCount} بطاقة بنجاح` });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/cards/bulk-status', requireAuth, (req, res) => {
+  try {
+    const { cardIds, isActive } = req.body;
+    if (!Array.isArray(cardIds) || cardIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'يرجى تحديد بطاقة واحدة على الأقل' });
+    }
+    const updatedCount = db.bulkUpdateStatus(cardIds, isActive);
+    res.json({ success: true, updatedCount, message: `تم تحديث حالة ${updatedCount} بطاقة بنجاح` });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/cards/bulk-delete', requireAuth, (req, res) => {
+  try {
+    const { cardIds } = req.body;
+    if (!Array.isArray(cardIds) || cardIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'يرجى تحديد بطاقة واحدة على الأقل' });
+    }
+    const deletedCount = db.bulkDeleteCards(cardIds);
+    res.json({ success: true, deletedCount, message: `تم حذف ${deletedCount} بطاقة نهائياً` });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }

@@ -290,6 +290,22 @@
             return;
           }
 
+          // Check Limits & Expiration
+          const limits = card.limits || {};
+          const isExpired = limits.expiresAt && new Date(limits.expiresAt).getTime() < Date.now();
+          const isMaxScans = limits.maxScans && Number(limits.maxScans) > 0 && (card.scanCount || 0) >= Number(limits.maxScans);
+          if (isExpired || isMaxScans) {
+            if (limits.fallbackUrl) {
+              executeRedirection({ destinationUrl: limits.fallbackUrl, mode: 'direct' });
+              return;
+            }
+            document.getElementById('redirectLoadingBox').classList.add('hidden');
+            document.getElementById('notFoundBox').classList.remove('hidden');
+            document.getElementById('unregHeading').textContent = limits.expiredMessage || (isAr ? 'انتهت صلاحية هذا الرابط' : 'This Tag Has Expired');
+            document.getElementById('unregDesc').textContent = isAr ? 'وصل هذا الرابط للحد الأقصى للمسحات أو انتهت صلاحيته المحددة.' : 'This tag has reached its scan limit or has expired.';
+            return;
+          }
+
           if (card.pinCode && card.pinCode.trim().length > 0) {
             document.getElementById('redirectLoadingBox').classList.add('hidden');
             document.getElementById('pinBox').classList.remove('hidden');
@@ -346,6 +362,10 @@
         }
         if (mode === 'catalog') {
           window.location.replace(`${repoBase}/catalog.html?slug=${encodeURIComponent(slug)}`);
+          return;
+        }
+        if (mode === 'wifi' || mode === 'sos' || (card.leadCapture && card.leadCapture.enabled)) {
+          window.location.replace(`${repoBase}/?slug=${encodeURIComponent(slug)}`);
           return;
         }
         let target = sanitizeRedirectUrl(card.destinationUrl || '');

@@ -189,14 +189,6 @@ const I18N = {
       // Toast Notifications
       toast_copied: "Copied to clipboard! 📋",
       toast_saved: "Tag saved & activated successfully! ✨",
-      toast_saved_sync: "✅ Saved and synchronized across all devices",
-      btn_delete_card: "Delete Card Permanently",
-      confirm_delete_card: "Are you sure you want to permanently delete this tag?",
-      settings_cleanup_title: "Account Clean-up & Demo Tags",
-      settings_cleanup_desc: "Clear initial test/demo tags with 1-click and start with a clean workspace",
-      btn_clear_demo: "Delete All Demo Tags",
-      confirm_clear_demo: "Are you sure you want to delete all demo tags?",
-      toast_demo_cleared: "All demo tags removed successfully 🧹",
       toast_updated: "Target destination updated successfully! 🚀",
       toast_deleted: "Tag deleted successfully! 🗑️",
       toast_cloud_synced: "Real-time cloud sync complete 🟢",
@@ -277,7 +269,54 @@ const I18N = {
       btn_quick_page: "Standalone PIN Quick Editor",
       btn_quick_page_short: "PIN Edit",
       toast_qr_print_downloaded: "Downloaded 2000px Ultra HD QR Code (Print-Ready)! 🖨️",
-      toast_qr_svg_downloaded: "Downloaded Vector SVG (Laser & PVC card ready)! 📐"
+      toast_qr_svg_downloaded: "Downloaded Vector SVG (Laser & PVC card ready)! 📐",
+
+      // Enterprise Pro Edition - Leads CRM
+      nav_leads: "Leads CRM",
+      section_leads_title: "Visitor Leads & CRM",
+      section_leads_subtitle: "Customer contacts captured automatically upon tapping your smart cards",
+      btn_export_csv: "Export to Excel (CSV) 📊",
+      btn_export_vcf: "Download Contacts (.vcf) 📇",
+      btn_clear_leads: "Clear Leads 🗑️",
+      leads_empty_title: "No Customer Leads Captured Yet",
+      leads_empty_desc: "Enable 'Visitor Lead Capture' inside any card's advanced settings to start collecting contact info automatically.",
+      col_lead_name: "Visitor Name",
+      col_lead_phone: "Phone / WhatsApp",
+      col_lead_card: "Source Tag",
+      col_lead_time: "Time",
+      col_lead_note: "Note",
+      col_lead_actions: "Direct Actions",
+
+      // Enterprise Pro Edition - New Smart Modes
+      card_mode_wifi: "Smart Wi-Fi 📶",
+      card_mode_sos: "Lost & Found / SOS 🆘",
+      action_wifi_title: "5. Smart Wi-Fi Tag 📶",
+      action_wifi_desc: "Allows guests to connect to Wi-Fi with 1-tap password copy or camera auto-connect QR.",
+      action_sos_title: "6. Lost & Found / SOS Emergency 🆘",
+      action_sos_desc: "Emergency tag for luggage, keys, pets, or kids with 1-tap call and WhatsApp GPS location sharing.",
+
+      // Smart Folders & Filters
+      folder_all: "All Tags",
+      folder_restaurant: "🍽️ Menus",
+      folder_personal: "👤 Personal",
+      folder_wifi: "📶 Wi-Fi",
+      folder_sos: "🆘 SOS / Lost",
+      folder_vip: "⭐ VIP",
+
+      // Bulk Actions
+      btn_bulk_mode: "Bulk Actions ☑️",
+      btn_bulk_cancel: "Cancel ✕",
+      btn_bulk_update_url: "Bulk URL 🔗",
+      btn_bulk_activate: "Activate 🟢",
+      btn_bulk_pause: "Pause ⏸️",
+      btn_bulk_delete: "Delete 🗑️",
+      bulk_selected_count: "Selected Tags",
+
+      // Quick Pass Show Mode
+      btn_quick_pass: "Quick Pass 📲",
+      quick_pass_title: "Apple Wallet Style Quick Pass",
+      quick_pass_sub: "Present this high-contrast QR code directly to customers from your phone screen",
+      quick_pass_brightness: "Max Contrast Mode"
     },
 
     ar: {
@@ -460,14 +499,6 @@ const I18N = {
       // Toast Notifications
       toast_copied: "تم النسخ إلى الحافظة بنجاح! 📋",
       toast_saved: "تم حفظ وتفعيل البطاقة بنجاح! ✨",
-      toast_saved_sync: "✅ تم الحفظ والمزامنة لجميع الأجهزة",
-      btn_delete_card: "حذف البطاقة نهائياً",
-      confirm_delete_card: "هل أنت متأكد من حذف هذه البطاقة نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
-      settings_cleanup_title: "تنظيف الحساب والبطاقات التجريبية",
-      settings_cleanup_desc: "حذف البطاقات التجريبية بضغطة زر لبدء العمل ببطاقاتك الخاصة",
-      btn_clear_demo: "حذف جميع البطاقات التجريبية",
-      confirm_clear_demo: "هل تريد حذف جميع البطاقات التجريبية؟",
-      toast_demo_cleared: "تم تنظيف وحذف كافة البطاقات التجريبية بنجاح 🧹",
       toast_updated: "تم تحديث رابط الوجهة الهدف بنجاح! 🚀",
       toast_deleted: "تم حذف البطاقة بنجاح! 🗑️",
       toast_cloud_synced: "تمت المزامنة السحابية الفورية 🟢",
@@ -548,7 +579,54 @@ const I18N = {
       btn_quick_page: "لوحة التعديل السريع برمز PIN",
       btn_quick_page_short: "تعديل بالـ PIN",
       toast_qr_print_downloaded: "تم تنزيل رمز QR فائق الدقة 2000 بكسل جاهز للطباعة! 🖨️",
-      toast_qr_svg_downloaded: "تم تنزيل ملف SVG المتجهي للطباعة البلاستيكية والليزر! 📐"
+      toast_qr_svg_downloaded: "تم تنزيل ملف SVG المتجهي للطباعة البلاستيكية والليزر! 📐",
+
+      // Enterprise Pro Edition - Leads CRM
+      nav_leads: "سجل العملاء",
+      section_leads_title: "سجل بيانات العملاء والزوار (CRM)",
+      section_leads_subtitle: "قائمة الزوار والعملاء الذين سجلوا بياناتهم تلقائياً عبر مسح بطاقاتك الذكية",
+      btn_export_csv: "تصدير إلى Excel (CSV) 📊",
+      btn_export_vcf: "تنزيل الكل جهات اتصال (.vcf) 📇",
+      btn_clear_leads: "مسح السجل 🗑️",
+      leads_empty_title: "لم يتم تسجيل أي عملاء بعد",
+      leads_empty_desc: "قم بتفعيل خيار 'جمع بيانات الزوار' داخل الإعدادات المتقدمة لأي بطاقة لبدء استقبال بيانات العملاء تلقائياً.",
+      col_lead_name: "اسم العميل",
+      col_lead_phone: "رقم الجوال / واتساب",
+      col_lead_card: "البطاقة المصدر",
+      col_lead_time: "وقت التسجيل",
+      col_lead_note: "ملاحظة العميل",
+      col_lead_actions: "إجراءات مباشرة",
+
+      // Enterprise Pro Edition - New Smart Modes
+      card_mode_wifi: "واي فاي ذكي 📶",
+      card_mode_sos: "طوارئ ومفقودات 🆘",
+      action_wifi_title: "5. شبكة واي فاي الذكية 📶",
+      action_wifi_desc: "تتيح للزوار الاتصال بشبكة الواي فاي بلمسة واحدة أو عبر مسح رمز QR مخصص بكاميرا الجوال.",
+      action_sos_title: "6. طوارئ ومفقودات (SOS) 🆘",
+      action_sos_desc: "مخصصة للحقائب والمفاتيح والحيوانات الأليفة والأطفال، تتيح الاتصال المباشر وإرسال موقع الغرض عبر واتساب بضغطة واحدة.",
+
+      // Smart Folders & Filters
+      folder_all: "جميع البطاقات",
+      folder_restaurant: "🍽️ قوائم ومطاعم",
+      folder_personal: "👤 كروت شخصية",
+      folder_wifi: "📶 شبكات واي فاي",
+      folder_sos: "🆘 طوارئ ومفقودات",
+      folder_vip: "⭐ VIP",
+
+      // Bulk Actions
+      btn_bulk_mode: "إجراءات جماعية ☑️",
+      btn_bulk_cancel: "إلغاء التحديد ✕",
+      btn_bulk_update_url: "تعديل الرابط جماعياً 🔗",
+      btn_bulk_activate: "تفعيل المحدد 🟢",
+      btn_bulk_pause: "إيقاف المحدد ⏸️",
+      btn_bulk_delete: "حذف المحدد 🗑️",
+      bulk_selected_count: "بطاقات محددة",
+
+      // Quick Pass Show Mode
+      btn_quick_pass: "وضع العرض السريع 📲",
+      quick_pass_title: "بطاقة العرض السريع (Apple Wallet Style)",
+      quick_pass_sub: "أظهر هذا الرمز بحجم كبير ليتمكن أي شخص من مسحه بكاميرا جواله مباشرة دون الحاجة للبطاقة البلاستيكية",
+      quick_pass_brightness: "وضع السطوع الفائق"
     }
   },
 

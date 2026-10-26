@@ -5,7 +5,7 @@
     "slug": "card-hoomi",
     "mode": "direct",
     "actionType": "direct",
-    "destinationUrl": "https://maps.google.com",
+    "destinationUrl": "https://instagram.com/mybusiness",
     "isActive": true,
     "scanCount": 1,
     "pinCode": "",
@@ -14,7 +14,7 @@
       {
         "id": "t-google",
         "label": "Google Reviews 5-Star",
-        "url": "https://maps.google.com",
+        "url": "https://instagram.com/mybusiness",
         "active": true,
         "icon": "⭐"
       }
@@ -26,7 +26,7 @@
     "profile": null,
     "catalog": null,
     "createdAt": "2026-10-26T14:56:47.316Z",
-    "updatedAt": "2026-10-26T14:56:47.317Z",
+    "updatedAt": "2026-10-26T17:30:16.015Z",
     "lastScannedAt": "2026-10-26T15:02:17.921Z"
   },
   {
@@ -65,7 +65,7 @@
     "slug": "cardtest",
     "mode": "direct",
     "actionType": "direct",
-    "destinationUrl": "https://maps.google.com",
+    "destinationUrl": "https://instagram.com/mybusiness",
     "isActive": true,
     "scanCount": 3,
     "pinCode": "",
@@ -74,7 +74,7 @@
       {
         "id": "t-google",
         "label": "Google Reviews 5-Star",
-        "url": "https://maps.google.com",
+        "url": "https://instagram.com/mybusiness",
         "active": true,
         "icon": "⭐"
       }
@@ -86,6 +86,6 @@
     "profile": null,
     "catalog": null,
     "createdAt": "2026-10-26T14:08:02.307Z",
-    "updatedAt": "2026-10-26T14:56:47.317Z"
+    "updatedAt": "2026-10-26T17:30:16.015Z"
   }
 ]

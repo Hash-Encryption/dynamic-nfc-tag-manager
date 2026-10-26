@@ -384,8 +384,73 @@
         return 'https://' + url;
       }
 
-      function performRedirect(card) {
-        const mode = card.mode || (card.actionType === 'profile' ? 'profile' : 'direct');
+      window.skipVisitorLeadCapture = function() {
+        const modal = document.getElementById('modalLeadCaptureVisitor');
+        if (modal) modal.classList.add('hidden');
+        if (window.__PENDING_REDIRECT_CARD) {
+          proceedAfterLeadCapture(window.__PENDING_REDIRECT_CARD);
+        }
+      };
+
+      window.submitVisitorLeadCapture = async function(e) {
+        if (e) e.preventDefault();
+        const card = window.__PENDING_REDIRECT_CARD;
+        const name = (document.getElementById('inpVisitorName')?.value || '').trim();
+        const phone = (document.getElementById('inpVisitorPhone')?.value || '').trim();
+        const note = (document.getElementById('inpVisitorNote')?.value || '').trim();
+
+        if (!name || !phone) {
+          alert('Please enter name and phone number.');
+          return;
+        }
+
+        const newLead = {
+          id: 'lead-' + Date.now().toString(36),
+          cardId: card ? card.id : '',
+          cardSlug: slug,
+          cardTitle: card ? card.title : slug,
+          visitorName: name,
+          visitorPhone: phone,
+          visitorNote: note,
+          capturedAt: new Date().toISOString()
+        };
+
+        // Save locally
+        try {
+          const raw = localStorage.getItem('nfc_leads_db') || '[]';
+          const list = JSON.parse(raw);
+          list.unshift(newLead);
+          localStorage.setItem('nfc_leads_db', JSON.stringify(list));
+        } catch (err) {}
+
+        // Send to backend API
+        try {
+          fetch('/api/leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newLead)
+          }).catch(() => {});
+        } catch (err) {}
+
+        sessionStorage.setItem('lead_captured_' + slug, '1');
+        const modal = document.getElementById('modalLeadCaptureVisitor');
+        if (modal) modal.classList.add('hidden');
+
+        if (card) {
+          proceedAfterLeadCapture(card);
+        }
+      };
+
+      function proceedAfterLeadCapture(card) {
+        const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
+        if (mode === 'wifi') {
+          renderClientWifiView(card);
+          return;
+        }
+        if (mode === 'sos') {
+          renderClientSosView(card);
+          return;
+        }
         if (mode === 'profile') {
           window.location.replace(`./landing.html?slug=${encodeURIComponent(slug)}`);
           return;
@@ -395,10 +460,155 @@
           return;
         }
         let target = sanitizeRedirectUrl(card.destinationUrl || '');
-        if (!target || target === 'https://') {
-          target = 'https://maps.google.com';
-        }
+        if (!target || target === 'https://') target = 'https://maps.google.com';
         window.location.replace(target);
+      }
+
+      function performRedirect(card) {
+        // 1. Check limits and expiration
+        const limits = card.limits || {};
+        const isExpired = limits.expiresAt && new Date(limits.expiresAt).getTime() < Date.now();
+        const isMaxScans = limits.maxScans && Number(limits.maxScans) > 0 && (card.scanCount || 0) >= Number(limits.maxScans);
+        if (isExpired || isMaxScans) {
+          if (limits.fallbackUrl) {
+            window.location.replace(sanitizeRedirectUrl(limits.fallbackUrl));
+            return;
+          }
+          const loadBox = document.getElementById('redirectLoadingBox');
+          const notFoundBox = document.getElementById('redirectNotFoundBox');
+          if (loadBox) loadBox.classList.add('hidden');
+          if (notFoundBox) {
+            notFoundBox.classList.remove('hidden');
+            const h1 = notFoundBox.querySelector('h1');
+            const p = notFoundBox.querySelector('p');
+            if (h1) h1.textContent = limits.expiredMessage || 'This Smart Tag Has Expired';
+            if (p) p.textContent = 'This card has reached its scan limit or expiration date.';
+          }
+          return;
+        }
+
+        // 2. Check lead capture intercept
+        const leadCapture = card.leadCapture || {};
+        const hasCapturedLead = sessionStorage.getItem('lead_captured_' + slug);
+        if (leadCapture.enabled && !hasCapturedLead) {
+          const lcModal = document.getElementById('modalLeadCaptureVisitor');
+          const loadBox = document.getElementById('redirectLoadingBox');
+          if (lcModal) {
+            if (loadBox) loadBox.classList.add('hidden');
+            lcModal.classList.remove('hidden');
+            const t = document.getElementById('lcVisitorTitle');
+            const st = document.getElementById('lcVisitorSubtitle');
+            const skipBtn = document.getElementById('btnSkipLeadCapture');
+            if (t && leadCapture.title) t.textContent = leadCapture.title;
+            if (st && leadCapture.subtitle) st.textContent = leadCapture.subtitle;
+            if (skipBtn) {
+              if (leadCapture.required) skipBtn.classList.add('hidden');
+              else skipBtn.classList.remove('hidden');
+            }
+            window.__PENDING_REDIRECT_CARD = card;
+            return;
+          }
+        }
+
+        proceedAfterLeadCapture(card);
+      }
+
+      function renderClientWifiView(card) {
+        const wifi = card.wifi || {};
+        const ssid = wifi.ssid || 'Wi-Fi Network';
+        const pass = wifi.password || '';
+        const enc = wifi.encryption || 'WPA';
+        const wifiQrPayload = `WIFI:S:${ssid};T:${enc};P:${pass};;`;
+
+        const sc = document.getElementById('cardRedirectScreen');
+        if (!sc) return;
+        sc.innerHTML = `
+          <div class="w-full max-w-sm bg-zinc-950/95 border border-emerald-500/30 rounded-3xl p-6 text-center space-y-4 shadow-2xl relative">
+            <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-emerald-500/40">
+              📶
+            </div>
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Smart Wi-Fi Tag</span>
+              <h2 class="text-lg font-black text-white mt-1">${card.title || ssid}</h2>
+              <p class="text-xs text-zinc-400">Scan QR to connect automatically, or copy password</p>
+            </div>
+            <div class="p-3 bg-white rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-lg" id="clientWifiQrWrapper"></div>
+            <div class="p-3 bg-zinc-900 rounded-2xl border border-zinc-800 text-start space-y-1.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-zinc-400">SSID:</span>
+                <span class="text-white font-bold font-mono">${ssid}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-zinc-400">Password:</span>
+                <span class="text-emerald-400 font-bold font-mono">${pass || 'No password'}</span>
+              </div>
+            </div>
+            <button onclick="navigator.clipboard.writeText('${pass}'); alert('Password copied! 📋');" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+              <span>📋</span>
+              <span>Copy Wi-Fi Password</span>
+            </button>
+          </div>
+        `;
+        setTimeout(() => {
+          const wrap = document.getElementById('clientWifiQrWrapper');
+          if (wrap && window.QRCode) {
+            new QRCode(wrap, { text: wifiQrPayload, width: 170, height: 170, colorDark: '#050806', colorLight: '#ffffff' });
+          }
+        }, 50);
+      }
+
+      function renderClientSosView(card) {
+        const sos = card.sos || {};
+        const owner = sos.ownerName || 'Emergency Contact';
+        const phone = sos.phone || '';
+        const wa = sos.whatsapp || phone;
+        const msg = sos.message || 'If you found this item or pet, please contact me immediately.';
+        const reward = sos.reward || '';
+
+        const sc = document.getElementById('cardRedirectScreen');
+        if (!sc) return;
+        sc.innerHTML = `
+          <div class="w-full max-w-sm bg-zinc-950/95 border border-rose-500/40 rounded-3xl p-6 text-center space-y-4 shadow-2xl relative">
+            <div class="w-14 h-14 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center mx-auto text-2xl border border-rose-500/40 animate-pulse">
+              🆘
+            </div>
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Lost & Found / Emergency</span>
+              <h2 class="text-lg font-black text-white mt-1">${card.title || owner}</h2>
+              <p class="text-xs text-zinc-300 leading-relaxed mt-2 p-3 bg-zinc-900 rounded-xl border border-zinc-800 text-start">
+                "${msg}"
+              </p>
+            </div>
+            ${reward ? `<div class="p-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-xl text-xs font-bold">💰 Reward: ${reward}</div>` : ''}
+            <div class="space-y-2 pt-2">
+              <a href="tel:${phone}" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+                <span>📞</span>
+                <span>Call Owner (${phone})</span>
+              </a>
+              <button onclick="shareGpsLocation('${wa}')" class="w-full py-3 bg-zinc-900 hover:bg-zinc-850 text-emerald-300 border border-emerald-500/30 font-bold rounded-xl text-xs active:scale-95 transition-all flex items-center justify-center gap-2">
+                <span>📍</span>
+                <span>Send My GPS Location via WhatsApp</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        window.shareGpsLocation = function(waNumber) {
+          if (!navigator.geolocation) {
+            window.open(`https://wa.me/${waNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello, I found your item: ' + card.title)}`, '_blank');
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+              const text = `Hello, I found your item (${card.title})! My current GPS location: ${mapsUrl}`;
+              window.open(`https://wa.me/${waNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
+            },
+            () => {
+              window.open(`https://wa.me/${waNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello, I found your item: ' + card.title)}`, '_blank');
+            }
+          );
+        };
       }
     })();
   </script>
@@ -490,6 +700,12 @@
 
       <!-- Action Icons -->
       <div class="flex items-center gap-1.5">
+        <!-- Quick Pass Apple Wallet Button -->
+        <button id="btnHeaderQuickPass" onclick="openQuickPassModal()" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-green-600/20 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" title="Quick Pass Mode">
+          <span>📲</span>
+          <span class="hidden sm:inline" data-i18n="btn_quick_pass">Quick Pass</span>
+        </button>
+
         <!-- Language Switcher Button -->
         <button id="btnLangToggle" class="px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white hover:bg-emerald-950/40 text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" title="Switch Language">
           <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
@@ -674,13 +890,23 @@
         </button>
       </div>
 
-      <!-- Mode Filters -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-semibold">
-        <button onclick="filterCardsByMode('all')" id="filterBtnAll" class="px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap" data-i18n="filter_all">All Cards</button>
-        <button onclick="filterCardsByMode('active')" id="filterBtnActive" class="px-3.5 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="filter_active">Active Only</button>
-        <button onclick="filterCardsByMode('direct')" id="filterBtnDirect" class="px-3.5 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="filter_direct">Direct URL</button>
-        <button onclick="filterCardsByMode('profile')" id="filterBtnProfile" class="px-3.5 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="filter_profile">Digital Profile</button>
-        <button onclick="filterCardsByMode('catalog')" id="filterBtnCatalog" class="px-3.5 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="filter_catalog">Menu & Catalog</button>
+      <!-- Smart Folders & Mode Filters Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-semibold scrollbar-none">
+          <button onclick="filterCardsByFolder('all')" id="folderBtnAll" class="folder-pill active px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap" data-i18n="folder_all">All Tags</button>
+          <button onclick="filterCardsByFolder('restaurant')" id="folderBtnRestaurant" class="folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="folder_restaurant">🍽️ Menus</button>
+          <button onclick="filterCardsByFolder('personal')" id="folderBtnPersonal" class="folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="folder_personal">👤 Personal</button>
+          <button onclick="filterCardsByFolder('wifi')" id="folderBtnWifi" class="folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="folder_wifi">📶 Wi-Fi</button>
+          <button onclick="filterCardsByFolder('sos')" id="folderBtnSos" class="folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="folder_sos">🆘 SOS / Lost</button>
+          <button onclick="filterCardsByFolder('vip')" id="folderBtnVip" class="folder-pill px-3 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap" data-i18n="folder_vip">⭐ VIP</button>
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+          <button onclick="toggleBulkSelectionMode()" id="btnToggleBulkMode" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shadow-sm">
+            <span id="bulkModeIcon">☑️</span>
+            <span id="bulkModeLabel" data-i18n="btn_bulk_mode">Bulk Actions</span>
+          </button>
+        </div>
       </div>
 
       <!-- Cards Grid -->
@@ -690,6 +916,83 @@
           <div class="w-8 h-8 border-3 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-3"></div>
           Loading your smart tags...
         </div>
+      </div>
+
+      <!-- Bulk Actions Floating Bar (Appears when cards are selected) -->
+      <div id="bulkActionBar" class="hidden fixed bottom-20 inset-x-4 max-w-lg mx-auto z-40 bg-zinc-950/95 border border-emerald-500/40 backdrop-blur-2xl p-3 sm:p-4 rounded-3xl shadow-2xl flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-bold text-white"><span id="bulkSelectedCount">0</span> <span data-i18n="bulk_selected_count">Selected</span></span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="openBulkUrlModal()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1">
+            <span>🔗</span>
+            <span class="hidden sm:inline" data-i18n="btn_bulk_update_url">Update URL</span>
+          </button>
+          <button onclick="executeBulkStatusToggle(true)" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all active:scale-95" title="Activate Selected">
+            🟢
+          </button>
+          <button onclick="executeBulkStatusToggle(false)" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-zinc-900 hover:bg-zinc-800 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all active:scale-95" title="Pause Selected">
+            ⏸️
+          </button>
+          <button onclick="executeBulkDelete()" class="p-1.5 sm:px-2.5 sm:py-1.5 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/40 rounded-xl text-xs font-bold transition-all active:scale-95" title="Delete Selected">
+            🗑️
+          </button>
+          <button onclick="toggleBulkSelectionMode(false)" class="p-1.5 text-zinc-400 hover:text-white text-xs font-bold" title="Cancel">
+            ✕
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: LEADS CRM MINI-SYSTEM                 -->
+    <!-- ========================================== -->
+    <section id="viewLeads" class="hidden space-y-5">
+      
+      <!-- Sub-header & Action Buttons -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-black text-white" data-i18n="section_leads_title">Visitor Leads & CRM</h2>
+            <span id="leadsCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">0 Leads</span>
+          </div>
+          <p class="text-xs text-zinc-400" data-i18n="section_leads_subtitle">Customer contacts captured automatically upon tapping your smart cards</p>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button onclick="exportLeadsToCsv()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-850 active:scale-95 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
+            <span>📊</span>
+            <span data-i18n="btn_export_csv">Export CSV (Excel)</span>
+          </button>
+          <button onclick="exportAllLeadsVcf()" class="px-3 py-2 bg-zinc-900 hover:bg-zinc-850 active:scale-95 text-zinc-200 border border-zinc-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
+            <span>📇</span>
+            <span data-i18n="btn_export_vcf">Export Contacts (.vcf)</span>
+          </button>
+          <button onclick="clearAllLeadsHandler()" class="px-2.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 active:scale-95 text-rose-400 border border-rose-500/20 rounded-xl text-xs font-bold flex items-center gap-1 transition-all" title="Clear Leads">
+            <span>🗑️</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar for Leads -->
+      <div class="relative">
+        <input 
+          type="text" 
+          id="leadSearchInput" 
+          placeholder="Search leads by name, phone, note, or card..." 
+          oninput="filterLeadsTable()"
+          class="w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl ps-10 pe-4 py-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-zinc-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <!-- Leads Grid / Table Container -->
+      <div id="leadsListContainer" class="space-y-3">
+        <!-- Rendered dynamically by app.js -->
       </div>
 
     </section>
@@ -978,6 +1281,15 @@
         <span data-i18n="nav_cards">My Cards</span>
       </button>
 
+      <!-- Tab 3: Leads CRM -->
+      <button onclick="switchTab('leads')" id="tabBtnLeads" class="bottom-nav-item flex-1 relative">
+        <div class="nav-icon-container relative">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          <span id="navLeadsBadge" class="hidden absolute -top-1 -end-1 w-2 h-2 rounded-full bg-emerald-400"></span>
+        </div>
+        <span data-i18n="nav_leads">Leads</span>
+      </button>
+
       <!-- Elevated Floating Action Button (+) -->
       <div class="flex-1 flex justify-center -translate-y-5">
         <button 
@@ -1033,6 +1345,8 @@
       <!-- Drawer Sub-tabs -->
       <div class="px-6 pt-3 flex gap-2 border-b border-zinc-800 overflow-x-auto text-xs font-semibold shrink-0">
         <button type="button" onclick="switchEditorTab('basic')" id="edTabBtnBasic" class="pb-2 px-2 text-emerald-400 border-b-2 border-emerald-500 whitespace-nowrap">Basic & Mode</button>
+        <button type="button" onclick="switchEditorTab('wifi')" id="edTabBtnWifi" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Smart Wi-Fi 📶</button>
+        <button type="button" onclick="switchEditorTab('sos')" id="edTabBtnSos" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Lost & Found 🆘</button>
         <button type="button" onclick="switchEditorTab('presets')" id="edTabBtnPresets" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Saved Targets</button>
         <button type="button" onclick="switchEditorTab('conditional')" id="edTabBtnConditional" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Smart Routing</button>
         <button type="button" onclick="switchEditorTab('catalog')" id="edTabBtnCatalog" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Menu & Catalog</button>
@@ -1105,11 +1419,29 @@
                 </div>
               </label>
 
+              <!-- Mode 5: Smart Wi-Fi Tag -->
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="wifi" class="mt-1 text-emerald-600 focus:ring-emerald-500">
+                <div>
+                  <div class="font-black text-white text-xs">5. Smart Wi-Fi Tag 📶</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5" data-i18n="action_wifi_desc">One-tap Wi-Fi connection page with auto QR and password copy button.</div>
+                </div>
+              </label>
+
+              <!-- Mode 6: Lost & Found / SOS Mode -->
+              <label class="p-3 bg-zinc-900 border border-zinc-700 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all flex items-start gap-2.5">
+                <input type="radio" name="inpCardMode" value="sos" class="mt-1 text-emerald-600 focus:ring-emerald-500">
+                <div>
+                  <div class="font-black text-white text-xs">6. Lost & Found / SOS 🆘</div>
+                  <div class="text-[10px] text-zinc-400 mt-0.5" data-i18n="action_sos_desc">Emergency tag for luggage, keys & pets with 1-tap call & WhatsApp GPS share.</div>
+                </div>
+              </label>
+
             </div>
           </div>
 
           <!-- Destination URL & Smart Link Generator Trigger -->
-          <div>
+          <div id="wrapperDestinationUrl">
             <div class="flex items-center justify-between mb-1.5">
               <label class="font-semibold text-zinc-200" data-i18n="label_destination_url">Target Destination URL *</label>
               <button type="button" onclick="openSmartLinkGenModal()" class="text-emerald-400 hover:text-emerald-300 font-bold text-[11px] flex items-center gap-1">
@@ -1128,6 +1460,184 @@
               <input type="checkbox" id="inpIsActive" checked class="sr-only peer">
               <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
             </label>
+          </div>
+
+          <!-- PROGRESSIVE DISCLOSURE: ADVANCED CARD SETTINGS ACCORDION -->
+          <details id="detailsAdvancedCardSettings" class="group bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden transition-all">
+            <summary class="p-3.5 flex items-center justify-between cursor-pointer font-bold text-xs text-zinc-300 hover:text-white select-none list-none transition-colors">
+              <span class="flex items-center gap-2">
+                <span>⚙️</span>
+                <span data-i18n="adv_accordion_title">خيارات متقدمة للبطاقة (Advanced Options)</span>
+              </span>
+              <svg class="w-4 h-4 text-zinc-400 group-open:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </summary>
+
+            <div class="p-4 pt-1 space-y-4 border-t border-zinc-800/80 bg-zinc-950/40">
+              
+              <!-- Smart Folder / Category -->
+              <div>
+                <label class="block font-semibold text-zinc-200 mb-1" data-i18n="label_category">المجلد والتصنيف الذكي (Smart Folder)</label>
+                <select id="inpCardCategory" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+                  <option value="all">📁 عام (General)</option>
+                  <option value="restaurant">🍽️ مطاعم وقوائم طعام (Menu & Food)</option>
+                  <option value="personal">👤 كروت شخصية وvCard (Personal & Business)</option>
+                  <option value="wifi">📶 شبكات واي فاي (Wi-Fi Tags)</option>
+                  <option value="sos">🆘 طوارئ ومفقودات (SOS & Lost Items)</option>
+                  <option value="vip">⭐ VIP & بريميوم (VIP Luxury)</option>
+                </select>
+              </div>
+
+              <!-- Two-Way Lead Capture Settings -->
+              <div class="p-3.5 bg-zinc-900/90 rounded-xl border border-zinc-800 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span>📥</span>
+                    <div>
+                      <span class="font-bold text-white block text-xs" data-i18n="label_lead_capture_enable">جمع بيانات الزوار (Lead Capture)</span>
+                      <span class="text-[10px] text-zinc-400" data-i18n="desc_lead_capture">نافذة أنيقة تطلب من العميل تسجيل اسمه ورقم هاتفه عند المسح</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" id="inpLeadCaptureEnabled" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500 w-4 h-4">
+                </div>
+
+                <div id="leadCaptureFields" class="space-y-2 pt-2 border-t border-zinc-800/60">
+                  <label class="flex items-center gap-2 text-[11px] text-zinc-300">
+                    <input type="checkbox" id="inpLeadCaptureRequired" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
+                    <span data-i18n="label_lead_capture_req">التسجيل إجباري للمتابعة للوجهة (Required)</span>
+                  </label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="inpLeadCaptureTitle" placeholder="العنوان: اترك بياناتك للتواصل" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                    <input type="text" id="inpLeadCaptureSubtitle" placeholder="الوصف: سنتواصل معك فوراً" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expiration & Max Scans Limits -->
+              <div class="p-3.5 bg-zinc-900/90 rounded-xl border border-zinc-800 space-y-2.5">
+                <div class="flex items-center gap-2">
+                  <span>⏳</span>
+                  <div>
+                    <span class="font-bold text-white block text-xs" data-i18n="label_limits_title">صلاحية الرابط وحد المسحات (Limits & Expiration)</span>
+                    <span class="text-[10px] text-zinc-400" data-i18n="desc_limits">تحديد تاريخ انتهاء أو حد أقصى لعدد مرات المسح</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[10px] text-zinc-400 mb-0.5">الحد الأقصى للمسحات (Max Scans)</label>
+                    <input type="number" id="inpMaxScans" min="0" placeholder="0 = غير محدود" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-xs font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-zinc-400 mb-0.5">تاريخ ووقت الانتهاء (Expires At)</label>
+                    <input type="datetime-local" id="inpExpiresAt" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-xs">
+                  </div>
+                </div>
+
+                <div class="space-y-1.5">
+                  <input type="text" id="inpFallbackUrl" placeholder="رابط بديل بعد الانتهاء: https://example.com/expired" dir="ltr" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono rounded-lg px-2.5 py-1.5 text-[11px] text-start">
+                  <input type="text" id="inpExpiredMessage" placeholder="رسالة مخصصة عند الانتهاء (اختياري)" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                </div>
+              </div>
+
+              <!-- Security PIN & Standalone Card Management PIN -->
+              <div class="p-3.5 bg-zinc-900/90 rounded-xl border border-zinc-800 space-y-2.5">
+                <div class="flex items-center gap-2">
+                  <span>🔒</span>
+                  <div>
+                    <span class="font-bold text-white block text-xs" data-i18n="label_pins_title">رموز الحماية والإدارة السريعة (PIN Codes)</span>
+                    <span class="text-[10px] text-zinc-400" data-i18n="desc_pins">قفل البطاقة أو تمكين تعديلها دون لوحة التحكم</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_security_pin">رمز فتح الرابط للعميل (PIN)</label>
+                    <input type="password" id="inpPinCode" maxlength="8" placeholder="مثال: 2026" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_manage_pin">رمز تعديل البطاقة (/c/:slug/edit)</label>
+                    <input type="password" id="inpManagePin" maxlength="8" placeholder="1234" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </details>
+        </div>
+
+        <!-- SUB-TAB: SMART WI-FI -->
+        <div id="edTabWifi" class="hidden space-y-4">
+          <div class="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-emerald-300 text-xs flex items-start gap-2.5">
+            <span class="text-base">📶</span>
+            <div>
+              <strong>Smart Wi-Fi Tag Configuration</strong>
+              <p class="text-[11px] text-emerald-400/90 mt-0.5">When scanned, visitors see a luxury card with 1-tap copy password and auto-connecting Wi-Fi QR code.</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-zinc-200 mb-1" data-i18n="wifi_label_ssid">Network Name (SSID) *</label>
+            <input type="text" id="inpWifiSsid" placeholder="e.g. VIP_GUESTS_5G" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-zinc-200 mb-1" data-i18n="wifi_label_pass">Network Password</label>
+            <input type="text" id="inpWifiPass" placeholder="Network password (leave empty if open)" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs text-start" dir="ltr">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-semibold text-zinc-200 mb-1" data-i18n="wifi_label_enc">Encryption Type</label>
+              <select id="inpWifiEncryption" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+                <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">Open Network (No Password)</option>
+              </select>
+            </div>
+            <div class="flex items-center pt-5">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
+                <input type="checkbox" id="inpWifiHidden" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
+                <span data-i18n="wifi_label_hidden">Hidden SSID</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB: SOS / LOST & FOUND -->
+        <div id="edTabSos" class="hidden space-y-4">
+          <div class="bg-rose-500/10 border border-rose-500/20 p-3.5 rounded-2xl text-rose-300 text-xs flex items-start gap-2.5">
+            <span class="text-base">🆘</span>
+            <div>
+              <strong>Lost & Found / SOS Mode</strong>
+              <p class="text-[11px] text-rose-400/90 mt-0.5">For luggage, pets, keys, or kids wristbands. Finders can 1-tap call you or send their live GPS location via WhatsApp.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-zinc-200 mb-1" data-i18n="sos_label_owner">Owner / Pet / Item Name *</label>
+              <input type="text" id="inpSosOwnerName" placeholder="e.g. Alex Morgan / Rover" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs">
+            </div>
+            <div>
+              <label class="block font-semibold text-zinc-200 mb-1" data-i18n="sos_label_reward">Reward Offer (Optional)</label>
+              <input type="text" id="inpSosReward" placeholder="e.g. 100$ Reward on Return 💰" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-zinc-200 mb-1" data-i18n="sos_label_phone">Direct Call Phone *</label>
+              <input type="tel" id="inpSosPhone" placeholder="+1234567890" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs text-start">
+            </div>
+            <div>
+              <label class="block font-semibold text-zinc-200 mb-1" data-i18n="sos_label_whatsapp">WhatsApp for GPS Sharing *</label>
+              <input type="tel" id="inpSosWhatsapp" placeholder="+1234567890" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 text-xs text-start">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-zinc-200 mb-1" data-i18n="sos_label_msg">Emergency Instructions / Message</label>
+            <textarea id="inpSosMessage" rows="2" placeholder="Please contact me immediately if found. Greatly appreciated!" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2 focus:ring-2 focus:ring-emerald-500 text-xs"></textarea>
           </div>
         </div>
 
@@ -1471,6 +1981,164 @@
         <p class="text-[10px] text-zinc-500 mt-1.5" id="webNfcSupportNote" data-i18n="note_web_nfc">Supported natively on Google Chrome for Android</p>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: QUICK PASS (APPLE WALLET SHOW MODE) -->
+  <!-- ========================================== -->
+  <div id="quickPassModal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col justify-between p-4 sm:p-6 hidden transition-all">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-sm">
+          📲
+        </div>
+        <div>
+          <h2 class="text-sm font-black text-white" data-i18n="qp_title">Apple Wallet Quick Pass</h2>
+          <span id="qpCardCounter" class="text-[10px] text-zinc-400">Card 1 of 1</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnQpContrast" onclick="toggleQpMaxBrightness()" class="px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-amber-300 text-xs font-bold flex items-center gap-1 active:scale-95" title="Toggle Maximum Brightness Contrast">
+          <span>☀️</span>
+          <span class="hidden sm:inline" data-i18n="qp_max_contrast">Max Contrast</span>
+        </button>
+        <button onclick="closeQuickPassModal()" class="w-8 h-8 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center text-sm font-bold">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Card Stage -->
+    <div class="flex-1 flex flex-col items-center justify-center py-4 max-w-sm mx-auto w-full">
+      <div id="qpCardContainer" class="w-full bg-gradient-to-b from-zinc-900 to-zinc-950 border-2 border-emerald-500/30 rounded-3xl p-6 shadow-2xl text-center space-y-4 relative overflow-hidden transition-all">
+        <!-- Ambient Pulse on NFC -->
+        <div class="relative w-12 h-12 mx-auto flex items-center justify-center">
+          <div class="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+          <div class="relative w-10 h-10 bg-emerald-500/30 border border-emerald-400/50 rounded-2xl flex items-center justify-center text-emerald-300 text-base">
+            📡
+          </div>
+        </div>
+
+        <div>
+          <span id="qpCardBadge" class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-1">Direct Tag</span>
+          <h3 id="qpCardTitle" class="text-base font-black text-white truncate">TapLink Smart Tag</h3>
+          <p id="qpCardSlug" class="text-xs text-zinc-400 font-mono">/c/slug</p>
+        </div>
+
+        <!-- High-Contrast QR Frame -->
+        <div id="qpQrBox" class="p-3.5 bg-white rounded-2xl w-56 h-56 mx-auto flex items-center justify-center shadow-2xl border-4 border-white transition-all">
+          <div id="qpQrCodeWrapper"></div>
+        </div>
+
+        <!-- Target Destination Preview -->
+        <div class="p-2.5 bg-zinc-950/80 rounded-xl border border-zinc-800 text-center">
+          <span class="text-[10px] text-zinc-500 block">Current Target Destination</span>
+          <span id="qpCardTarget" class="text-xs text-emerald-400 font-mono truncate block" dir="ltr">https://...</span>
+        </div>
+      </div>
+
+      <!-- Navigation Arrows for Multi-Card Quick Switcher -->
+      <div class="flex items-center justify-center gap-6 mt-4 w-full">
+        <button onclick="navigateQpCard(-1)" class="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white flex items-center justify-center active:scale-95 transition-all" title="Previous Card">
+          ←
+        </button>
+        <button onclick="copyQpLink()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs font-bold rounded-xl active:scale-95 transition-all shadow-md shadow-emerald-600/30 flex items-center gap-1.5">
+          <span>📋</span>
+          <span data-i18n="qp_copy_link">Copy Card Link</span>
+        </button>
+        <button onclick="navigateQpCard(1)" class="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white flex items-center justify-center active:scale-95 transition-all" title="Next Card">
+          →
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center text-[10px] text-zinc-500">
+      TapLink Enterprise Quick Pass &copy; 2026 - Present to scan or hold near NFC reader
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: BULK DESTINATION URL UPDATE         -->
+  <!-- ========================================== -->
+  <div id="bulkUrlModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4 hidden">
+    <div class="bg-zinc-950 border border-emerald-500/30 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🌐</span>
+          <div>
+            <h3 class="text-sm font-black text-white" data-i18n="bulk_url_title">Bulk Update Destination URL</h3>
+            <p id="bulkUrlSubtext" class="text-[11px] text-zinc-400">Updating 0 selected tags</p>
+          </div>
+        </div>
+        <button onclick="closeBulkUrlModal()" class="w-7 h-7 rounded-full bg-zinc-900 text-zinc-400 hover:text-white flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-zinc-300" data-i18n="bulk_new_url_label">New Target URL for all selected tags *</label>
+        <input 
+          type="text" 
+          id="inpBulkTargetUrl" 
+          placeholder="https://instagram.com/..., wa.me/..., or any link" 
+          dir="ltr"
+          class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500 text-start"
+        >
+        <p class="text-[10px] text-zinc-500">All selected chips will redirect instantly to this new URL upon the next tap.</p>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2">
+        <button onclick="executeBulkUrlSave()" class="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-md shadow-emerald-600/30">
+          Apply to All Selected ✓
+        </button>
+        <button onclick="closeBulkUrlModal()" class="px-4 py-2.5 bg-zinc-900 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: VISITOR LEAD CAPTURE (CLIENT SIDE)  -->
+  <!-- ========================================== -->
+  <div id="modalLeadCaptureVisitor" class="fixed inset-0 z-[110] bg-black/85 backdrop-blur-md flex items-end justify-center hidden">
+    <div class="bottom-sheet-content bg-zinc-950 border-t-2 border-emerald-500/40 rounded-t-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto cursor-pointer" onclick="skipVisitorLeadCapture()"></div>
+      
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl border border-emerald-500/30">
+          📥
+        </div>
+        <h3 id="lcVisitorTitle" class="text-base font-black text-white">اترك بياناتك للتواصل</h3>
+        <p id="lcVisitorSubtitle" class="text-xs text-zinc-400">سجل بياناتك للتواصل معك وتقديم أفضل خدمة</p>
+      </div>
+
+      <form id="formVisitorLeadCapture" onsubmit="submitVisitorLeadCapture(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_name">الاسم الكامل *</label>
+          <input type="text" id="inpVisitorName" required placeholder="مثال: محمد عبدالله" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_phone">رقم الجوال (واتساب) *</label>
+          <input type="tel" id="inpVisitorPhone" required placeholder="+966500000000" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 text-xs text-start focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_note">ملاحظة أو استفسار (اختياري)</label>
+          <input type="text" id="inpVisitorNote" placeholder="مهتم بالخدمة / موعد / استفسار..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-lg shadow-emerald-600/30">
+            إرسال ومتابعة 🚀
+          </button>
+          <button type="button" id="btnSkipLeadCapture" onclick="skipVisitorLeadCapture()" class="px-4 py-3 bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800">
+            تخطي
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
