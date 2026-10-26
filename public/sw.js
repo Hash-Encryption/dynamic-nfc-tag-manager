@@ -1,5 +1,5 @@
-// PWA Service Worker for Smart NFC Tag Manager
-const CACHE_NAME = 'nfc-manager-v5';
+// PWA Service Worker for Smart NFC Tag Manager - High-Availability v6
+const CACHE_NAME = 'nfc-manager-v6';
 const STATIC_ASSETS = [
   './',
   './index.html',

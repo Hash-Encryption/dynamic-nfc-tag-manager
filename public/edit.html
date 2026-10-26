@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Quick Tag Editor • TapLink - by MUHAB</title>
   
+  <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -244,13 +249,17 @@
     // Production Auto URL Sanitizer Helper
     function sanitizeUrl(rawUrl) {
       if (!rawUrl || typeof rawUrl !== 'string') return '';
-      let url = rawUrl.trim();
-      url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+      let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
       if (!url) return '';
+      // Zero-Trust Malicious Scheme Shield: Block javascript:, data:, vbscript:, file:, blob:, about:
+      const lowerUrl = url.toLowerCase().replace(/[\s\r\n\t]+/g, '');
+      if (/^(javascript|data|vbscript|file|blob|about):/i.test(lowerUrl)) {
+        console.warn('[Security Shield] Blocked dangerous URL scheme:', rawUrl);
+        return '';
+      }
       if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
       url = url.replace(/[\s\r\n\t]+/g, '');
       if (/^wa\.me\//i.test(url)) return 'https://' + url;
-      url = url.replace(/[\s\r\n\t]+/g, '');
       if (/^https?:\/\//i.test(url)) return url;
       if (url.startsWith('//')) return 'https:' + url;
       return 'https://' + url;

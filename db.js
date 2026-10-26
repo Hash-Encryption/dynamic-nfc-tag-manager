@@ -16,13 +16,25 @@ function sanitizeUrl(rawUrl) {
   url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
   if (!url) return '';
 
-  // Check special protocols: tel, mailto, sms, whatsapp, tg, geo, etc.
-  if (/^(tel|mailto|sms|whatsapp|tg|geo):/i.test(url)) {
+  // Zero-Trust Malicious Scheme Shield: Block javascript:, data:, vbscript:, file:, blob:, about:
+  const lowerUrl = url.toLowerCase().replace(/[\s\r\n\t]+/g, '');
+  if (/^(javascript|data|vbscript|file|blob|about):/i.test(lowerUrl)) {
+    console.warn('[Security Shield] Blocked dangerous URL scheme:', rawUrl);
+    return '';
+  }
+
+  // Check special protocols: tel, mailto, sms, whatsapp, tg, geo, intent, facetime, instagram
+  if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) {
     return url;
   }
 
   // Remove internal stray spaces or line breaks often caused by copy-pasting
   url = url.replace(/[\s\r\n\t]+/g, '');
+
+  // wa.me shorthand
+  if (/^wa\.me\//i.test(url)) {
+    return 'https://' + url;
+  }
 
   // If starts with http:// or https://
   if (/^https?:\/\//i.test(url)) {

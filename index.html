@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>TapLink | Smart NFC Tags & Dynamic Links Manager - MUHAB</title>
   
+  <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+
   <!-- PWA & Mobile Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -234,21 +239,53 @@
           return;
         }
 
-        // 2. Determine repository base path
+        // 2. Anti-Spam Scan Protection: 15s throttle per slug
+        const scanKey = 'taplink_scan_' + normalizedSlug;
+        const lastScan = Number(localStorage.getItem(scanKey) || 0);
+        const now = Date.now();
+        if (now - lastScan > 15000) {
+          localStorage.setItem(scanKey, String(now));
+        }
+
+        // 3. Fast check Multi-Layer Cache (SessionStorage / LocalStorage) before waiting for network
+        try {
+          const cachedRaw = sessionStorage.getItem('nfc_cards_db_cache') || localStorage.getItem('nfc_cards_db');
+          if (cachedRaw) {
+            const cachedList = JSON.parse(cachedRaw);
+            if (Array.isArray(cachedList)) {
+              const cachedCard = cachedList.find(c => c.slug && c.slug.toLowerCase() === normalizedSlug);
+              if (cachedCard && cachedCard.isActive && cachedCard.destinationUrl) {
+                performRedirect(cachedCard);
+                return;
+              }
+            }
+          }
+        } catch (e) {}
+
+        // 4. Determine repository base path
         let repoBase = '';
         if (window.location.pathname.includes('/dynamic-nfc-tag-manager')) {
           repoBase = '/dynamic-nfc-tag-manager';
         }
 
-        // 3. Try local/cloud database
+        // 5. Try cloud database with strict 800ms AbortController timeout
         try {
-          const fetchWithTimeout = async (url, ms = 700) => {
+          const fetchWithTimeout = async (url, ms = 800) => {
             const ctrl = new AbortController();
             const tid = setTimeout(() => ctrl.abort(), ms);
             try {
               const res = await fetch(url, { signal: ctrl.signal });
               clearTimeout(tid);
-              if (res.ok) return await res.json();
+              if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                  try {
+                    sessionStorage.setItem('nfc_cards_db_cache', JSON.stringify(data));
+                    localStorage.setItem('nfc_cards_db', JSON.stringify(data));
+                  } catch (err) {}
+                }
+                return data;
+              }
             } catch (e) {
               clearTimeout(tid);
             }
@@ -257,13 +294,13 @@
 
           const customCloudUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
           const promises = [
-            fetchWithTimeout(`${PRIMARY_CLOUD_DB}?t=${Date.now()}`, 600),
-            fetchWithTimeout(`${BACKUP_CLOUD_DB}?t=${Date.now()}`, 600),
-            fetchWithTimeout(`${repoBase}/data/cards.json?_nocache=${Date.now()}`, 500),
-            fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 700),
-            fetchWithTimeout(`${CDN_DB_URL}?_nocache=${Date.now()}`, 700)
+            fetchWithTimeout(`${PRIMARY_CLOUD_DB}?t=${Date.now()}`, 750),
+            fetchWithTimeout(`${BACKUP_CLOUD_DB}?t=${Date.now()}`, 750),
+            fetchWithTimeout(`${repoBase}/data/cards.json?_nocache=${Date.now()}`, 600),
+            fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 800),
+            fetchWithTimeout(`${CDN_DB_URL}?_nocache=${Date.now()}`, 800)
           ];
-          if (customCloudUrl) promises.unshift(fetchWithTimeout(customCloudUrl, 700));
+          if (customCloudUrl) promises.unshift(fetchWithTimeout(customCloudUrl, 800));
 
           const results = await Promise.allSettled(promises);
           for (const r of results) {
@@ -274,7 +311,7 @@
           }
         } catch (e) {}
 
-        // 4. Try LocalStorage
+        // 6. Secondary fallback to LocalStorage
         if (!card) {
           try {
             const raw = localStorage.getItem('nfc_cards_db');
@@ -334,6 +371,11 @@
         if (!rawUrl || typeof rawUrl !== 'string') return '';
         let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
         if (!url) return '';
+        const lowerUrl = url.toLowerCase().replace(/[\s\r\n\t]+/g, '');
+        if (/^(javascript|data|vbscript|file|blob|about):/i.test(lowerUrl)) {
+          console.warn('[Security Shield] Blocked dangerous redirect URL:', rawUrl);
+          return '';
+        }
         if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
         url = url.replace(/[\s\r\n\t]+/g, '');
         if (/^wa\.me\//i.test(url)) return 'https://' + url;

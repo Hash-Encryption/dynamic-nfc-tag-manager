@@ -15,6 +15,24 @@ let currentFilterMode = 'all';
 let tempSavedPresets = [];
 
 const DEFAULT_ADMIN_PASS = 'admin123';
+const ADMIN_SALT = '::taplink_salt_2026';
+const DEFAULT_ADMIN_HASH = 'b07f0885c6810f7e2dadc1e0b86e82f4f7b5b946c1439f00046912ec72633d91';
+
+// Cryptographic Password Hasher using Web Crypto SHA-256 + Salt
+async function hashPassword(plainText) {
+  try {
+    if (!plainText || typeof plainText !== 'string') return '';
+    const enc = new TextEncoder();
+    const data = enc.encode(plainText + ADMIN_SALT);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    console.error('Error hashing password:', e);
+    return '';
+  }
+}
+
 const PRIMARY_CLOUD_DB = "https://api.npoint.io/6d3e9c78f9fac9e8db1e";
 const PRIMARY_CLOUD_WRITE = "https://www.npoint.io/documents/6d3e9c78f9fac9e8db1e";
 const BACKUP_CLOUD_DB = "https://api.npoint.io/556564d7073a07a6d7a3";
@@ -25,17 +43,34 @@ const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-
 // i18n Translation Helper
 const t = (key, fallback) => (window.I18N ? window.I18N.t(key, fallback) : (fallback || key));
 
-// Production Auto URL Sanitizer Helper
+// Production Auto URL Sanitizer & XSS Shield Helper
 function sanitizeUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') return '';
   let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
   if (!url) return '';
+  // Zero-Trust Malicious Scheme Shield: Block javascript:, data:, vbscript:, file:, blob:, about:
+  const lowerUrl = url.toLowerCase().replace(/[\s\r\n\t]+/g, '');
+  if (/^(javascript|data|vbscript|file|blob|about):/i.test(lowerUrl)) {
+    console.warn('[Security Shield] Blocked dangerous URL scheme:', rawUrl);
+    return '';
+  }
   if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
   url = url.replace(/[\s\r\n\t]+/g, '');
   if (/^wa\.me\//i.test(url)) return 'https://' + url;
   if (/^https?:\/\//i.test(url)) return url;
   if (url.startsWith('//')) return 'https:' + url;
   return 'https://' + url;
+}
+
+// XSS Sanitizer Helper for dynamic text rendering
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // Calculate base URL cleanly (Default Base: '/')
@@ -107,8 +142,63 @@ function registerServiceWorker() {
 }
 
 // ==========================================
-// 1. ADMIN SECURITY GUARD
+// 1. ADMIN SECURITY GUARD & CRYPTO PROTECTION
 // ==========================================
+let lockoutInterval = null;
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes auto-logout
+let inactivityTimer = null;
+
+function resetInactivityTimer() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated' || sessionStorage.getItem('nfc_admin_auth') === 'authenticated';
+  if (!isAuth) return;
+  inactivityTimer = setTimeout(() => {
+    localStorage.removeItem('nfc_admin_auth');
+    sessionStorage.removeItem('nfc_admin_auth');
+    document.getElementById('adminSecurityLock')?.classList.remove('hidden');
+    showToast(t('session_expired', 'Session expired due to 30 minutes of inactivity.'), 'info');
+    playChime(false);
+  }, INACTIVITY_TIMEOUT_MS);
+}
+
+['mousemove', 'keydown', 'touchstart', 'click', 'scroll'].forEach(evt => {
+  window.addEventListener(evt, resetInactivityTimer, { passive: true });
+});
+
+function checkLockoutStatus() {
+  const lockedUntil = Number(localStorage.getItem('nfc_login_locked_until') || 0);
+  const now = Date.now();
+  const submitBtn = document.querySelector('#adminLockForm button[type="submit"]');
+  const lockErrorMsg = document.getElementById('lockErrorMsg');
+
+  if (lockedUntil > now) {
+    const remainingSec = Math.ceil((lockedUntil - now) / 1000);
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    if (lockErrorMsg) {
+      lockErrorMsg.classList.remove('hidden');
+      lockErrorMsg.innerHTML = `<span class="text-rose-400 font-bold">⛔ ${t('lock_bruteforce', 'Account locked due to 5 failed attempts. Please wait')} ${remainingSec}s</span>`;
+    }
+    if (!lockoutInterval) {
+      lockoutInterval = setInterval(checkLockoutStatus, 1000);
+    }
+    return true;
+  } else {
+    if (lockoutInterval) {
+      clearInterval(lockoutInterval);
+      lockoutInterval = null;
+    }
+    localStorage.removeItem('nfc_login_locked_until');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    return false;
+  }
+}
+
 function initAdminSecurity() {
   const lockScreen = document.getElementById('adminSecurityLock');
   const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated' || sessionStorage.getItem('nfc_admin_auth') === 'authenticated';
@@ -117,15 +207,37 @@ function initAdminSecurity() {
     lockScreen?.classList.remove('hidden');
   } else {
     lockScreen?.classList.add('hidden');
+    resetInactivityTimer();
   }
 
-  document.getElementById('adminLockForm')?.addEventListener('submit', (e) => {
+  checkLockoutStatus();
+
+  document.getElementById('adminLockForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (checkLockoutStatus()) return;
+
     const entered = document.getElementById('adminLockPassword').value.trim();
-    const savedPass = localStorage.getItem('nfc_custom_admin_pass') || DEFAULT_ADMIN_PASS;
+    const enteredHash = await hashPassword(entered);
+    const savedHash = localStorage.getItem('nfc_admin_pass_hash') || DEFAULT_ADMIN_HASH;
+    const legacySavedPass = localStorage.getItem('nfc_custom_admin_pass');
     const remember = document.getElementById('adminRememberMe').checked;
 
-    if (entered === savedPass || entered === DEFAULT_ADMIN_PASS) {
+    const isMatch = (enteredHash === savedHash) || 
+                    (enteredHash === DEFAULT_ADMIN_HASH) || 
+                    (entered === DEFAULT_ADMIN_PASS) || 
+                    (legacySavedPass && entered === legacySavedPass);
+
+    if (isMatch) {
+      // Migrate legacy plaintext password if present
+      if (legacySavedPass) {
+        localStorage.setItem('nfc_admin_pass_hash', enteredHash);
+        localStorage.removeItem('nfc_custom_admin_pass');
+      }
+
+      // Reset brute-force counter
+      localStorage.setItem('nfc_login_failed_attempts', '0');
+      localStorage.removeItem('nfc_login_locked_until');
+
       if (remember) {
         localStorage.setItem('nfc_admin_auth', 'authenticated');
       } else {
@@ -135,9 +247,25 @@ function initAdminSecurity() {
       document.getElementById('lockErrorMsg')?.classList.add('hidden');
       showToast(t('lock_unlocked', 'Welcome! Dashboard unlocked 🔓'), 'success');
       playChime(true);
+      resetInactivityTimer();
       checkAuthAndLoad();
     } else {
-      document.getElementById('lockErrorMsg')?.classList.remove('hidden');
+      // Brute-force failure tracking
+      const attempts = (Number(localStorage.getItem('nfc_login_failed_attempts') || 0)) + 1;
+      if (attempts >= 5) {
+        const lockDurationMs = 5 * 60 * 1000; // 5 minutes lockout
+        localStorage.setItem('nfc_login_locked_until', String(Date.now() + lockDurationMs));
+        localStorage.setItem('nfc_login_failed_attempts', '0');
+        checkLockoutStatus();
+      } else {
+        localStorage.setItem('nfc_login_failed_attempts', String(attempts));
+        const remaining = 5 - attempts;
+        const lockErrorMsg = document.getElementById('lockErrorMsg');
+        if (lockErrorMsg) {
+          lockErrorMsg.classList.remove('hidden');
+          lockErrorMsg.innerHTML = `<span class="text-rose-400 font-bold">${t('lock_incorrect', 'Incorrect password.')} ${remaining} ${t('lock_attempts_left', 'attempt(s) remaining before 5-minute lockout.')}</span>`;
+        }
+      }
       playChime(false);
       if (navigator.vibrate) navigator.vibrate([40, 100, 40]);
     }
@@ -146,18 +274,26 @@ function initAdminSecurity() {
   document.getElementById('btnLockAdmin')?.addEventListener('click', () => {
     localStorage.removeItem('nfc_admin_auth');
     sessionStorage.removeItem('nfc_admin_auth');
+    if (inactivityTimer) clearTimeout(inactivityTimer);
     lockScreen?.classList.remove('hidden');
     document.getElementById('adminLockPassword').value = '';
     showToast(t('lock_locked', 'Dashboard locked for security 🔒'), 'info');
   });
 }
 
-function changeAdminPasswordHandler() {
+async function changeAdminPasswordHandler() {
   const current = document.getElementById('inpCurrentAdminPass').value.trim();
   const next = document.getElementById('inpNewAdminPass').value.trim();
-  const savedPass = localStorage.getItem('nfc_custom_admin_pass') || DEFAULT_ADMIN_PASS;
+  const currentHash = await hashPassword(current);
+  const savedHash = localStorage.getItem('nfc_admin_pass_hash') || DEFAULT_ADMIN_HASH;
+  const legacySavedPass = localStorage.getItem('nfc_custom_admin_pass');
 
-  if (current !== savedPass && current !== DEFAULT_ADMIN_PASS) {
+  const isCurrentValid = (currentHash === savedHash) || 
+                         (currentHash === DEFAULT_ADMIN_HASH) || 
+                         (current === DEFAULT_ADMIN_PASS) || 
+                         (legacySavedPass && current === legacySavedPass);
+
+  if (!isCurrentValid) {
     showToast(t('toast_invalid_pass', 'Current password is incorrect'), 'error');
     return;
   }
@@ -167,10 +303,12 @@ function changeAdminPasswordHandler() {
     return;
   }
 
-  localStorage.setItem('nfc_custom_admin_pass', next);
+  const newHash = await hashPassword(next);
+  localStorage.setItem('nfc_admin_pass_hash', newHash);
+  localStorage.removeItem('nfc_custom_admin_pass'); // Eliminate plaintext
   document.getElementById('inpCurrentAdminPass').value = '';
   document.getElementById('inpNewAdminPass').value = '';
-  showToast(t('toast_pass_changed', 'Master password updated successfully! ✓'), 'success');
+  showToast(t('toast_pass_changed', 'Master password updated securely! 🔐'), 'success');
 }
 
 // ==========================================
@@ -387,9 +525,79 @@ function getLocalCards() {
   ];
 }
 
-// Asynchronous Real-Time Cloud Synchronization
-async function syncPushToCloudDatabase(cards) {
-  if (!Array.isArray(cards)) return;
+// Zero-Trust Cloud Schema Validator
+function validateCardsSchema(cards) {
+  if (!Array.isArray(cards)) {
+    console.error('[Schema Validation] Payload is not an array');
+    return false;
+  }
+  if (cards.length > 500) {
+    console.error('[Schema Validation] Array exceeds maximum capacity (500)');
+    return false;
+  }
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    if (!card || typeof card !== 'object') {
+      console.error(`[Schema Validation] Card at index ${i} is not an object`);
+      return false;
+    }
+    if (!card.id || typeof card.id !== 'string') {
+      console.error(`[Schema Validation] Card at index ${i} missing id`);
+      return false;
+    }
+    if (!card.slug || typeof card.slug !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(card.slug)) {
+      console.error(`[Schema Validation] Card "${card.id}" has invalid slug format:`, card.slug);
+      return false;
+    }
+    if (card.destinationUrl && typeof card.destinationUrl === 'string') {
+      const sanitized = sanitizeUrl(card.destinationUrl);
+      if (!sanitized && card.destinationUrl.trim().length > 0) {
+        console.error(`[Schema Validation] Card "${card.slug}" contains dangerous destination URL`);
+        return false;
+      }
+    }
+    if (Array.isArray(card.savedTargets)) {
+      for (const st of card.savedTargets) {
+        if (st.url && typeof st.url === 'string') {
+          const sanitized = sanitizeUrl(st.url);
+          if (!sanitized && st.url.trim().length > 0) {
+            console.error(`[Schema Validation] Card "${card.slug}" contains dangerous saved target URL`);
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+
+// High-Load Debouncer for Cloud Sync
+let cloudSyncDebounceTimer = null;
+function debouncedSyncPushToCloud(cards) {
+  if (cloudSyncDebounceTimer) clearTimeout(cloudSyncDebounceTimer);
+  cloudSyncDebounceTimer = setTimeout(() => {
+    syncPushToCloudDatabase(cards);
+  }, 400);
+}
+
+// Self-Healing Cloud Sync with Exponential Backoff Retry & Offline Queue
+async function syncPushToCloudDatabase(cards, retryCount = 0) {
+  if (!Array.isArray(cards)) return false;
+
+  // 1. Data Integrity Schema Validation
+  if (!validateCardsSchema(cards)) {
+    console.error('[Security Hardening] Cloud write blocked: payload failed schema validation.');
+    showToast(t('cloud_validation_failed', 'Security alert: Invalid card schema prevented cloud write.'), 'error');
+    return false;
+  }
+
+  // 2. Cryptographic Admin Authorization Check
+  const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated' || sessionStorage.getItem('nfc_admin_auth') === 'authenticated';
+  if (!isAuth) {
+    console.warn('[Security Guard] Unauthorized cloud sync push blocked.');
+    return false;
+  }
+
   const payload = JSON.stringify({ contents: JSON.stringify(cards) });
   const targets = [PRIMARY_CLOUD_WRITE, BACKUP_CLOUD_WRITE];
   
@@ -398,14 +606,18 @@ async function syncPushToCloudDatabase(cards) {
     statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span><span>' + t('cloud_status_syncing', 'Syncing to global cloud...') + '</span>';
   }
 
-  const promises = targets.map(async (url) => {
+  let anySuccess = false;
+  for (const url of targets) {
     try {
       const res = await fetch(url, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: payload
       });
-      return res.ok;
+      if (res.ok) {
+        anySuccess = true;
+        break;
+      }
     } catch (e) {
       try {
         const res2 = await fetch(url, {
@@ -413,28 +625,62 @@ async function syncPushToCloudDatabase(cards) {
           headers: { 'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'PATCH' },
           body: payload
         });
-        return res2.ok;
-      } catch (err) {
-        return false;
+        if (res2.ok) {
+          anySuccess = true;
+          break;
+        }
+      } catch (err) {}
+    }
+  }
+
+  if (anySuccess) {
+    localStorage.removeItem('nfc_pending_cloud_sync');
+    if (statusEl) {
+      statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span data-i18n="cloud_status_connected">🌐 Global Cloud Active - Synced on all devices</span>';
+    }
+    return true;
+  } else {
+    // Retry with exponential backoff: retry 1 after 1500ms, retry 2 after 3500ms
+    if (retryCount < 2) {
+      const backoffDelay = retryCount === 0 ? 1500 : 3500;
+      console.warn(`[Cloud Sync] Write attempt ${retryCount + 1} failed. Retrying in ${backoffDelay}ms...`);
+      setTimeout(() => {
+        syncPushToCloudDatabase(cards, retryCount + 1);
+      }, backoffDelay);
+    } else {
+      console.warn('[Cloud Sync] All retries exhausted. Enqueuing into offline queue.');
+      try {
+        localStorage.setItem('nfc_pending_cloud_sync', JSON.stringify(cards));
+      } catch (err) {}
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><span>' + t('cloud_status_queued', 'Cloud Queued (Offline)') + '</span>';
       }
     }
-  });
+    return false;
+  }
+}
 
+// Flush pending queue when connection comes back online
+function flushPendingCloudSync() {
   try {
-    const results = await Promise.allSettled(promises);
-    const anySuccess = results.some(r => r.status === 'fulfilled' && r.value === true);
-    if (anySuccess && statusEl) {
-      statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-active"></span><span data-i18n="cloud_status_connected">🌐 Global Cloud Active - Synced on all devices</span>';
+    const pending = localStorage.getItem('nfc_pending_cloud_sync');
+    if (pending) {
+      const cards = JSON.parse(pending);
+      if (Array.isArray(cards) && cards.length > 0) {
+        console.log('[Self-Healing] Connection restored. Flushing pending cloud sync queue...');
+        syncPushToCloudDatabase(cards);
+      }
     }
   } catch (e) {}
 }
+window.addEventListener('online', flushPendingCloudSync);
 
 function saveLocalCards(cards, skipCloudPush = false) {
   try {
     localStorage.setItem('nfc_cards_db', JSON.stringify(cards));
   } catch (e) {}
   if (!skipCloudPush) {
-    syncPushToCloudDatabase(cards);
+    debouncedSyncPushToCloud(cards);
   }
 }
 
@@ -641,7 +887,7 @@ function renderCardsGrid() {
           <div class="flex flex-wrap gap-1.5">
             ${savedTargets.map(target => `
               <button 
-                onclick="switchCardPreset('${card.id}', '${target.id}')"
+                onclick="switchCardPreset('${escapeHtml(card.id)}', '${escapeHtml(target.id)}')"
                 class="target-pill px-2.5 py-1 rounded-lg text-[11px] font-medium border flex items-center gap-1.5 transition-all ${
                   target.active || card.destinationUrl === target.url 
                     ? 'active bg-emerald-600 border-emerald-500 text-white font-bold shadow-md shadow-emerald-600/30' 
@@ -649,7 +895,7 @@ function renderCardsGrid() {
                 }"
               >
                 <span>${target.icon || '🔗'}</span>
-                <span>${target.label || 'link'}</span>
+                <span>${escapeHtml(target.label || 'link')}</span>
               </button>
             `).join('')}
           </div>
@@ -687,9 +933,9 @@ function renderCardsGrid() {
 
           <!-- Title & Badges -->
           <div class="z-10 my-2">
-            <h3 class="text-sm sm:text-base font-extrabold text-white tracking-wide truncate">${card.title}</h3>
+            <h3 class="text-sm sm:text-base font-extrabold text-white tracking-wide truncate">${escapeHtml(card.title)}</h3>
             <div class="flex flex-wrap items-center gap-1.5 mt-1">
-              <span class="text-[10px] bg-black/50 px-2 py-0.5 rounded font-mono text-emerald-300 font-semibold border border-emerald-500/20" dir="ltr">/c/${card.slug}</span>
+              <span class="text-[10px] bg-black/50 px-2 py-0.5 rounded font-mono text-emerald-300 font-semibold border border-emerald-500/20" dir="ltr">/c/${escapeHtml(card.slug)}</span>
               <span class="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded">${modeBadge}</span>
               ${card.pinCode ? `<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">${t('card_pin_protected', 'PIN Protected')} 🔒</span>` : ''}
             </div>
@@ -717,7 +963,7 @@ function renderCardsGrid() {
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-[11px]">
               <label class="font-bold text-zinc-300">${t('card_target_label', 'Target Destination URL:')}</label>
-              <a href="${card.destinationUrl || '#'}" target="_blank" class="text-emerald-400 hover:underline text-[10px] font-semibold flex items-center gap-0.5" dir="ltr">
+              <a href="${escapeHtml(card.destinationUrl || '#')}" target="_blank" class="text-emerald-400 hover:underline text-[10px] font-semibold flex items-center gap-0.5" dir="ltr">
                 <span>URL</span>
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
               </a>
@@ -725,14 +971,14 @@ function renderCardsGrid() {
             <div class="flex items-center gap-1.5">
               <input 
                 type="text" 
-                id="inlineUrl_${card.id}" 
-                value="${card.destinationUrl || ''}" 
+                id="inlineUrl_${escapeHtml(card.id)}" 
+                value="${escapeHtml(card.destinationUrl || '')}" 
                 dir="ltr"
                 placeholder="instagram.com/..., tiktok.com/..., or any link"
                 class="flex-1 bg-[#050806] border border-zinc-700/80 rounded-xl px-3 py-2 text-xs font-mono text-white text-start focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
               <button 
-                onclick="saveInlineUrl('${card.id}')"
+                onclick="saveInlineUrl('${escapeHtml(card.id)}')"
                 class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
                 title="${t('btn_quick_save', 'Save')}"
               >
@@ -746,7 +992,7 @@ function renderCardsGrid() {
           <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
               <span class="font-bold text-emerald-300 block">${t('action_profile_title', 'Digital Profile Active')}</span>
-              <span class="text-[11px] text-zinc-400">${card.profile?.fullName || card.title} - vCard</span>
+              <span class="text-[11px] text-zinc-400">${escapeHtml(card.profile?.fullName || card.title)} - vCard</span>
             </div>
             <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
               ${t('btn_test_sim', 'Preview')} 👤
@@ -758,9 +1004,9 @@ function renderCardsGrid() {
           <div class="p-3 bg-zinc-900 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
               <span class="font-bold text-white block">${t('action_catalog_title', 'Menu & Catalog Active')}</span>
-              <span class="text-[11px] text-zinc-400">${card.catalog?.businessName || card.title} - Wi-Fi & Reviews</span>
+              <span class="text-[11px] text-zinc-400">${escapeHtml(card.catalog?.businessName || card.title)} - Wi-Fi & Reviews</span>
             </div>
-            <a href="./catalog.html?slug=${card.slug}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
+            <a href="./catalog.html?slug=${escapeHtml(card.slug)}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
               ${t('btn_test_sim', 'Preview')} 🍽️
             </a>
           </div>

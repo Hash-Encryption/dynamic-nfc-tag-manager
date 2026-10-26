@@ -37,7 +37,7 @@
     "actionType": "direct",
     "destinationUrl": "https://maps.google.com",
     "isActive": true,
-    "scanCount": 6,
+    "scanCount": 7,
     "pinCode": "",
     "managePin": "1234",
     "savedTargets": [
@@ -56,7 +56,8 @@
     "profile": null,
     "catalog": null,
     "createdAt": "2026-10-25T17:25:00.000Z",
-    "updatedAt": "2026-10-26T14:56:47.317Z"
+    "updatedAt": "2026-10-26T14:56:47.317Z",
+    "lastScannedAt": "2026-10-26T16:34:40.262Z"
   },
   {
     "id": "card-b62374ed",

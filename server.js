@@ -16,6 +16,25 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(SESSION_SECRET));
 
+// Zero-Trust Security Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;");
+  next();
+});
+
+// Anti-Spam Rate Limiter for NFC Scans (10s throttle per IP per slug)
+const scanRateLimit = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of scanRateLimit.entries()) {
+    if (now - timestamp > 60000) scanRateLimit.delete(key);
+  }
+}, 10 * 60 * 1000);
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -198,15 +217,22 @@ function handleDynamicRedirect(req, res, slug) {
   const ua = req.headers['user-agent'] || '';
   const { deviceType, browser } = parseUserAgent(ua);
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+  const clientIp = String(ip).split(',')[0].trim();
   const referrer = req.headers.referer || req.headers.referrer || 'NFC Tag Tap';
 
-  // Increment scan count and log analytics
-  db.recordScan(card, {
-    deviceType,
-    browser,
-    referrer,
-    ip: String(ip).split(',')[0].trim()
-  });
+  // Anti-Spam Scan Protection: Throttle to at most 1 scan every 10 seconds per IP per card
+  const scanKey = `${clientIp}_${card.slug}`;
+  const now = Date.now();
+  const lastScan = scanRateLimit.get(scanKey) || 0;
+  if (now - lastScan > 10000) {
+    scanRateLimit.set(scanKey, now);
+    db.recordScan(card, {
+      deviceType,
+      browser,
+      referrer,
+      ip: clientIp
+    });
+  }
 
   const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
 
@@ -276,10 +302,12 @@ function handleDynamicRedirect(req, res, slug) {
     `);
   }
 
-  // Ensure scheme exists
-  if (!/^https?:\/\//i.test(targetUrl) && !/^(tel|mailto|sms):/i.test(targetUrl)) {
-    targetUrl = 'https://' + targetUrl;
+  // Ensure URL is clean and safe (Zero-Trust Validation)
+  const cleanTargetUrl = db.sanitizeUrl(targetUrl);
+  if (!cleanTargetUrl) {
+    return res.status(400).send('Invalid or dangerous destination URL.');
   }
+  targetUrl = cleanTargetUrl;
 
   // Ultra-fast HTTP 302 Redirect with instant HTML fallback for in-app webviews
   res.writeHead(302, {
