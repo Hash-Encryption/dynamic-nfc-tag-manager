@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" class="dark">
+<html lang="ar" dir="rtl" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>TapLink | Redirecting Tag... - MUHAB</title>
+  <title>TapLink | جاري تحويل البطاقة الذكية... - شركة MUHAB</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'Tajawal', 'Cairo', 'sans-serif'],
+            sans: ['Tajawal', 'Cairo', 'Inter', 'sans-serif'],
           }
         }
       }
@@ -45,8 +45,8 @@
     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold mb-2">
       <span>TapLink • by MUHAB</span>
     </div>
-    <h3 class="text-base font-extrabold text-white mb-1" id="loadingTitle">Smart NFC Tag Scanned 📡</h3>
-    <p class="text-xs text-emerald-400 font-mono mb-3" id="loadingSlugText">Redirecting to destination...</p>
+    <h3 class="text-base font-extrabold text-white mb-1" id="loadingTitle">تم مسح الشريحة الذكية 📡</h3>
+    <p class="text-xs text-emerald-400 font-mono mb-3" id="loadingSlugText">جاري التحويل للوجهة...</p>
     <div class="w-7 h-7 border-3 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto"></div>
   </div>
 
@@ -58,10 +58,10 @@
       </svg>
     </div>
     <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mb-2" id="pinBadge">
-      PIN Protected Tag
+      رابط محمي برمز PIN
     </span>
-    <h2 class="text-lg font-bold mb-1 text-white" id="pinCardTitle">Protected Tag</h2>
-    <p class="text-zinc-400 text-xs mb-5" id="pinSubtitle">Enter security PIN to continue to destination</p>
+    <h2 class="text-lg font-bold mb-1 text-white" id="pinCardTitle">بطاقة محمية</h2>
+    <p class="text-zinc-400 text-xs mb-5" id="pinSubtitle">أدخل رمز الحماية السري للمتابعة إلى الوجهة</p>
 
     <div class="space-y-3">
       <input 
@@ -78,73 +78,54 @@
         id="btnSubmitPin" 
         class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/30 text-xs"
       >
-        Unlock Secret Link 🔓
+        فتح الرابط السري 🔓
       </button>
     </div>
   </div>
 
-  <!-- Unregistered / Activation Screen -->
-  <main id="notFoundBox" class="hidden w-full max-w-md bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
-    <div class="relative w-16 h-16 bg-gradient-to-tr from-emerald-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mx-auto mb-4">
-      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+  <!-- Unregistered / Inactive Public Safe Screen (ZERO LEAK - NO ADMIN CONTROLS) -->
+  <main id="notFoundBox" class="hidden w-full max-w-sm bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-2xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+    <div class="relative w-16 h-16 bg-gradient-to-tr from-zinc-800 to-zinc-900 border border-zinc-700/80 rounded-2xl flex items-center justify-center shadow-lg shadow-black/40 mx-auto mb-4">
+      <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
       </svg>
     </div>
 
-    <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mb-2" id="unregBadge">
-      New NFC Tag Requires Activation
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-full text-[11px] font-bold mb-3">
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <span id="unregBadge">البطاقة الذكية غير مفعلة</span>
     </span>
 
-    <h1 class="text-xl font-bold mb-1 text-white" id="unregHeading">This chip is not linked to a URL yet</h1>
+    <h1 class="text-lg font-extrabold text-white mb-2 leading-snug" id="unregHeading">
+      البطاقة الذكية غير مفعلة حالياً
+    </h1>
     
-    <p class="text-zinc-400 text-xs leading-relaxed mb-4">
-      <span id="unregSlugLabel">Chip Identifier:</span> <code id="displaySlug" class="text-emerald-300 font-mono bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded-lg">card-xxx</code>
-      <br>
-      <span id="unregPrompt">If you own this tag, you can assign its destination URL right now:</span>
+    <p class="text-zinc-400 text-xs leading-relaxed mb-4" id="unregDesc">
+      يرجى مراجعة مسؤول البطاقة أو نقطة الخدمة لتفعيل هذا الرابط.
     </p>
 
-    <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl mb-5 text-start space-y-3">
-      <label class="block text-xs font-semibold text-zinc-200" id="unregTargetLabel">Target Destination URL:</label>
-      <input 
-        type="url" 
-        id="assignTargetUrl" 
-        dir="ltr"
-        placeholder="https://maps.google.com/... or your website" 
-        class="w-full bg-[#050806] border border-zinc-700 text-white text-xs font-mono rounded-xl px-3 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-emerald-500"
-      >
-      <button 
-        id="btnSaveUnregistered" 
-        class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5"
-      >
-        <span id="unregSaveBtn">Save & Activate Redirection 🚀</span>
-      </button>
+    <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-center gap-2 text-[11px] text-zinc-500 font-mono">
+      <span>Tag ID:</span>
+      <code id="displaySlug" class="text-emerald-400/80 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded-lg">card-xxx</code>
     </div>
-
-    <a href="./" class="block w-full py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium rounded-xl transition-all border border-zinc-700" id="unregBackDash">
-      Access TapLink Admin Dashboard
-    </a>
   </main>
 
   <script>
     (function() {
-      const isAr = localStorage.getItem('taplink_lang') === 'ar';
+      const isAr = localStorage.getItem('taplink_lang') !== 'en';
       document.documentElement.lang = isAr ? 'ar' : 'en';
       document.documentElement.dir = isAr ? 'rtl' : 'ltr';
 
-      if (isAr) {
-        document.title = 'TapLink | جاري تحويل البطاقة... - شركة MUHAB';
-        document.getElementById('loadingTitle').textContent = 'تم مسح الشريحة الذكية 📡';
-        document.getElementById('loadingSlugText').textContent = 'جاري التحويل للوجهة...';
-        document.getElementById('pinBadge').textContent = 'رابط محمي برمز PIN';
-        document.getElementById('pinSubtitle').textContent = 'أدخل رمز الحماية السري للمتابعة إلى الوجهة';
-        document.getElementById('btnSubmitPin').textContent = 'فتح الرابط السري 🔓';
-        document.getElementById('unregBadge').textContent = 'بطاقة NFC جديدة تحتاج تفعيل';
-        document.getElementById('unregHeading').textContent = 'هذه الشريحة غير مربوطة برابط بعد';
-        document.getElementById('unregSlugLabel').textContent = 'معرف الشريحة:';
-        document.getElementById('unregPrompt').textContent = 'إذا كنت صاحب هذه الشريحة، يمكنك تعيين رابط الوجهة الهدف فوراً:';
-        document.getElementById('unregTargetLabel').textContent = 'الرابط الهدف (Target Destination URL):';
-        document.getElementById('unregSaveBtn').textContent = 'حفظ وتفعيل التحويل فوراً 🚀';
-        document.getElementById('unregBackDash').textContent = 'الدخول إلى لوحة التحكم الرئيسية (TapLink)';
+      if (!isAr) {
+        document.title = 'TapLink | Redirecting Tag... - MUHAB';
+        document.getElementById('loadingTitle').textContent = 'Smart NFC Tag Scanned 📡';
+        document.getElementById('loadingSlugText').textContent = 'Redirecting to destination...';
+        document.getElementById('pinBadge').textContent = 'PIN Protected Tag';
+        document.getElementById('pinSubtitle').textContent = 'Enter security PIN to continue to destination';
+        document.getElementById('btnSubmitPin').textContent = 'Unlock Secret Link 🔓';
+        document.getElementById('unregBadge').textContent = 'Tag Currently Inactive';
+        document.getElementById('unregHeading').textContent = 'This Smart Tag is Currently Inactive';
+        document.getElementById('unregDesc').textContent = 'Please contact the card administrator or service desk to activate this tag.';
       }
 
       const path = window.location.pathname;
@@ -157,19 +138,31 @@
       const slug = (pathMatch && pathMatch[1]) || qSlug || (hashMatch && hashMatch[1]);
 
       if (!slug) {
-        window.location.replace('./');
+        // Safe fallback - no redirect to admin
+        document.getElementById('redirectLoadingBox').classList.add('hidden');
+        document.getElementById('notFoundBox').classList.remove('hidden');
         return;
       }
 
       const normalizedSlug = slug.toLowerCase();
-      document.getElementById('loadingSlugText').textContent = `Slug: ${normalizedSlug}`;
+      document.getElementById('loadingSlugText').textContent = `Tag: ${normalizedSlug}`;
       document.getElementById('displaySlug').textContent = normalizedSlug;
 
+      // Real, pre-bundled fallback cards for sub-10ms instant offline/static redirect
       const BUNDLED_FALLBACK_CARDS = [
         {
           id: "card-ksnjv",
-          title: "Google 5-Star Reviews Smart Card",
+          title: "بطاقة تقييم جوجل الذكية",
           slug: "card-ksnjv",
+          mode: "direct",
+          actionType: "direct",
+          destinationUrl: "https://maps.google.com",
+          isActive: true
+        },
+        {
+          id: "card-cardtest",
+          title: "Google Reviews Smart Card - cardtest",
+          slug: "cardtest",
           mode: "direct",
           actionType: "direct",
           destinationUrl: "https://maps.google.com",
@@ -178,12 +171,27 @@
       ];
 
       const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-nfc-tag-manager/main/data/cards.json";
+      const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-manager@main/data/cards.json";
 
       async function findAndRedirect() {
         let card = null;
 
+        // Step 1: Check bundled cards first for instant sub-10ms redirect
+        card = BUNDLED_FALLBACK_CARDS.find(c => c.slug && c.slug.toLowerCase() === normalizedSlug);
+        if (card && card.isActive && card.destinationUrl) {
+          executeRedirection(card);
+          return;
+        }
+
+        // Step 2: Determine repository base path
+        let repoBase = '';
+        if (window.location.pathname.includes('/dynamic-nfc-tag-manager')) {
+          repoBase = '/dynamic-nfc-tag-manager';
+        }
+
+        // Step 3: Fetch dynamic cloud updates with timeout
         try {
-          const fetchWithTimeout = async (url, ms = 600) => {
+          const fetchWithTimeout = async (url, ms = 700) => {
             const ctrl = new AbortController();
             const tid = setTimeout(() => ctrl.abort(), ms);
             try {
@@ -198,10 +206,11 @@
 
           const customCloudUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
           const promises = [
-            fetchWithTimeout(`./data/cards.json?_nocache=${Date.now()}`, 500),
-            fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 600)
+            fetchWithTimeout(`${repoBase}/data/cards.json?_nocache=${Date.now()}`, 500),
+            fetchWithTimeout(`${CLOUD_DB_URL}?_nocache=${Date.now()}`, 700),
+            fetchWithTimeout(`${CDN_DB_URL}?_nocache=${Date.now()}`, 700)
           ];
-          if (customCloudUrl) promises.unshift(fetchWithTimeout(customCloudUrl, 600));
+          if (customCloudUrl) promises.unshift(fetchWithTimeout(customCloudUrl, 700));
 
           const results = await Promise.allSettled(promises);
           for (const r of results) {
@@ -212,6 +221,7 @@
           }
         } catch (e) {}
 
+        // Step 4: Check LocalStorage cache
         if (!card) {
           try {
             const raw = localStorage.getItem('nfc_cards_db');
@@ -222,13 +232,11 @@
           } catch (e) {}
         }
 
-        if (!card) {
-          card = BUNDLED_FALLBACK_CARDS.find(c => c.slug.toLowerCase() === normalizedSlug);
-        }
-
         if (card) {
           if (!card.isActive) {
-            window.location.replace('./inactive.html');
+            document.getElementById('redirectLoadingBox').classList.add('hidden');
+            document.getElementById('notFoundBox').classList.remove('hidden');
+            document.getElementById('unregHeading').textContent = isAr ? 'البطاقة متوقفة مؤقتاً' : 'Card is Temporarily Paused';
             return;
           }
 
@@ -253,45 +261,24 @@
           return;
         }
 
+        // Tag is unconfigured / not registered: Show safe public screen (ZERO LEAK)
         document.getElementById('redirectLoadingBox').classList.add('hidden');
         document.getElementById('notFoundBox').classList.remove('hidden');
-
-        document.getElementById('btnSaveUnregistered').onclick = () => {
-          const val = document.getElementById('assignTargetUrl').value.trim();
-          if (!val) {
-            alert(isAr ? 'يرجى كتابة الرابط أولاً' : 'Please enter a target URL');
-            return;
-          }
-          const newCard = {
-            id: 'card-' + normalizedSlug,
-            slug: normalizedSlug,
-            title: 'NFC Card - ' + normalizedSlug,
-            destinationUrl: val.startsWith('http') ? val : ('https://' + val),
-            actionType: 'direct',
-            mode: 'direct',
-            isActive: true,
-            scanCount: 1,
-            createdAt: new Date().toISOString()
-          };
-          try {
-            let cur = [];
-            const raw = localStorage.getItem('nfc_cards_db');
-            if (raw) cur = JSON.parse(raw);
-            cur.push(newCard);
-            localStorage.setItem('nfc_cards_db', JSON.stringify(cur));
-          } catch (e) {}
-          window.location.replace(newCard.destinationUrl);
-        };
       }
 
       function executeRedirection(card) {
-        const mode = card.mode || (card.actionType === 'profile' ? 'profile' : 'direct');
+        let repoBase = '';
+        if (window.location.pathname.includes('/dynamic-nfc-tag-manager')) {
+          repoBase = '/dynamic-nfc-tag-manager';
+        }
+
+        const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
         if (mode === 'profile') {
-          window.location.replace(`./landing.html?slug=${encodeURIComponent(slug)}`);
+          window.location.replace(`${repoBase}/landing.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
         if (mode === 'catalog') {
-          window.location.replace(`./catalog.html?slug=${encodeURIComponent(slug)}`);
+          window.location.replace(`${repoBase}/catalog.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
         let target = (card.destinationUrl || '').trim();

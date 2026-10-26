@@ -18,16 +18,81 @@
       "actionType": "direct",
       "destinationUrl": "https://maps.google.com",
       "isActive": true,
-      "scanCount": 5,
-      "lastScannedAt": "2026-10-26T13:53:22.783Z",
+      "scanCount": 6,
+      "lastScannedAt": "2026-10-26T14:18:12.412Z",
       "createdAt": "2026-10-25T17:25:00.000Z",
       "updatedAt": "2026-10-26T13:53:22.789Z",
       "pinCode": "",
       "savedTargets": [],
       "managePin": "1234"
+    },
+    {
+      "id": "card-b62374ed",
+      "title": "Google Reviews Smart Card - cardtest",
+      "slug": "cardtest",
+      "mode": "direct",
+      "actionType": "direct",
+      "destinationUrl": "https://maps.google.com",
+      "isActive": true,
+      "createdAt": "2026-10-26T14:08:02.307Z",
+      "updatedAt": "2026-10-26T14:08:02.307Z",
+      "scanCount": 2,
+      "lastScannedAt": "2026-10-26T14:18:12.405Z",
+      "pinCode": "",
+      "managePin": "1234",
+      "savedTargets": [
+        {
+          "id": "t-google",
+          "label": "Google Reviews 5-Star",
+          "url": "https://maps.google.com",
+          "active": true,
+          "icon": "⭐"
+        }
+      ],
+      "timeRouting": {
+        "enabled": false,
+        "morningUrl": "",
+        "morningLabel": "فترة الصباح",
+        "eveningUrl": "",
+        "eveningLabel": "فترة المساء",
+        "switchHour": 16
+      },
+      "conditional": null,
+      "profile": null,
+      "catalog": null
     }
   ],
   "scans": [
+    {
+      "id": "scan-0a6942ad",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-26T14:18:12.412Z",
+      "deviceType": "Desktop",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::ffff:127.0.0.1"
+    },
+    {
+      "id": "scan-acc3bfd3",
+      "cardId": "card-b62374ed",
+      "slug": "cardtest",
+      "timestamp": "2026-10-26T14:18:12.405Z",
+      "deviceType": "Desktop",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::ffff:127.0.0.1"
+    },
+    {
+      "id": "scan-c842fe1f",
+      "cardId": "card-b62374ed",
+      "slug": "cardtest",
+      "timestamp": "2026-10-26T14:18:12.393Z",
+      "deviceType": "Desktop",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::ffff:127.0.0.1"
+    },
     {
       "id": "scan-2d3846c2",
       "cardId": "card-ksnjv",

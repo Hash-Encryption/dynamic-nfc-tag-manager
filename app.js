@@ -106,7 +106,7 @@ function registerServiceWorker() {
 // ==========================================
 function initAdminSecurity() {
   const lockScreen = document.getElementById('adminSecurityLock');
-  const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated';
+  const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated' || sessionStorage.getItem('nfc_admin_auth') === 'authenticated';
 
   if (!isAuth) {
     lockScreen?.classList.remove('hidden');
@@ -129,8 +129,11 @@ function initAdminSecurity() {
       lockScreen?.classList.add('hidden');
       document.getElementById('lockErrorMsg')?.classList.add('hidden');
       showToast(t('lock_unlocked', 'Welcome! Dashboard unlocked 🔓'), 'success');
+      playChime(true);
+      checkAuthAndLoad();
     } else {
       document.getElementById('lockErrorMsg')?.classList.remove('hidden');
+      playChime(false);
       if (navigator.vibrate) navigator.vibrate([40, 100, 40]);
     }
   });
@@ -169,18 +172,34 @@ function changeAdminPasswordHandler() {
 // 2. DATA LOADING & REAL-TIME CLOUD SYNC
 // ==========================================
 async function checkAuthAndLoad() {
+  const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated' || sessionStorage.getItem('nfc_admin_auth') === 'authenticated';
+  const lockScreen = document.getElementById('adminSecurityLock');
+
+  // Strict Admin Protection: Always require login password
+  if (!isAuth) {
+    lockScreen?.classList.remove('hidden');
+    return;
+  }
+
+  lockScreen?.classList.add('hidden');
+
+  const isStatic = window.location.hostname.includes('github.io') || window.location.hostname.includes('vercel.app') || window.location.protocol === 'file:';
+  if (isStatic) {
+    enableStaticStorageMode();
+    return;
+  }
+
   try {
     const res = await fetch('/api/auth/check');
     if (!res.ok && res.status !== 401) {
-      throw new Error('Static environment');
+      enableStaticStorageMode();
+      return;
     }
 
     const data = await res.json();
     if (!data.authenticated) {
-      if (window.location.hostname.includes('github.io') || window.location.hostname.includes('vercel.app')) {
-        enableStaticStorageMode();
-        return;
-      }
+      lockScreen?.classList.remove('hidden');
+      return;
     }
 
     await Promise.all([loadStats(), loadCards()]);
@@ -329,14 +348,36 @@ function getLocalCards() {
     {
       id: "card-ksnjv",
       slug: "card-ksnjv",
-      title: "Google 5-Star Reviews Smart Card",
+      title: "بطاقة تقييم جوجل الذكية",
       actionType: "direct",
       mode: "direct",
       destinationUrl: "https://maps.google.com",
       isActive: true,
       scanCount: 0,
       createdAt: "2026-10-25T17:25:00.000Z",
+      managePin: "1234",
       savedTargets: []
+    },
+    {
+      id: "card-cardtest",
+      slug: "cardtest",
+      title: "Google Reviews Smart Card - cardtest",
+      actionType: "direct",
+      mode: "direct",
+      destinationUrl: "https://maps.google.com",
+      isActive: true,
+      scanCount: 0,
+      createdAt: "2026-10-26T14:00:00.000Z",
+      managePin: "1234",
+      savedTargets: [
+        {
+          id: "t-google",
+          label: "Google Reviews 5-Star",
+          url: "https://maps.google.com",
+          active: true,
+          icon: "⭐"
+        }
+      ]
     }
   ];
 }
@@ -348,11 +389,18 @@ function saveLocalCards(cards) {
 }
 
 // Real-time Cloud Sync
+const CDN_DB_URL = "https://cdn.jsdelivr.net/gh/Hash-Encryption/dynamic-nfc-tag-manager@main/data/cards.json";
+
 async function syncWithCloudDatabase(showNotification = false) {
   const customUrl = localStorage.getItem('nfc_custom_cloud_url') || '';
+  let repoBase = '';
+  if (window.location.pathname.includes('/dynamic-nfc-tag-manager')) {
+    repoBase = '/dynamic-nfc-tag-manager';
+  }
   const endpoints = [
-    `./data/cards.json?_nocache=${Date.now()}`,
-    `${CLOUD_DB_URL}?_nocache=${Date.now()}`
+    `${repoBase}/data/cards.json?_nocache=${Date.now()}`,
+    `${CLOUD_DB_URL}?_nocache=${Date.now()}`,
+    `${CDN_DB_URL}?_nocache=${Date.now()}`
   ];
   if (customUrl) endpoints.unshift(customUrl);
 
