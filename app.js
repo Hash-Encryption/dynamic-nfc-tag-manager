@@ -20,6 +20,19 @@ const CLOUD_DB_URL = "https://raw.githubusercontent.com/Hash-Encryption/dynamic-
 // i18n Translation Helper
 const t = (key, fallback) => (window.I18N ? window.I18N.t(key, fallback) : (fallback || key));
 
+// Production Auto URL Sanitizer Helper
+function sanitizeUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return '';
+  let url = rawUrl.trim();
+  url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+  if (!url) return '';
+  if (/^(tel|mailto|sms|whatsapp|tg|geo):/i.test(url)) return url;
+  url = url.replace(/[\s\r\n\t]+/g, '');
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('//')) return 'https:' + url;
+  return 'https://' + url;
+}
+
 // Calculate base URL cleanly (Default Base: '/')
 function getBaseUrl() {
   if (window.APP_CONFIG && window.APP_CONFIG.baseUrl) {
@@ -685,6 +698,16 @@ function renderCardsGrid() {
             <span>${t('btn_edit', 'Edit')}</span>
           </button>
 
+          <a 
+            href="/c/${card.slug}/edit" 
+            target="_blank"
+            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-amber-300 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-amber-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            title="${t('btn_quick_page', 'Standalone PIN Quick Editor')}"
+          >
+            <span>🔑</span>
+            <span>${t('btn_quick_page_short', 'PIN')}</span>
+          </a>
+
           <button 
             onclick="toggleCardActiveState('${card.id}')"
             class="py-2 px-2 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-1 active:scale-95 transition-all ${
@@ -737,16 +760,13 @@ async function saveInlineUrl(cardId) {
   const input = document.getElementById(`inlineUrl_${cardId}`);
   if (!input) return;
 
-  let newUrl = (input.value || '').trim();
+  let newUrl = sanitizeUrl(input.value);
   if (!newUrl) {
     showToast(t('toast_enter_url', 'Please enter a target destination URL'), 'error');
     input.focus();
     return;
   }
-
-  if (!/^https?:\/\//i.test(newUrl) && !/^(tel|mailto|sms):/i.test(newUrl)) {
-    newUrl = 'https://' + newUrl;
-  }
+  input.value = newUrl;
 
   const card = cardsList.find(c => c.id === cardId);
   if (!card) return;
@@ -796,6 +816,7 @@ function openAddCardDrawer() {
   document.getElementById('cardDrawerTitle').textContent = t('drawer_add_title', 'Add New Smart NFC Tag');
   document.getElementById('cardEditorForm').reset();
   document.getElementById('inpIsActive').checked = true;
+  if (document.getElementById('inpManagePin')) document.getElementById('inpManagePin').value = '1234';
   tempSavedPresets = [];
   renderTempPresetsList();
   switchEditorTab('basic');
@@ -838,6 +859,7 @@ function openEditCardDrawer(cardId) {
   document.getElementById('inpAndroidUrl').value = dev.androidUrl || '';
 
   document.getElementById('inpPinCode').value = card.pinCode || '';
+  if (document.getElementById('inpManagePin')) document.getElementById('inpManagePin').value = card.managePin || '1234';
 
   // Catalog
   const cat = card.catalog || {};
@@ -960,26 +982,23 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
   const title = document.getElementById('inpCardTitle').value.trim();
   const slug = document.getElementById('inpCardSlug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-');
   const mode = document.querySelector('input[name="inpCardMode"]:checked')?.value || 'direct';
-  let destinationUrl = document.getElementById('inpDestinationUrl').value.trim();
+  let destinationUrl = sanitizeUrl(document.getElementById('inpDestinationUrl').value);
   const isActive = document.getElementById('inpIsActive').checked;
   const pinCode = document.getElementById('inpPinCode').value.trim();
-
-  if (destinationUrl && !/^https?:\/\//i.test(destinationUrl) && !/^(tel|mailto|sms):/i.test(destinationUrl)) {
-    destinationUrl = 'https://' + destinationUrl;
-  }
+  const managePin = document.getElementById('inpManagePin') ? (document.getElementById('inpManagePin').value.trim() || '1234') : '1234';
 
   const conditional = {
     type: mode === 'conditional' ? (pinCode ? 'pin' : (document.getElementById('inpDeviceRoutingEnabled').checked ? 'device' : 'time')) : 'none',
     time: {
       enabled: document.getElementById('inpTimeRoutingEnabled').checked,
-      morningUrl: document.getElementById('inpMorningUrl').value.trim(),
-      eveningUrl: document.getElementById('inpEveningUrl').value.trim(),
+      morningUrl: sanitizeUrl(document.getElementById('inpMorningUrl').value),
+      eveningUrl: sanitizeUrl(document.getElementById('inpEveningUrl').value),
       switchHour: Number(document.getElementById('inpSwitchHour').value) || 16
     },
     device: {
       enabled: document.getElementById('inpDeviceRoutingEnabled').checked,
-      iosUrl: document.getElementById('inpIosUrl').value.trim(),
-      androidUrl: document.getElementById('inpAndroidUrl').value.trim(),
+      iosUrl: sanitizeUrl(document.getElementById('inpIosUrl').value),
+      androidUrl: sanitizeUrl(document.getElementById('inpAndroidUrl').value),
       defaultUrl: destinationUrl
     }
   };
@@ -989,7 +1008,7 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
     tagline: document.getElementById('inpCatTagline').value.trim(),
     wifiSsid: document.getElementById('inpCatWifiSsid').value.trim(),
     wifiPassword: document.getElementById('inpCatWifiPass').value.trim(),
-    googleReviewUrl: document.getElementById('inpCatGoogleReview').value.trim() || destinationUrl,
+    googleReviewUrl: sanitizeUrl(document.getElementById('inpCatGoogleReview').value) || destinationUrl,
     whatsappPhone: document.getElementById('inpProfWhatsapp')?.value.trim() || '',
     callPhone: document.getElementById('inpProfPhone')?.value.trim() || ''
   };
@@ -1022,9 +1041,10 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
     destinationUrl,
     isActive,
     pinCode,
+    managePin,
     conditional,
     timeRouting: conditional.time,
-    savedTargets: tempSavedPresets,
+    savedTargets: tempSavedPresets.map(st => ({ ...st, url: sanitizeUrl(st.url) })),
     profile: mode === 'profile' ? profile : null,
     catalog: mode === 'catalog' ? catalog : null
   };
@@ -1290,12 +1310,14 @@ function openNfcProgrammerModal(cardId) {
   document.getElementById('drawerNfcProgrammer').classList.add('active');
 }
 
+let currentQrInstance = null;
+
 function renderCustomQrCode(text, darkColor, lightColor) {
   const qrWrapper = document.getElementById('nfcQrCodeWrapper');
   if (!qrWrapper) return;
   qrWrapper.innerHTML = '';
   try {
-    new QRCode(qrWrapper, {
+    currentQrInstance = new QRCode(qrWrapper, {
       text: text,
       width: 170,
       height: 170,
@@ -1303,7 +1325,9 @@ function renderCustomQrCode(text, darkColor, lightColor) {
       colorLight: lightColor || '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
-  } catch (e) {}
+  } catch (e) {
+    currentQrInstance = null;
+  }
 }
 
 function regenerateCustomQr() {
@@ -1315,6 +1339,65 @@ function regenerateCustomQr() {
 
 function closeNfcProgrammerDrawer() {
   document.getElementById('drawerNfcProgrammer').classList.remove('active');
+}
+
+// Generate High-Resolution Canvas for 300 DPI Print Manufacturing (2000x2000px)
+function generateHighResQrCanvas(qrInstance, size = 2000, marginModules = 4, darkColor = '#050806', lightColor = '#ffffff') {
+  const model = qrInstance?._oQRCode;
+  if (!model) return null;
+  const count = model.getModuleCount();
+  const totalModules = count + marginModules * 2;
+  const moduleSize = size / totalModules;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  // Crisp background
+  ctx.fillStyle = lightColor;
+  ctx.fillRect(0, 0, size, size);
+
+  // High contrast dark modules
+  ctx.fillStyle = darkColor;
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (model.isDark(r, c)) {
+        const x = Math.round((c + marginModules) * moduleSize);
+        const y = Math.round((r + marginModules) * moduleSize);
+        const w = Math.ceil((c + marginModules + 1) * moduleSize) - x;
+        const h = Math.ceil((r + marginModules + 1) * moduleSize) - y;
+        ctx.fillRect(x, y, w, h);
+      }
+    }
+  }
+  return canvas;
+}
+
+// Generate Pure Vector SVG for Laser Engraving & Plastic PVC Cards
+function generateQrSvgString(qrInstance, marginModules = 4, darkColor = '#050806', lightColor = '#ffffff') {
+  const model = qrInstance?._oQRCode;
+  if (!model) return null;
+  const count = model.getModuleCount();
+  const totalModules = count + marginModules * 2;
+
+  let pathData = '';
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (model.isDark(r, c)) {
+        const x = c + marginModules;
+        const y = r + marginModules;
+        pathData += `M${x},${y}h1v1h-1z `;
+      }
+    }
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalModules} ${totalModules}" shape-rendering="crispEdges">
+  <rect width="${totalModules}" height="${totalModules}" fill="${lightColor}"/>
+  <path d="${pathData.trim()}" fill="${darkColor}"/>
+</svg>`;
 }
 
 // Web NFC Writer (Android Chrome NDEFReader)
@@ -1348,6 +1431,49 @@ document.getElementById('btnCopyModalUrl')?.addEventListener('click', () => {
   copyToClipboard(url, t('toast_copied', 'Copied permanent URL to clipboard! 📋'));
 });
 
+// Download Print-Ready 2000px Ultra HD PNG (300 DPI)
+document.getElementById('btnDownloadQrPrintPng')?.addEventListener('click', () => {
+  const dark = document.getElementById('qrColorDark')?.value || '#050806';
+  const light = document.getElementById('qrColorLight')?.value || '#ffffff';
+  const canvas = generateHighResQrCanvas(currentQrInstance, 2000, 4, dark, light);
+  
+  if (canvas) {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `nfc-qr-${currentActiveCardForQr?.slug || 'tag'}-print-2000px.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    playChime(true);
+    showToast(t('toast_qr_print_downloaded', 'Downloaded 2000px Ultra HD QR Code (Print-Ready)! 🖨️'), 'success');
+  } else {
+    // Fallback to standard canvas
+    document.getElementById('btnDownloadQr')?.click();
+  }
+});
+
+// Download Resolution-Independent Vector SVG (Laser & PVC card printing)
+document.getElementById('btnDownloadQrVectorSvg')?.addEventListener('click', () => {
+  const dark = document.getElementById('qrColorDark')?.value || '#050806';
+  const light = document.getElementById('qrColorLight')?.value || '#ffffff';
+  const svgString = generateQrSvgString(currentQrInstance, 4, dark, light);
+
+  if (svgString) {
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nfc-qr-${currentActiveCardForQr?.slug || 'tag'}-vector.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    playChime(true);
+    showToast(t('toast_qr_svg_downloaded', 'Downloaded Vector SVG (Laser & PVC card ready)! 📐'), 'success');
+  }
+});
+
+// Standard Web QR Download
 document.getElementById('btnDownloadQr')?.addEventListener('click', () => {
   const canvas = document.querySelector('#nfcQrCodeWrapper canvas');
   const img = document.querySelector('#nfcQrCodeWrapper img');
@@ -1360,8 +1486,11 @@ document.getElementById('btnDownloadQr')?.addEventListener('click', () => {
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = `nfc-qr-${currentActiveCardForQr?.slug || 'code'}.png`;
+    document.body.appendChild(a);
     a.click();
-    showToast('Downloaded high-res QR code ✓', 'success');
+    document.body.removeChild(a);
+    playChime(true);
+    showToast(t('toast_qr_downloaded', 'Downloaded standard QR code ✓'), 'success');
   }
 });
 

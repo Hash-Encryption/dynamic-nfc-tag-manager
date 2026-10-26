@@ -303,7 +303,60 @@
         document.getElementById('profileBio').classList.add('hidden');
       }
 
-      document.getElementById('vcardDownloadBtn').href = `/c/${slug}/vcard`;
+      // Production-grade UTF-8 vCard generator with BOM for flawless Arabic on iOS & Android
+      const vcardBtn = document.getElementById('vcardDownloadBtn');
+      vcardBtn.href = `/c/${slug}/vcard`;
+      vcardBtn.onclick = (e) => {
+        try {
+          e.preventDefault();
+          const fullName = (p.fullName || card.title || 'NFC Contact').trim();
+          const nameParts = fullName.split(/\s+/);
+          const firstName = nameParts[0] || fullName;
+          const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+          const phone = (p.phone || p.whatsapp || '').trim();
+          const email = (p.email || '').trim();
+          const website = (p.website || '').trim();
+          const company = (p.company || '').trim();
+          const jobTitle = (p.jobTitle || '').trim();
+          const bio = (p.bio || '').trim().replace(/\r\n/g, '\\n').replace(/\n/g, '\\n');
+          const address = (p.location || '').trim().replace(/\r\n/g, ' ').replace(/\n/g, ' ');
+
+          const vcfLines = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            'PRODID:-//TapLink//NFC Smart Card//EN',
+            `N;CHARSET=UTF-8:${lastName};${firstName};;;`,
+            `FN;CHARSET=UTF-8:${fullName}`,
+            jobTitle ? `TITLE;CHARSET=UTF-8:${jobTitle}` : '',
+            company ? `ORG;CHARSET=UTF-8:${company}` : '',
+            phone ? `TEL;TYPE=CELL,VOICE:${phone}` : '',
+            email ? `EMAIL;TYPE=WORK,INTERNET:${email}` : '',
+            website ? `URL:${website}` : '',
+            address ? `ADR;CHARSET=UTF-8;TYPE=WORK:;;${address};;;;` : '',
+            bio ? `NOTE;CHARSET=UTF-8:${bio}` : '',
+            'REV:' + new Date().toISOString(),
+            'END:VCARD'
+          ];
+
+          // \uFEFF Byte Order Mark ensures immediate UTF-8 recognition without mojibake
+          const vcardString = '\uFEFF' + vcfLines.filter(Boolean).join('\r\n') + '\r\n';
+          const blob = new Blob([vcardString], { type: 'text/vcard;charset=utf-8' });
+          const blobUrl = URL.createObjectURL(blob);
+          const dlLink = document.createElement('a');
+          const safeName = fullName.replace(/[\/\\?%*:|"<>]/g, '_') + '.vcf';
+          dlLink.href = blobUrl;
+          dlLink.download = safeName;
+          document.body.appendChild(dlLink);
+          dlLink.click();
+          setTimeout(() => {
+            document.body.removeChild(dlLink);
+            URL.revokeObjectURL(blobUrl);
+          }, 1000);
+        } catch (err) {
+          // Fallback to server route
+          window.location.href = `/c/${slug}/vcard`;
+        }
+      };
 
       setupAction('callAction', p.phone ? `tel:${p.phone}` : null);
       

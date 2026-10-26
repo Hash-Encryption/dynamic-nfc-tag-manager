@@ -256,7 +256,19 @@ const I18N = {
       landing_qr_title: "QR Code for Card",
       landing_qr_subtitle: "Scan to open digital profile immediately",
       landing_copy_card_link: "Copy Profile Link",
-      landing_link_copied: "Profile link copied to clipboard!"
+      landing_link_copied: "Profile link copied to clipboard!",
+
+      // Card Quick Edit & Print QR additions
+      label_manage_pin: "4. Card Quick Management PIN (/c/:slug/edit)",
+      placeholder_manage_pin: "1234",
+      manage_pin_hint: "Allows changing this card's destination from a standalone mobile page (/c/:slug/edit) without accessing the dashboard.",
+      btn_qr_print_png: "Ultra HD (2000px PNG)",
+      btn_qr_vector_svg: "Vector (Print SVG)",
+      btn_download_qr_std: "Standard Digital QR (Web/PNG)",
+      btn_quick_page: "Standalone PIN Quick Editor",
+      btn_quick_page_short: "PIN Edit",
+      toast_qr_print_downloaded: "Downloaded 2000px Ultra HD QR Code (Print-Ready)! 🖨️",
+      toast_qr_svg_downloaded: "Downloaded Vector SVG (Laser & PVC card ready)! 📐"
     },
 
     ar: {
@@ -506,7 +518,19 @@ const I18N = {
       landing_qr_title: "رمز QR للبطاقة",
       landing_qr_subtitle: "امسح الكود لفتح البطاقة مباشرة",
       landing_copy_card_link: "نسخ رابط الملف الشخصي",
-      landing_link_copied: "تم نسخ الرابط للحافظة!"
+      landing_link_copied: "تم نسخ الرابط للحافظة!",
+
+      // Card Quick Edit & Print QR additions
+      label_manage_pin: "4. رمز PIN السريع لإدارة البطاقة (/c/:slug/edit)",
+      placeholder_manage_pin: "1234",
+      manage_pin_hint: "يتيح تعديل الرابط الهدف لهذه البطاقة عبر صفحة مخصصة للجوال (/c/:slug/edit) دون الحاجة للدخول إلى لوحة التحكم الرئيسية.",
+      btn_qr_print_png: "فائق الدقة (2000px PNG)",
+      btn_qr_vector_svg: "متجه للطباعة (Vector SVG)",
+      btn_download_qr_std: "رمز QR رقمي قياسي (ويب)",
+      btn_quick_page: "لوحة التعديل السريع برمز PIN",
+      btn_quick_page_short: "تعديل بالـ PIN",
+      toast_qr_print_downloaded: "تم تنزيل رمز QR فائق الدقة 2000 بكسل جاهز للطباعة! 🖨️",
+      toast_qr_svg_downloaded: "تم تنزيل ملف SVG المتجهي للطباعة البلاستيكية والليزر! 📐"
     }
   },
 

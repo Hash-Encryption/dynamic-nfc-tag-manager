@@ -7,6 +7,37 @@ const DB_FILE = path.join(DATA_DIR, 'db.json');
 const CARDS_SEED_FILE = path.join(DATA_DIR, 'cards.json');
 const PUBLIC_CARDS_FILE = path.join(__dirname, 'public', 'data', 'cards.json');
 
+// Production Auto URL Sanitizer Helper
+function sanitizeUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return '';
+  let url = rawUrl.trim();
+
+  // Strip zero-width, non-breaking, and invisible characters
+  url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+  if (!url) return '';
+
+  // Check special protocols: tel, mailto, sms, whatsapp, tg, geo, etc.
+  if (/^(tel|mailto|sms|whatsapp|tg|geo):/i.test(url)) {
+    return url;
+  }
+
+  // Remove internal stray spaces or line breaks often caused by copy-pasting
+  url = url.replace(/[\s\r\n\t]+/g, '');
+
+  // If starts with http:// or https://
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  // If protocol-relative (//example.com)
+  if (url.startsWith('//')) {
+    return 'https:' + url;
+  }
+
+  // Prepend https://
+  return 'https://' + url;
+}
+
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -55,6 +86,12 @@ class Database {
         // Ensure defaults
         if (!this.data.cards || this.data.cards.length === 0) {
           this.data.cards = seedCards;
+        }
+        if (Array.isArray(this.data.cards)) {
+          this.data.cards.forEach(c => {
+            if (!c.managePin) c.managePin = '1234';
+            if (c.destinationUrl) c.destinationUrl = sanitizeUrl(c.destinationUrl);
+          });
         }
         if (!this.data.scans) this.data.scans = [];
         if (!this.data.admin) this.data.admin = initialData.admin;
@@ -135,12 +172,13 @@ class Database {
       throw new Error('هذا المعرف الفريد (Slug) مستخدم بالفعل لبطاقة أخرى. اختر معرفاً مختلفاً');
     }
 
+    const cleanDestUrl = sanitizeUrl(cardData.destinationUrl);
     const savedTargets = Array.isArray(cardData.savedTargets) ? cardData.savedTargets : [];
-    if (cardData.destinationUrl && savedTargets.length === 0) {
+    if (cleanDestUrl && savedTargets.length === 0) {
       savedTargets.push({
         id: 't-' + crypto.randomUUID().slice(0, 6),
         label: 'الرابط الأساسي',
-        url: cardData.destinationUrl.trim(),
+        url: cleanDestUrl,
         active: true,
         icon: '🔗'
       });
@@ -154,19 +192,20 @@ class Database {
       slug: cleanSlug,
       mode: mode,
       actionType: mode,
-      destinationUrl: (cardData.destinationUrl || '').trim(),
+      destinationUrl: cleanDestUrl,
       isActive: cardData.isActive !== false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       scanCount: 0,
       lastScannedAt: null,
       pinCode: (cardData.pinCode || '').trim(),
-      savedTargets: savedTargets,
+      managePin: (cardData.managePin !== undefined && String(cardData.managePin).trim().length > 0 ? String(cardData.managePin).trim() : '1234'),
+      savedTargets: savedTargets.map(st => ({ ...st, url: sanitizeUrl(st.url) })),
       timeRouting: {
         enabled: Boolean(cardData.timeRouting?.enabled),
-        morningUrl: (cardData.timeRouting?.morningUrl || '').trim(),
+        morningUrl: sanitizeUrl(cardData.timeRouting?.morningUrl || ''),
         morningLabel: (cardData.timeRouting?.morningLabel || 'فترة الصباح').trim(),
-        eveningUrl: (cardData.timeRouting?.eveningUrl || '').trim(),
+        eveningUrl: sanitizeUrl(cardData.timeRouting?.eveningUrl || ''),
         eveningLabel: (cardData.timeRouting?.eveningLabel || 'فترة المساء').trim(),
         switchHour: Number(cardData.timeRouting?.switchHour) || 16
       },
@@ -205,22 +244,23 @@ class Database {
       currentCard.mode = updateData.actionType;
       currentCard.actionType = updateData.actionType;
     }
-    if (updateData.destinationUrl !== undefined) currentCard.destinationUrl = updateData.destinationUrl.trim();
+    if (updateData.destinationUrl !== undefined) currentCard.destinationUrl = sanitizeUrl(updateData.destinationUrl);
     if (updateData.isActive !== undefined) currentCard.isActive = Boolean(updateData.isActive);
     if (updateData.pinCode !== undefined) currentCard.pinCode = String(updateData.pinCode || '').trim();
+    if (updateData.managePin !== undefined) currentCard.managePin = String(updateData.managePin || '').trim();
     if (updateData.timeRouting !== undefined) {
       currentCard.timeRouting = {
         enabled: Boolean(updateData.timeRouting?.enabled),
-        morningUrl: (updateData.timeRouting?.morningUrl || '').trim(),
+        morningUrl: sanitizeUrl(updateData.timeRouting?.morningUrl || ''),
         morningLabel: (updateData.timeRouting?.morningLabel || 'فترة الصباح').trim(),
-        eveningUrl: (updateData.timeRouting?.eveningUrl || '').trim(),
+        eveningUrl: sanitizeUrl(updateData.timeRouting?.eveningUrl || ''),
         eveningLabel: (updateData.timeRouting?.eveningLabel || 'فترة المساء').trim(),
         switchHour: Number(updateData.timeRouting?.switchHour) || 16
       };
     }
     if (updateData.conditional !== undefined) currentCard.conditional = updateData.conditional;
     if (updateData.savedTargets !== undefined && Array.isArray(updateData.savedTargets)) {
-      currentCard.savedTargets = updateData.savedTargets;
+      currentCard.savedTargets = updateData.savedTargets.map(st => ({ ...st, url: sanitizeUrl(st.url) }));
     }
     if (updateData.profile !== undefined) currentCard.profile = updateData.profile;
     if (updateData.catalog !== undefined) currentCard.catalog = updateData.catalog;
@@ -233,7 +273,43 @@ class Database {
   quickUpdateUrl(id, destinationUrl) {
     const card = this.getCardById(id);
     if (!card) throw new Error('البطاقة غير موجودة');
-    card.destinationUrl = destinationUrl.trim();
+    const cleanUrl = sanitizeUrl(destinationUrl);
+    card.destinationUrl = cleanUrl;
+    if (Array.isArray(card.savedTargets)) {
+      const active = card.savedTargets.find(t => t.active);
+      if (active) active.url = cleanUrl;
+    }
+    card.updatedAt = new Date().toISOString();
+    this.save();
+    return card;
+  }
+
+  verifyManagePin(slug, enteredPin) {
+    const card = this.getCardBySlug(slug);
+    if (!card) return false;
+    const expectedPin = String(card.managePin || '1234').trim();
+    return String(enteredPin || '').trim() === expectedPin;
+  }
+
+  updateDestinationByManagePin(slug, enteredPin, newDestinationUrl) {
+    const card = this.getCardBySlug(slug);
+    if (!card) throw new Error('البطاقة غير موجودة');
+
+    const isValid = this.verifyManagePin(slug, enteredPin);
+    if (!isValid) {
+      throw new Error('رمز PIN الخاص بإدارة هذه البطاقة غير صحيح');
+    }
+
+    const cleanUrl = sanitizeUrl(newDestinationUrl);
+    if (!cleanUrl) {
+      throw new Error('الرابط الهدف مطلوب');
+    }
+
+    card.destinationUrl = cleanUrl;
+    if (Array.isArray(card.savedTargets)) {
+      const active = card.savedTargets.find(t => t.active);
+      if (active) active.url = cleanUrl;
+    }
     card.updatedAt = new Date().toISOString();
     this.save();
     return card;
@@ -264,7 +340,7 @@ class Database {
     const newTarget = {
       id: 't-' + crypto.randomUUID().slice(0, 6),
       label: (label || 'رابط إضافي').trim(),
-      url: (url || '').trim(),
+      url: sanitizeUrl(url),
       active: false,
       icon: icon
     };
@@ -438,4 +514,6 @@ class Database {
   }
 }
 
-module.exports = new Database();
+const dbInstance = new Database();
+dbInstance.sanitizeUrl = sanitizeUrl;
+module.exports = dbInstance;

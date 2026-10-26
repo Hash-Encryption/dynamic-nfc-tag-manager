@@ -18,15 +18,26 @@
       "actionType": "direct",
       "destinationUrl": "https://maps.google.com",
       "isActive": true,
-      "scanCount": 4,
-      "lastScannedAt": "2026-10-26T13:29:40.701Z",
+      "scanCount": 5,
+      "lastScannedAt": "2026-10-26T13:53:22.783Z",
       "createdAt": "2026-10-25T17:25:00.000Z",
-      "updatedAt": "2026-10-25T17:25:00.000Z",
+      "updatedAt": "2026-10-26T13:53:22.789Z",
       "pinCode": "",
-      "savedTargets": []
+      "savedTargets": [],
+      "managePin": "1234"
     }
   ],
   "scans": [
+    {
+      "id": "scan-2d3846c2",
+      "cardId": "card-ksnjv",
+      "slug": "card-ksnjv",
+      "timestamp": "2026-10-26T13:53:22.783Z",
+      "deviceType": "Desktop",
+      "browser": "Unknown Browser",
+      "referrer": "NFC Tag Tap",
+      "ip": "::ffff:127.0.0.1"
+    },
     {
       "id": "scan-5efcd5b1",
       "cardId": "card-ksnjv",

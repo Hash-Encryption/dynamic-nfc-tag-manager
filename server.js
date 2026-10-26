@@ -40,34 +40,43 @@ function parseUserAgent(ua = '') {
   return { deviceType, browser };
 }
 
-// Generate vCard string helper (RFC 6350 / vCard 3.0) with UTF-8 support
+// Generate vCard string helper (RFC 6350 / vCard 3.0) with UTF-8 BOM & Arabic support
 function generateVCard(profile = {}, title = '') {
-  const name = profile.fullName || title || 'جهة اتصال NFC';
-  const phone = profile.phone || profile.whatsapp || '';
-  const email = profile.email || '';
-  const website = profile.website || '';
-  const company = profile.company || '';
-  const jobTitle = profile.jobTitle || '';
-  const bio = profile.bio || '';
-  const address = profile.location || '';
+  const fullName = (profile.fullName || title || 'جهة اتصال NFC').trim();
+  const nameParts = fullName.split(/\s+/);
+  const firstName = nameParts[0] || fullName;
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+  const phone = (profile.phone || profile.whatsapp || '').trim();
+  const email = (profile.email || '').trim();
+  const website = (profile.website || '').trim();
+  const company = (profile.company || '').trim();
+  const jobTitle = (profile.jobTitle || '').trim();
+  const bio = (profile.bio || '').trim();
+  const address = (profile.location || '').trim();
+
+  const cleanBio = bio.replace(/\r\n/g, '\\n').replace(/\n/g, '\\n');
+  const cleanAddress = address.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
 
   let vcf = [
     'BEGIN:VCARD',
     'VERSION:3.0',
-    `FN;CHARSET=UTF-8:${name}`,
-    `N;CHARSET=UTF-8:${name};;;;`,
+    'PRODID:-//TapLink//NFC Smart Card//EN',
+    `N;CHARSET=UTF-8:${lastName};${firstName};;;`,
+    `FN;CHARSET=UTF-8:${fullName}`,
     jobTitle ? `TITLE;CHARSET=UTF-8:${jobTitle}` : '',
     company ? `ORG;CHARSET=UTF-8:${company}` : '',
     phone ? `TEL;TYPE=CELL,VOICE:${phone}` : '',
     email ? `EMAIL;TYPE=WORK,INTERNET:${email}` : '',
     website ? `URL:${website}` : '',
-    address ? `ADR;CHARSET=UTF-8;TYPE=WORK:;;${address};;;;` : '',
-    bio ? `NOTE;CHARSET=UTF-8:${bio.replace(/\n/g, '\\n')}` : '',
+    cleanAddress ? `ADR;CHARSET=UTF-8;TYPE=WORK:;;${cleanAddress};;;;` : '',
+    cleanBio ? `NOTE;CHARSET=UTF-8:${cleanBio}` : '',
     'REV:' + new Date().toISOString(),
     'END:VCARD'
   ];
 
-  return vcf.filter(line => line.length > 0).join('\r\n');
+  // Prepend \uFEFF (UTF-8 Byte Order Mark) for 100% Arabic decoding on iOS, Android, macOS & Windows
+  return '\uFEFF' + vcf.filter(line => line.length > 0).join('\r\n') + '\r\n';
 }
 
 // Simple signed session helper
@@ -303,6 +312,68 @@ function handleDynamicRedirect(req, res, slug) {
   `);
 }
 
+// ==========================================
+// CARD QUICK-EDIT ROUTES (/c/:slug/edit & /go/:slug/edit)
+// ==========================================
+app.get(['/c/:slug/edit', '/go/:slug/edit'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'edit.html'));
+});
+
+// Verify Management PIN for a specific card
+app.post(['/api/cards/:slug/quick-edit-auth'], (req, res) => {
+  const { slug } = req.params;
+  const { pin } = req.body;
+  const card = db.getCardBySlug(slug);
+  if (!card) {
+    return res.status(404).json({ success: false, error: 'البطاقة غير موجودة / Card not found' });
+  }
+
+  const isValid = db.verifyManagePin(slug, pin);
+  if (!isValid) {
+    return res.status(401).json({ success: false, error: 'رمز PIN الخاص بإدارة هذه البطاقة غير صحيح / Invalid Card PIN' });
+  }
+
+  res.json({
+    success: true,
+    card: {
+      id: card.id,
+      slug: card.slug,
+      title: card.title,
+      destinationUrl: card.destinationUrl,
+      mode: card.mode,
+      isActive: card.isActive,
+      savedTargets: card.savedTargets || []
+    }
+  });
+});
+
+// Update Destination URL using Card Management PIN
+app.post(['/api/cards/:slug/quick-edit-update'], (req, res) => {
+  const { slug } = req.params;
+  const { pin, destinationUrl } = req.body;
+  const card = db.getCardBySlug(slug);
+  if (!card) {
+    return res.status(404).json({ success: false, error: 'البطاقة غير موجودة / Card not found' });
+  }
+
+  try {
+    const updated = db.updateDestinationByManagePin(slug, pin, destinationUrl);
+    res.json({
+      success: true,
+      message: 'تم تحديث رابط البطاقة فوراً / Card destination updated successfully',
+      destinationUrl: updated.destinationUrl,
+      card: {
+        id: updated.id,
+        slug: updated.slug,
+        title: updated.title,
+        destinationUrl: updated.destinationUrl
+      }
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 // Redirect Routes: /c/:slug and /go/:slug
 app.get('/c/:slug', (req, res) => handleDynamicRedirect(req, res, req.params.slug));
 app.get('/go/:slug', (req, res) => handleDynamicRedirect(req, res, req.params.slug));
@@ -324,17 +395,19 @@ app.post(['/c/:slug/verify-pin', '/go/:slug/verify-pin'], (req, res) => {
   return res.redirect(`/go/${slug}?err=1`);
 });
 
-// Direct vCard download for profile cards
+// Direct vCard download for profile cards (UTF-8 BOM + RFC 6266/5987)
 app.get(['/c/:slug/vcard', '/go/:slug/vcard'], (req, res) => {
   const { slug } = req.params;
   const card = db.getCardBySlug(slug);
   if (!card) return res.status(404).send('Card not found');
 
   const vcardText = generateVCard(card.profile || {}, card.title);
-  const filename = encodeURIComponent((card.profile?.fullName || card.title || 'contact') + '.vcf');
+  const rawName = (card.profile?.fullName || card.title || 'contact').replace(/[\/\\?%*:|"<>]/g, '_');
+  const asciiFallback = 'contact.vcf';
+  const utf8Filename = encodeURIComponent(rawName) + '.vcf';
 
   res.setHeader('Content-Type', 'text/vcard; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"; filename*=UTF-8''${filename}`);
+  res.setHeader('Content-Disposition', `attachment; filename="${asciiFallback}"; filename*=UTF-8''${utf8Filename}`);
   return res.send(vcardText);
 });
 
