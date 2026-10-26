@@ -96,40 +96,40 @@ function requireAuth(req, res, next) {
   if (verifyAuthToken(token)) {
     return next();
   }
-  return res.status(401).json({ success: false, error: 'غير مصرح لك. يرجى تسجيل الدخول أولاً' });
+  return res.status(401).json({ success: false, error: 'Unauthorized. Please sign in to the dashboard first.' });
 }
 
 // Render PIN Code Protected Lock Screen
 function renderPinLockPage(card, currentPath, errorMsg = '') {
   return `
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-      <title>مغلق برمز حماية | ${card.title}</title>
+      <title>PIN Protected Link | ${card.title}</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
       <script src="https://cdn.tailwindcss.com"></script>
-      <style>body { font-family: 'Tajawal', sans-serif; }</style>
+      <style>body { font-family: 'Inter', 'Tajawal', sans-serif; }</style>
     </head>
-    <body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+    <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black">
       <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div class="absolute -top-40 -start-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -top-40 -start-40 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-emerald-900/20 rounded-full blur-3xl"></div>
       </div>
-      <div class="bg-slate-900/90 border border-slate-800 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl">
-        <div class="w-16 h-16 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-500/10">
+      <div class="bg-zinc-950/90 border border-emerald-500/20 backdrop-blur-xl max-w-sm w-full p-6 sm:p-8 rounded-3xl text-center shadow-2xl">
+        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/10">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
           </svg>
         </div>
-        <span class="inline-block px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold mb-2">
-          رابط محمي برمز PIN
+        <span class="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mb-2">
+          PIN Protected Link
         </span>
         <h2 class="text-xl font-bold mb-1 text-white">${card.title}</h2>
-        <p class="text-slate-400 text-xs mb-6">أدخل رمز الحماية السري للمتابعة إلى الوجهة</p>
+        <p class="text-zinc-400 text-xs mb-6">Enter security PIN code to proceed to destination</p>
 
         ${errorMsg ? `<div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs py-2 px-3 rounded-xl mb-4">${errorMsg}</div>` : ''}
 
@@ -143,16 +143,16 @@ function renderPinLockPage(card, currentPath, errorMsg = '') {
             required 
             autofocus 
             placeholder="••••" 
-            class="w-full text-center tracking-[1em] text-2xl font-mono py-3 bg-slate-800 border border-slate-700 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-500"
+            class="w-full text-center tracking-[1em] text-2xl font-mono py-3 bg-zinc-900 border border-zinc-700 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-zinc-500"
           >
           <button 
             type="submit" 
-            class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/30 text-sm"
+            class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-2xl transition-all shadow-lg shadow-emerald-600/30 text-sm"
           >
-            فتح الرابط السري 🔓
+            Unlock Secret Link 🔓
           </button>
         </form>
-        <p class="text-[11px] text-slate-500 mt-6">نظام بطاقات NFC الذكية &copy; 2026</p>
+        <p class="text-[11px] text-zinc-500 mt-6">TapLink Smart NFC Ecosystem &copy; 2026 • by MUHAB</p>
       </div>
     </body>
     </html>
@@ -244,23 +244,23 @@ function handleDynamicRedirect(req, res, slug) {
   if (!targetUrl) {
     return res.send(`
       <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
+      <html lang="en" dir="ltr">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تنبيه البطاقة</title>
-        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700&display=swap" rel="stylesheet">
+        <title>Destination URL Not Configured</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com"></script>
-        <style>body { font-family: 'Tajawal', sans-serif; }</style>
+        <style>body { font-family: 'Inter', sans-serif; }</style>
       </head>
-      <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 max-w-md w-full p-8 rounded-3xl text-center shadow-2xl">
+      <body class="bg-[#050706] text-white min-h-screen flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-800 max-w-md w-full p-8 rounded-3xl text-center shadow-2xl">
           <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
           </div>
-          <h2 class="text-xl font-bold mb-2">الرابط الهدف غير محدد</h2>
-          <p class="text-slate-400 text-sm mb-6">هذه البطاقة نشطة ولكن لم يتم تعيين رابط التحويل الهدف لها بعد من لوحة التحكم.</p>
-          <a href="/login.html" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition-all">لوحة التحكم</a>
+          <h2 class="text-xl font-bold mb-2">Target Destination Not Configured</h2>
+          <p class="text-zinc-400 text-sm mb-6">This NFC card is active, but its target destination URL has not been assigned yet in the dashboard.</p>
+          <a href="/login.html" class="inline-block bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-medium px-6 py-2.5 rounded-xl transition-all">Open Dashboard</a>
         </div>
       </body>
       </html>
@@ -282,20 +282,20 @@ function handleDynamicRedirect(req, res, slug) {
 
   res.end(`
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
     <head>
       <meta charset="utf-8">
       <meta http-equiv="refresh" content="0;url=${encodeURI(targetUrl)}">
-      <title>جاري تحويلك...</title>
+      <title>Redirecting...</title>
       <script>
         window.location.replace("${encodeURI(targetUrl)}");
       </script>
     </head>
-    <body style="font-family: sans-serif; background: #090d16; color: #94a3b8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center;">
+    <body style="font-family: sans-serif; background: #050806; color: #94a3b8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center;">
       <div>
-        <div style="width: 48px; height: 48px; border: 3px solid rgba(99,102,241,0.2); border-top-color: #6366f1; border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite;"></div>
-        <p style="font-size: 1.1rem; margin-bottom: 8px; color: #f8fafc; font-weight: bold;">جاري تحويلك تلقائياً...</p>
-        <p style="font-size: 0.85rem; color: #64748b;">إذا لم يتم التحويل، <a href="${encodeURI(targetUrl)}" style="color: #818cf8; text-decoration: underline;">اضغط هنا للمتابعة</a></p>
+        <div style="width: 48px; height: 48px; border: 3px solid rgba(16,185,129,0.2); border-top-color: #10b981; border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite;"></div>
+        <p style="font-size: 1.1rem; margin-bottom: 8px; color: #f8fafc; font-weight: bold;">Redirecting you automatically...</p>
+        <p style="font-size: 0.85rem; color: #64748b;">If not redirected, <a href="${encodeURI(targetUrl)}" style="color: #34d399; text-decoration: underline;">click here to continue</a></p>
       </div>
       <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     </body>

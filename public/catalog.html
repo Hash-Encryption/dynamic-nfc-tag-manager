@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
+<html lang="en" dir="ltr" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>TapLink | الكتالوج والمنيو الذكي - شركة MUHAB</title>
+  <title>TapLink | Smart Menu & Business Hub - MUHAB</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./css/style.css">
 
@@ -17,7 +17,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Tajawal', 'Cairo', 'sans-serif'],
+            sans: ['Inter', 'Tajawal', 'Cairo', 'sans-serif'],
           }
         }
       }
@@ -36,14 +36,14 @@
   <div id="catalogToast" class="fixed top-4 start-1/2 -translate-x-1/2 z-50 hidden">
     <div class="bg-black/95 border border-emerald-500/50 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-2">
       <span id="toastIcon">✨</span>
-      <span id="toastMsg">تمت العملية بنجاح</span>
+      <span id="toastMsg">Action completed successfully</span>
     </div>
   </div>
 
   <!-- Loading State -->
   <div id="catalogLoading" class="min-h-screen flex flex-col items-center justify-center p-4">
     <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin mb-4"></div>
-    <p class="text-neutral-400 text-xs font-semibold">جاري تحميل قائمة الأعمال والمنيو الذكي من TapLink...</p>
+    <p class="text-zinc-400 text-xs font-semibold">Loading Smart Menu & Business Hub from TapLink...</p>
   </div>
 
   <!-- Main Content Container -->
@@ -53,15 +53,15 @@
     <div class="flex items-center justify-between px-1">
       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="openStatusBadge">مفتوح الآن للخدمة</span>
+        <span id="openStatusBadge">Open Now for Service</span>
       </span>
 
       <div class="flex items-center gap-2">
-        <button id="btnCatalogLang" class="px-2.5 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-emerald-400 border border-emerald-500/20 text-xs font-bold transition-all active:scale-95 flex items-center gap-1" title="Toggle Language">
+        <button id="btnCatalogLang" class="px-2.5 py-1.5 rounded-full bg-zinc-900 border border-emerald-500/20 text-emerald-400 hover:text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1" title="Toggle Language">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
-          <span id="catalogLangText">EN</span>
+          <span id="catalogLangText">عربي</span>
         </button>
-        <button id="btnShareCatalog" class="w-9 h-9 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-neutral-300 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95" title="مشاركة">
+        <button id="btnShareCatalog" class="w-9 h-9 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95" title="Share Hub">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
         </button>
       </div>
@@ -73,7 +73,7 @@
       <div id="catalogCover" class="h-32 bg-gradient-to-r from-neutral-950 via-emerald-950 to-black relative bg-cover bg-center border-b border-emerald-500/20">
         <div class="absolute inset-0 bg-black/30 backdrop-blur-[1px]"></div>
         <div class="absolute bottom-2.5 end-3 text-[10px] text-emerald-400 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1.5 font-bold border border-emerald-500/30">
-          <span>📡 TapLink • شريحة NFC موثقة</span>
+          <span>📡 TapLink • Verified NFC Tag</span>
         </div>
       </div>
 
@@ -85,15 +85,15 @@
           </div>
           <div class="flex items-center gap-1 text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl">
             <span>⭐</span>
-            <span id="catalogRating">4.9 (500+ تقييم)</span>
+            <span id="catalogRating">4.9 (500+ Reviews)</span>
           </div>
         </div>
 
-        <h1 id="catalogTitle" class="text-lg font-black text-white">مطعم وكافيه السفير الفاخر</h1>
-        <p id="catalogTagline" class="text-xs text-neutral-300 font-medium mt-0.5">أشهى المأكولات الشرقية والغربية والقهوة المختصة</p>
-        <p id="catalogHours" class="text-[11px] text-neutral-400 mt-1 flex items-center gap-1">
+        <h1 id="catalogTitle" class="text-lg font-black text-white">Ambassador Luxury Dining & Lounge</h1>
+        <p id="catalogTagline" class="text-xs text-neutral-300 font-medium mt-0.5">Artisan Coffee, Gourmet Cuisine & Signature Dining</p>
+        <p id="catalogHours" class="text-[11px] text-zinc-400 mt-1 flex items-center gap-1">
           <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span>ساعات العمل: 06:00 ص - 01:00 ص يومياً</span>
+          <span id="catalogHoursText">Business Hours: 07:00 AM - 01:00 AM Daily</span>
         </p>
       </div>
     </div>
@@ -106,11 +106,11 @@
             <span>⭐⭐⭐⭐⭐</span>
             <span class="bg-black/30 text-white px-2 py-0.5 rounded-full text-[10px]">Google Maps</span>
           </div>
-          <h2 class="text-sm font-black text-black">شاركنا تجربتك وقيمنا بـ 5 نجوم</h2>
-          <p class="text-[11px] text-neutral-900 font-medium">رأيك يهمنا ويسعدنا دائماً لتقديم الأفضل!</p>
+          <h2 class="text-sm font-black text-black">Rate Us 5 Stars on Google Maps</h2>
+          <p class="text-[11px] text-neutral-900 font-medium">Your 5-star review takes 5 seconds and means the world to us!</p>
         </div>
         <div class="w-10 h-10 rounded-2xl bg-black text-emerald-400 flex items-center justify-center shrink-0 shadow-md">
-          <svg class="w-5 h-5 text-emerald-400 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          <svg class="w-5 h-5 text-emerald-400 ltr:rotate-0 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </div>
       </div>
     </a>
@@ -122,31 +122,31 @@
           📶
         </div>
         <div>
-          <span class="text-[10px] text-neutral-400 font-semibold block">واي فاي مجاني للعملاء (Wi-Fi)</span>
-          <span class="text-xs font-bold text-white font-mono" id="wifiSsidDisplay">-</span>
+          <span class="text-[10px] text-zinc-400 font-semibold block">Free Guest Wi-Fi Network</span>
+          <span class="text-xs font-bold text-white font-mono" id="wifiSsidDisplay">Guest_WiFi</span>
         </div>
       </div>
       <button id="btnCopyWifi" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/25 flex items-center gap-1 active:scale-90 transition-all">
-        <span>نسخ كلمة السر</span>
+        <span>Copy Password</span>
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
       </button>
     </div>
 
     <!-- Quick Action Contact Grid -->
     <div class="grid grid-cols-3 gap-2 text-center text-xs">
-      <a id="btnWhatsappOrder" href="#" target="_blank" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-emerald-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+      <a id="btnWhatsappOrder" href="#" target="_blank" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">💬</div>
-        <span class="font-bold text-white text-[11px]">طلب واتساب</span>
+        <span class="font-bold text-white text-[11px]">WhatsApp Order</span>
       </a>
 
-      <a id="btnCallPhone" href="#" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-blue-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+      <a id="btnCallPhone" href="#" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">📞</div>
-        <span class="font-bold text-white text-[11px]">اتصال هاتفي</span>
+        <span class="font-bold text-white text-[11px]">Call Front Desk</span>
       </a>
 
-      <a id="btnLocationMap" href="#" target="_blank" class="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+      <a id="btnLocationMap" href="#" target="_blank" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">📍</div>
-        <span class="font-bold text-white text-[11px]">الموقع بالخريطة</span>
+        <span class="font-bold text-white text-[11px]">Google Maps</span>
       </a>
     </div>
 
@@ -155,9 +155,9 @@
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-black text-white flex items-center gap-1.5">
           <span>🍽️</span>
-          <span>القائمة والخدمات المميزة</span>
+          <span>Featured Menu & Services</span>
         </h3>
-        <span class="text-[11px] text-amber-400 font-bold" id="catalogCategoryCount">4 عناصر</span>
+        <span class="text-[11px] text-amber-400 font-bold" id="catalogCategoryCount">4 items</span>
       </div>
 
       <!-- Items List -->
@@ -167,8 +167,8 @@
     </div>
 
     <!-- Footer Copyright -->
-    <div class="pt-6 text-center text-neutral-400 text-[11px]">
-      نظام <span class="font-bold text-emerald-400">TapLink</span> الذكي عبر NFC &copy; 2026 • <span class="text-white font-semibold">شركة MUHAB</span>
+    <div class="pt-6 text-center text-zinc-400 text-[11px]">
+      Powered by <span class="font-bold text-emerald-400">TapLink</span> Smart NFC Ecosystem &copy; 2026 • <span class="text-white font-semibold">by MUHAB</span>
     </div>
 
   </main>
@@ -196,7 +196,6 @@
     async function loadCatalogData() {
       let card = null;
 
-      // 1. Try local/cloud database
       try {
         let cloudRes = await fetch(`./data/cards.json?_nocache=${Date.now()}`);
         if (!cloudRes.ok) {
@@ -210,7 +209,6 @@
         }
       } catch (e) {}
 
-      // 2. Try localStorage fallback
       if (!card) {
         try {
           const raw = localStorage.getItem('nfc_cards_db');
@@ -234,34 +232,32 @@
       document.getElementById('catalogContent').classList.remove('hidden');
 
       const cat = card.catalog || {};
-      const businessName = cat.businessName || card.title || 'القائمة والكتالوج الذكي';
+      const isAr = localStorage.getItem('taplink_lang') === 'ar';
+      const defaultTitle = isAr ? 'القائمة والكتالوج الذكي' : 'Ambassador Lounge & Dining';
+      const businessName = cat.businessName || card.title || defaultTitle;
 
       document.getElementById('catalogTitle').textContent = businessName;
       if (cat.tagline) {
         document.getElementById('catalogTagline').textContent = cat.tagline;
-      } else {
-        document.getElementById('catalogTagline').textContent = '';
       }
 
-      // Google Review Button Link
       const revLink = cat.googleReviewUrl || card.destinationUrl || 'https://maps.google.com';
       document.getElementById('linkGoogleReview').href = revLink;
 
-      // Wi-Fi setup
       currentWifiPass = cat.wifiPassword || '';
       const boxWifi = document.getElementById('boxWifi');
       if (currentWifiPass) {
-        document.getElementById('wifiSsidDisplay').textContent = cat.wifiSsid || 'شبكة Wi-Fi';
+        document.getElementById('wifiSsidDisplay').textContent = cat.wifiSsid || 'Guest_WiFi';
         if (boxWifi) boxWifi.classList.remove('hidden');
       } else {
         if (boxWifi) boxWifi.classList.add('hidden');
       }
 
-      // Buttons
       const waNumber = (cat.whatsappPhone || '').replace(/[^0-9]/g, '');
       const btnWa = document.getElementById('btnWhatsappOrder');
       if (waNumber) {
-        btnWa.href = `https://wa.me/${waNumber}?text=${encodeURIComponent('مرحباً، أود الطلب والاستفسار')}`;
+        btnWa.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(isAr ? 'مرحباً، أود الطلب' : 'Hello, I would like to place an order')}`;
+        btnWa.classList.remove('hidden');
       } else {
         btnWa.classList.add('hidden');
       }
@@ -269,64 +265,75 @@
       const btnCall = document.getElementById('btnCallPhone');
       if (cat.callPhone) {
         btnCall.href = `tel:${cat.callPhone}`;
+        btnCall.classList.remove('hidden');
       } else {
         btnCall.classList.add('hidden');
       }
 
       document.getElementById('btnLocationMap').href = cat.locationUrl || revLink;
 
-      // Items list
       const itemsContainer = document.getElementById('catalogItemsContainer');
-      const items = Array.isArray(cat.items) ? cat.items : [];
-      document.getElementById('catalogCategoryCount').textContent = `${items.length} أصناف`;
+      const items = Array.isArray(cat.items) && cat.items.length > 0 ? cat.items : [
+        {
+          title: isAr ? 'وجبة السفير الفاخرة' : 'Ambassador Signature Dish',
+          description: isAr ? 'جودة استثنائية من أرقى المكونات الطازجة يومياً' : 'Curated premium culinary experience with fresh artisan ingredients',
+          price: '$24.00',
+          badge: isAr ? 'الأكثر طلباً 🔥' : 'Best Seller 🔥',
+          image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80'
+        },
+        {
+          title: isAr ? 'قهوة مختصة مقطرة V60' : 'Artisan Hand-Drip Coffee (V60)',
+          description: isAr ? 'محاصيل مختارة بعناية من أفضل مزارع إثيوبيا وكولومبيا' : 'Single-origin Ethiopian specialty beans roasted to perfection',
+          price: '$8.50',
+          badge: isAr ? 'مميز ⭐' : 'Specialty ⭐',
+          image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80'
+        }
+      ];
 
-      if (items.length === 0) {
-        itemsContainer.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs bg-slate-900/60 rounded-2xl border border-slate-800">لا توجد عناصر مضافة في هذا الكتالوج بعد.</div>`;
-      } else {
-        itemsContainer.innerHTML = items.map(item => `
-          <div class="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl flex items-center gap-3 backdrop-blur-xl">
-            <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'}" alt="${item.title}" class="w-16 h-16 rounded-xl object-cover shrink-0 bg-slate-800">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-1 mb-0.5">
-                <h4 class="text-xs font-black text-white truncate">${item.title}</h4>
-                <span class="text-xs font-black text-amber-400 font-mono whitespace-nowrap">${item.price}</span>
-              </div>
-              <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">${item.description}</p>
-              ${item.badge ? `<span class="inline-block mt-1 text-[9px] font-bold text-amber-300 bg-amber-500/15 border border-amber-500/20 px-2 py-0.5 rounded-full">${item.badge}</span>` : ''}
+      document.getElementById('catalogCategoryCount').textContent = `${items.length} ${isAr ? 'أصناف' : 'items'}`;
+
+      itemsContainer.innerHTML = items.map(item => `
+        <div class="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center gap-3 backdrop-blur-xl">
+          <img src="${item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80'}" alt="${item.title}" class="w-16 h-16 rounded-xl object-cover shrink-0 bg-zinc-800">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1 mb-0.5">
+              <h4 class="text-xs font-black text-white truncate">${item.title}</h4>
+              <span class="text-xs font-black text-emerald-400 font-mono whitespace-nowrap">${item.price}</span>
             </div>
+            <p class="text-[10px] text-zinc-400 line-clamp-2 leading-relaxed">${item.description}</p>
+            ${item.badge ? `<span class="inline-block mt-1 text-[9px] font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 px-2 py-0.5 rounded-full">${item.badge}</span>` : ''}
           </div>
-        `).join('');
-      }
+        </div>
+      `).join('');
     }
 
-    // 1-Click Wi-Fi Copy Button
     document.getElementById('btnCopyWifi').addEventListener('click', async () => {
       if (!currentWifiPass) return;
+      const isAr = localStorage.getItem('taplink_lang') === 'ar';
       try {
         await navigator.clipboard.writeText(currentWifiPass);
-        showToast('تم نسخ كلمة سر الواي فاي بنجاح! 📶', '✅');
+        showToast(isAr ? 'تم نسخ كلمة سر الواي فاي بنجاح! 📶' : 'Wi-Fi password copied successfully! 📶', '✅');
       } catch (e) {
-        showToast(`كلمة السر: ${currentWifiPass}`, '📶');
+        showToast(`Wi-Fi: ${currentWifiPass}`, '📶');
       }
     });
 
-    // Share Button
     document.getElementById('btnShareCatalog').addEventListener('click', async () => {
+      const isAr = localStorage.getItem('taplink_lang') === 'ar';
       if (navigator.share) {
         try {
           await navigator.share({
             title: document.title,
-            text: 'تفضل بزيارة القائمة والكتالوج الذكي:',
+            text: isAr ? 'تفضل بزيارة القائمة والكتالوج الذكي:' : 'Visit our smart digital menu & hub:',
             url: window.location.href
           });
         } catch (e) {}
       } else {
-        showToast('تم نسخ رابط القائمة لمشاركته 📋', '✓');
+        showToast(isAr ? 'تم نسخ رابط القائمة 📋' : 'Menu link copied to clipboard 📋', '✓');
       }
     });
 
-    // Bilingual Switcher for Catalog
-    let currentCatalogLang = localStorage.getItem('taplink_lang') || 'ar';
+    let currentCatalogLang = localStorage.getItem('taplink_lang') || 'en';
     function updateCatalogLanguage(lang) {
       currentCatalogLang = lang;
       localStorage.setItem('taplink_lang', lang);
@@ -338,16 +345,19 @@
       if (langBtnText) langBtnText.textContent = isAr ? 'EN' : 'عربي';
 
       const statusBadge = document.getElementById('openStatusBadge');
-      if (statusBadge) statusBadge.textContent = isAr ? 'مفتوح الآن للخدمة' : 'Open for Service';
+      if (statusBadge) statusBadge.textContent = isAr ? 'مفتوح الآن للخدمة' : 'Open Now for Service';
+
+      const hoursText = document.getElementById('catalogHoursText');
+      if (hoursText) hoursText.textContent = isAr ? 'ساعات العمل: 07:00 ص - 01:00 ص يومياً' : 'Business Hours: 07:00 AM - 01:00 AM Daily';
 
       const revTitle = document.querySelector('#linkGoogleReview h2');
-      if (revTitle) revTitle.textContent = isAr ? 'شاركنا تجربتك وقيمنا بـ 5 نجوم' : 'Share your review & rate us 5 stars';
+      if (revTitle) revTitle.textContent = isAr ? 'شاركنا تجربتك وقيمنا بـ 5 نجوم' : 'Rate Us 5 Stars on Google Maps';
 
       const revSub = document.querySelector('#linkGoogleReview p');
-      if (revSub) revSub.textContent = isAr ? 'رأيك يهمنا ويسعدنا دائماً لتقديم الأفضل!' : 'We value your feedback and strive for excellence!';
+      if (revSub) revSub.textContent = isAr ? 'رأيك يهمنا ويسعدنا دائماً لتقديم الأفضل!' : 'Your 5-star review takes 5 seconds and means the world to us!';
 
       const wifiTitle = document.querySelector('#boxWifi span.block');
-      if (wifiTitle) wifiTitle.textContent = isAr ? 'واي فاي مجاني للعملاء (Wi-Fi)' : 'Free Customer Wi-Fi';
+      if (wifiTitle) wifiTitle.textContent = isAr ? 'واي فاي مجاني للعملاء (Wi-Fi)' : 'Free Guest Wi-Fi Network';
 
       const wifiBtnSpan = document.querySelector('#btnCopyWifi span');
       if (wifiBtnSpan) wifiBtnSpan.textContent = isAr ? 'نسخ كلمة السر' : 'Copy Password';
@@ -356,21 +366,20 @@
       if (waOrder) waOrder.textContent = isAr ? 'طلب واتساب' : 'WhatsApp Order';
 
       const callPhone = document.querySelector('#btnCallPhone span');
-      if (callPhone) callPhone.textContent = isAr ? 'اتصال هاتفي' : 'Call Us';
+      if (callPhone) callPhone.textContent = isAr ? 'اتصال هاتفي' : 'Call Front Desk';
 
       const mapLoc = document.querySelector('#btnLocationMap span');
-      if (mapLoc) mapLoc.textContent = isAr ? 'الموقع بالخريطة' : 'Location Map';
+      if (mapLoc) mapLoc.textContent = isAr ? 'الموقع بالخريطة' : 'Google Maps';
 
       const catSecTitle = document.querySelector('#catalogContent h3 span:last-child');
       if (catSecTitle) catSecTitle.textContent = isAr ? 'القائمة والخدمات المميزة' : 'Featured Menu & Services';
     }
 
     document.getElementById('btnCatalogLang')?.addEventListener('click', () => {
-      updateCatalogLanguage(currentCatalogLang === 'ar' ? 'en' : 'ar');
+      updateCatalogLanguage(currentCatalogLang === 'en' ? 'ar' : 'en');
     });
 
     updateCatalogLanguage(currentCatalogLang);
-
     loadCatalogData();
   </script>
 </body>

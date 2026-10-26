@@ -1,6 +1,7 @@
 /**
- * Dynamic NFC Tag Manager PRO - Frontend Architecture v3.0
- * 100% Real-Time Cloud Sync, 4 Smart Modes, Admin Security Guard, Smart Link Generator
+ * TapLink NFC Tag & Dynamic Routing Engine - v3.5 PRO
+ * Full English-First Bilingual Support (English LTR Default / Arabic RTL)
+ * TapLink by MUHAB
  */
 
 // Application Global State
@@ -10,6 +11,7 @@ let currentActiveCardForQr = null;
 let currentActiveCardForSim = null;
 let isOfflineOrStatic = false;
 let currentEditorSubTab = 'basic';
+let currentFilterMode = 'all';
 let tempSavedPresets = [];
 
 const DEFAULT_ADMIN_PASS = 'admin123';
@@ -25,12 +27,9 @@ function getBaseUrl() {
   }
   const origin = window.location.origin;
   
-  // If running specifically on GitHub Pages project subpath
   if (window.location.hostname.endsWith('github.io') && window.location.pathname.startsWith('/dynamic-nfc-tag-manager')) {
     return `${origin}/dynamic-nfc-tag-manager`;
   }
-  
-  // Clean base '/' for Vercel (e.g. https://lamsa.vercel.app), custom domains, and localhost
   return origin;
 }
 
@@ -97,9 +96,9 @@ function initAdminSecurity() {
   const isAuth = localStorage.getItem('nfc_admin_auth') === 'authenticated';
 
   if (!isAuth) {
-    lockScreen.classList.remove('hidden');
+    lockScreen?.classList.remove('hidden');
   } else {
-    lockScreen.classList.add('hidden');
+    lockScreen?.classList.add('hidden');
   }
 
   document.getElementById('adminLockForm')?.addEventListener('submit', (e) => {
@@ -114,11 +113,11 @@ function initAdminSecurity() {
       } else {
         sessionStorage.setItem('nfc_admin_auth', 'authenticated');
       }
-      lockScreen.classList.add('hidden');
-      document.getElementById('lockErrorMsg').classList.add('hidden');
-      showToast('أهلاً بك! تم إلغاء قفل لوحة التحكم 🔓', 'success');
+      lockScreen?.classList.add('hidden');
+      document.getElementById('lockErrorMsg')?.classList.add('hidden');
+      showToast(t('lock_unlocked', 'Welcome! Dashboard unlocked 🔓'), 'success');
     } else {
-      document.getElementById('lockErrorMsg').classList.remove('hidden');
+      document.getElementById('lockErrorMsg')?.classList.remove('hidden');
       if (navigator.vibrate) navigator.vibrate([40, 100, 40]);
     }
   });
@@ -126,9 +125,9 @@ function initAdminSecurity() {
   document.getElementById('btnLockAdmin')?.addEventListener('click', () => {
     localStorage.removeItem('nfc_admin_auth');
     sessionStorage.removeItem('nfc_admin_auth');
-    lockScreen.classList.remove('hidden');
+    lockScreen?.classList.remove('hidden');
     document.getElementById('adminLockPassword').value = '';
-    showToast('تم قفل لوحة التحكم لحماية بياناتك 🔒', 'info');
+    showToast(t('lock_locked', 'Dashboard locked for security 🔒'), 'info');
   });
 }
 
@@ -138,19 +137,19 @@ function changeAdminPasswordHandler() {
   const savedPass = localStorage.getItem('nfc_custom_admin_pass') || DEFAULT_ADMIN_PASS;
 
   if (current !== savedPass && current !== DEFAULT_ADMIN_PASS) {
-    showToast('كلمة المرور الحالية غير صحيحة', 'error');
+    showToast(t('toast_invalid_pass', 'Current password is incorrect'), 'error');
     return;
   }
 
   if (next.length < 4) {
-    showToast('كلمة المرور الجديدة يجب ألا تقل عن 4 خانات', 'error');
+    showToast(t('toast_short_pass', 'New password must be at least 4 characters'), 'error');
     return;
   }
 
   localStorage.setItem('nfc_custom_admin_pass', next);
   document.getElementById('inpCurrentAdminPass').value = '';
   document.getElementById('inpNewAdminPass').value = '';
-  showToast('تم تحديث كلمة المرور بنجاح ✓', 'success');
+  showToast(t('toast_pass_changed', 'Master password updated successfully! ✓'), 'success');
 }
 
 // ==========================================
@@ -265,16 +264,23 @@ function loadLocalStats() {
 }
 
 function applyStatsToUI(s) {
-  document.getElementById('statTotalCards').textContent = s.totalCards || 0;
-  document.getElementById('statTotalScans').textContent = s.totalScans || 0;
-  document.getElementById('statActiveCards').textContent = s.activeCards || 0;
+  const elTotal = document.getElementById('statTotalCards');
+  const elScans = document.getElementById('statTotalScans');
+  const elActive = document.getElementById('statActiveCards');
+  if (elTotal) elTotal.textContent = s.totalCards || 0;
+  if (elScans) elScans.textContent = s.totalScans || 0;
+  if (elActive) elActive.textContent = s.activeCards || 0;
 
-  if (s.topCard && (s.topCard.scanCount || 0) > 0) {
-    document.getElementById('statTopCardTitle').textContent = s.topCard.title;
-    document.getElementById('statTopCardScans').textContent = `${s.topCard.scanCount || 0} عملية مسح`;
-  } else {
-    document.getElementById('statTopCardTitle').textContent = '-';
-    document.getElementById('statTopCardScans').textContent = '-';
+  const topCardTitle = document.getElementById('statTopCardTitle');
+  const topCardScans = document.getElementById('statTopCardScans');
+  if (topCardTitle && topCardScans) {
+    if (s.topCard && (s.topCard.scanCount || 0) > 0) {
+      topCardTitle.textContent = s.topCard.title;
+      topCardScans.textContent = `${s.topCard.scanCount || 0} ${t('scans_count_suffix', 'scans')}`;
+    } else {
+      topCardTitle.textContent = '-';
+      topCardScans.textContent = '-';
+    }
   }
 
   const devEl = document.getElementById('statTopDevice');
@@ -290,10 +296,10 @@ function applyStatsToUI(s) {
         }
       }
       devEl.textContent = maxDev;
-      if (devLabel) devLabel.textContent = `الأكثر استخداماً (${maxCount} مسحة)`;
+      if (devLabel) devLabel.textContent = `${t('stat_top_device', 'Top Device')} (${maxCount} ${t('scans_count_suffix', 'scans')})`;
     } else {
       devEl.textContent = '-';
-      if (devLabel) devLabel.textContent = 'بانتظار أول مسحة';
+      if (devLabel) devLabel.textContent = t('stat_awaiting_scans', 'Awaiting first tap');
     }
   }
 }
@@ -310,7 +316,7 @@ function getLocalCards() {
     {
       id: "card-ksnjv",
       slug: "card-ksnjv",
-      title: "بطاقة تقييم جوجل الذكية",
+      title: "Google 5-Star Reviews Smart Card",
       actionType: "direct",
       mode: "direct",
       destinationUrl: "https://maps.google.com",
@@ -347,7 +353,7 @@ async function syncWithCloudDatabase(showNotification = false) {
           saveLocalCards(cloudCards);
           renderCardsGrid();
           loadLocalStats();
-          if (showNotification) showToast('تمت المزامنة السحابية الفورية 🟢', 'success');
+          if (showNotification) showToast(t('toast_cloud_synced', 'Real-time cloud sync complete 🟢'), 'success');
           return;
         }
       }
@@ -355,19 +361,19 @@ async function syncWithCloudDatabase(showNotification = false) {
   }
 
   cardsList = getLocalCards();
-  if (showNotification) showToast('تم التحديث من الذاكرة المحلية', 'info');
+  if (showNotification) showToast(t('cloud_status_offline', 'Updated from local offline storage'), 'info');
 }
 
 function saveCustomCloudEndpoint() {
   const inp = document.getElementById('inpCustomCloudEndpoint');
-  const val = (inp.value || '').trim();
+  const val = (inp?.value || '').trim();
   if (val) {
     localStorage.setItem('nfc_custom_cloud_url', val);
-    showToast('تم حفظ رابط السحابة المخصص بنجاح ☁️', 'success');
+    showToast('Custom cloud endpoint saved successfully ☁️', 'success');
     syncWithCloudDatabase(true);
   } else {
     localStorage.removeItem('nfc_custom_cloud_url');
-    showToast('تمت استعادة إعدادات السحابة الافتراضية', 'info');
+    showToast('Restored default cloud settings', 'info');
   }
 }
 
@@ -408,6 +414,7 @@ function switchTab(tab) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (tab === 'stats') renderAnalytics();
+  if (tab === 'cards') renderCardsGrid();
 }
 
 // ==========================================
@@ -421,6 +428,7 @@ function showToast(message, type = 'info', icon = '✨') {
   const inner = document.getElementById('toastInner');
   const msgEl = document.getElementById('toastMessage');
   const iconEl = document.getElementById('toastIcon');
+  if (!container || !inner || !msgEl || !iconEl) return;
 
   msgEl.textContent = message;
   iconEl.textContent = icon;
@@ -434,7 +442,7 @@ function showToast(message, type = 'info', icon = '✨') {
     inner.classList.add('bg-rose-950/90', 'border-rose-500/40', 'text-rose-200');
     iconEl.textContent = '⚠️';
   } else {
-    inner.classList.add('bg-slate-900/90', 'border-indigo-500/40', 'text-slate-100');
+    inner.classList.add('bg-zinc-900/90', 'border-emerald-500/30', 'text-white');
   }
 
   container.classList.remove('hidden');
@@ -446,20 +454,47 @@ function showToast(message, type = 'info', icon = '✨') {
 }
 
 // ==========================================
-// 5. CARDS GRID & SMART PRESET SWITCHER
+// 5. CARDS GRID & FILTERING
 // ==========================================
+function filterCardsByMode(mode) {
+  currentFilterMode = mode;
+  const filterButtons = ['All', 'Active', 'Direct', 'Profile', 'Catalog'];
+  filterButtons.forEach(f => {
+    const btn = document.getElementById(`filterBtn${f}`);
+    if (btn) {
+      if (f.toLowerCase() === mode.toLowerCase()) {
+        btn.className = 'px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap font-bold';
+      } else {
+        btn.className = 'px-3.5 py-1.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 whitespace-nowrap';
+      }
+    }
+  });
+  renderCardsGrid();
+}
+
 function renderCardsGrid() {
   const container = document.getElementById('cardsGridContainer');
   if (!container) return;
 
-  if (!cardsList || cardsList.length === 0) {
+  let displayCards = [...cardsList];
+  if (currentFilterMode === 'active') {
+    displayCards = displayCards.filter(c => c.isActive);
+  } else if (currentFilterMode === 'direct') {
+    displayCards = displayCards.filter(c => (!c.mode || c.mode === 'direct') && c.actionType !== 'profile' && c.actionType !== 'catalog');
+  } else if (currentFilterMode === 'profile') {
+    displayCards = displayCards.filter(c => c.mode === 'profile' || c.actionType === 'profile');
+  } else if (currentFilterMode === 'catalog') {
+    displayCards = displayCards.filter(c => c.mode === 'catalog' || c.actionType === 'catalog');
+  }
+
+  if (!displayCards || displayCards.length === 0) {
     container.innerHTML = `
-      <div class="col-span-full bg-slate-900/60 border border-slate-800 rounded-3xl p-10 text-center space-y-3">
+      <div class="col-span-full bg-zinc-950/70 border border-zinc-800 rounded-3xl p-10 text-center space-y-3">
         <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-2xl">💳</div>
-        <h3 class="text-sm font-bold text-white">${t('empty_cards_title', 'لا توجد بطاقات مسجلة بعد')}</h3>
-        <p class="text-xs text-slate-400 max-w-sm mx-auto">${t('empty_cards_desc', 'ابدأ بإضافة بطاقتك الأولى لتوليد رابط وبرمجته داخل شريحة الـ NFC.')}</p>
-        <button onclick="openAddCardDrawer()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 active:scale-95 transition-all">
-          ${t('empty_cards_btn', '+ إضافة بطاقة جديدة الآن')}
+        <h3 class="text-sm font-bold text-white">${t('empty_cards_title', 'No NFC Tags Registered Yet')}</h3>
+        <p class="text-xs text-zinc-400 max-w-sm mx-auto">${t('empty_cards_desc', 'Create your first smart tag to generate a permanent link and program your NFC chip.')}</p>
+        <button onclick="openAddCardDrawer()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/30 active:scale-95 transition-all">
+          ${t('empty_cards_btn', '+ Create First Tag Now')}
         </button>
       </div>
     `;
@@ -468,7 +503,7 @@ function renderCardsGrid() {
 
   const bUrl = getBaseUrl();
 
-  container.innerHTML = cardsList.map((card, idx) => {
+  container.innerHTML = displayCards.map((card, idx) => {
     const fixedUrl = `${bUrl}/c/${card.slug}`;
     const mode = card.mode || (card.actionType === 'profile' ? 'profile' : (card.actionType === 'catalog' ? 'catalog' : 'direct'));
     const isProfile = (mode === 'profile');
@@ -487,23 +522,23 @@ function renderCardsGrid() {
     let presetsHtml = '';
     if (savedTargets.length > 0 && !isProfile && !isCatalog) {
       presetsHtml = `
-        <div class="mt-3 pt-3 border-t border-slate-800/80">
+        <div class="mt-3 pt-3 border-t border-zinc-800/80">
           <div class="flex items-center justify-between text-[11px] mb-2">
-            <span class="font-bold text-slate-300">1-Tap Switch:</span>
+            <span class="font-bold text-zinc-300">1-Tap Switch:</span>
             <span class="text-emerald-400 font-semibold">${savedTargets.length} links</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
-            ${savedTargets.map(t => `
+            ${savedTargets.map(target => `
               <button 
-                onclick="switchCardPreset('${card.id}', '${t.id}')"
+                onclick="switchCardPreset('${card.id}', '${target.id}')"
                 class="target-pill px-2.5 py-1 rounded-lg text-[11px] font-medium border flex items-center gap-1.5 transition-all ${
-                  t.active || card.destinationUrl === t.url 
+                  target.active || card.destinationUrl === target.url 
                     ? 'active bg-emerald-600 border-emerald-500 text-white font-bold shadow-md shadow-emerald-600/30' 
-                    : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:border-emerald-500/40'
+                    : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-emerald-500/40'
                 }"
               >
-                <span>${t.icon || '🔗'}</span>
-                <span>${t.label || 'link'}</span>
+                <span>${target.icon || '🔗'}</span>
+                <span>${target.label || 'link'}</span>
               </button>
             `).join('')}
           </div>
@@ -512,13 +547,13 @@ function renderCardsGrid() {
     }
 
     // Mode Badge Text
-    let modeBadge = `${t('card_mode_direct', 'تحويل مباشر')} 🚀`;
-    if (isProfile) modeBadge = `${t('card_mode_profile', 'ملف شخصي')} 👤`;
-    else if (isCatalog) modeBadge = `${t('card_mode_catalog', 'منيو وكتالوج')} 🍽️`;
-    else if (isConditional) modeBadge = `${t('card_pin_protected', 'توجيه مشروط')} 🔀`;
+    let modeBadge = `${t('card_mode_direct', 'Direct URL')} 🚀`;
+    if (isProfile) modeBadge = `${t('card_mode_profile', 'Digital Profile')} 👤`;
+    else if (isCatalog) modeBadge = `${t('card_mode_catalog', 'Menu & Catalog')} 🍽️`;
+    else if (isConditional) modeBadge = `${t('card_mode_conditional', 'Smart Routing')} 🔀`;
 
     return `
-      <div class="bg-slate-900/90 border border-slate-800 hover:border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
+      <div class="bg-zinc-950/80 border border-zinc-800 hover:border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
         
         <!-- 3D Realistic Smart NFC Card Header Component -->
         <div class="${themeClasses} p-4 sm:p-5 text-white flex flex-col justify-between min-h-[145px] relative">
@@ -527,11 +562,11 @@ function renderCardsGrid() {
           <div class="flex items-center justify-between z-10">
             <div class="flex items-center gap-2.5">
               <div class="gold-chip"></div>
-              <span class="text-[9px] font-mono font-bold tracking-widest text-emerald-300 uppercase px-1.5 py-0.5 rounded bg-black/40 border border-emerald-500/20">TapLink • MUHAB</span>
+              <span class="text-[9px] font-mono font-bold tracking-widest text-emerald-300 uppercase px-1.5 py-0.5 rounded bg-black/40 border border-emerald-500/20">${t('card_brand_badge', 'TapLink • MUHAB')}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${card.isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
-                ${card.isActive ? `${t('card_status_active', 'نشطة')} 🟢` : `${t('card_status_paused', 'معطلة')} 🔴`}
+                ${card.isActive ? `${t('card_status_active', 'Active')} 🟢` : `${t('card_status_paused', 'Paused')} 🔴`}
               </span>
               <svg class="w-6 h-6 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -545,18 +580,18 @@ function renderCardsGrid() {
             <div class="flex flex-wrap items-center gap-1.5 mt-1">
               <span class="text-[10px] bg-black/50 px-2 py-0.5 rounded font-mono text-emerald-300 font-semibold border border-emerald-500/20" dir="ltr">/c/${card.slug}</span>
               <span class="text-[10px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded">${modeBadge}</span>
-              ${card.pinCode ? `<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">${t('card_pin_protected', 'PIN')} 🔒</span>` : ''}
+              ${card.pinCode ? `<span class="text-[10px] bg-rose-500/30 text-rose-200 px-1.5 py-0.5 rounded font-bold">${t('card_pin_protected', 'PIN Protected')} 🔒</span>` : ''}
             </div>
           </div>
 
           <!-- Bottom: Scans & Copy Link -->
           <div class="flex items-center justify-between text-[11px] text-white/90 z-10 pt-1 border-t border-white/10">
             <div class="flex items-center gap-1">
-              <span>${t('scans_count_suffix', 'مرات المسح')}:</span>
+              <span>${t('scans_count_suffix', 'Scans')}:</span>
               <strong class="text-white font-mono text-xs">${card.scanCount || 0}</strong>
             </div>
-            <button onclick="copyToClipboard('${fixedUrl}', '${t('toast_copied')}')" class="bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
-              <span>${t('btn_copy_link', 'نسخ الرابط')}</span>
+            <button onclick="copyToClipboard('${fixedUrl}', '${t('toast_copied', 'Copied to clipboard!')}')" class="bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
+              <span>${t('btn_copy_link', 'Copy Link')}</span>
               <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
             </button>
           </div>
@@ -570,7 +605,7 @@ function renderCardsGrid() {
         ${!isProfile && !isCatalog ? `
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-[11px]">
-              <label class="font-bold text-slate-300">${t('card_target_label', 'الرابط الهدف الحالي (Destination URL):')}</label>
+              <label class="font-bold text-zinc-300">${t('card_target_label', 'Target Destination URL:')}</label>
               <a href="${card.destinationUrl || '#'}" target="_blank" class="text-emerald-400 hover:underline text-[10px] font-semibold flex items-center gap-0.5" dir="ltr">
                 <span>URL</span>
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
@@ -582,15 +617,15 @@ function renderCardsGrid() {
                 id="inlineUrl_${card.id}" 
                 value="${card.destinationUrl || ''}" 
                 dir="ltr"
-                placeholder="https://..."
-                class="flex-1 bg-slate-950/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-mono text-white text-start focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="https://maps.google.com/..."
+                class="flex-1 bg-[#050806] border border-zinc-700/80 rounded-xl px-3 py-2 text-xs font-mono text-white text-start focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
               <button 
                 onclick="saveInlineUrl('${card.id}')"
-                class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
-                title="${t('btn_quick_save')}"
+                class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
+                title="${t('btn_quick_save', 'Save')}"
               >
-                ${t('btn_quick_save', 'حفظ')} ✓
+                ${t('btn_quick_save', 'Save')} ✓
               </button>
             </div>
           </div>
@@ -599,11 +634,11 @@ function renderCardsGrid() {
         ${isProfile ? `
           <div class="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
-              <span class="font-bold text-emerald-300 block">${t('action_profile_title', 'كرت شخصي رقمي مفعل')}</span>
-              <span class="text-[11px] text-slate-400">${card.profile?.fullName || card.title} - vCard</span>
+              <span class="font-bold text-emerald-300 block">${t('action_profile_title', 'Digital Profile Active')}</span>
+              <span class="text-[11px] text-zinc-400">${card.profile?.fullName || card.title} - vCard</span>
             </div>
             <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
-              ${t('btn_test_sim', 'معاينة')} 👤
+              ${t('btn_test_sim', 'Preview')} 👤
             </a>
           </div>
         ` : ''}
@@ -611,43 +646,43 @@ function renderCardsGrid() {
         ${isCatalog ? `
           <div class="p-3 bg-zinc-900 border border-emerald-500/20 rounded-2xl flex items-center justify-between text-xs">
             <div>
-              <span class="font-bold text-white block">${t('action_catalog_title', 'المنيو والكتالوج الذكي مفعل')}</span>
-              <span class="text-[11px] text-slate-400">${card.catalog?.businessName || card.title} - Wi-Fi & Reviews</span>
+              <span class="font-bold text-white block">${t('action_catalog_title', 'Menu & Catalog Active')}</span>
+              <span class="text-[11px] text-zinc-400">${card.catalog?.businessName || card.title} - Wi-Fi & Reviews</span>
             </div>
             <a href="./catalog.html?slug=${card.slug}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
-              ${t('btn_test_sim', 'معاينة')} 🍽️
+              ${t('btn_test_sim', 'Preview')} 🍽️
             </a>
           </div>
         ` : ''}
 
         <!-- Action Control Buttons Footer -->
-        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-800/80">
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-zinc-800/80">
           
           <button 
             onclick="openSimulatorDrawer('${card.id}')"
-            class="py-2 px-2 bg-slate-800/90 hover:bg-slate-750 text-white rounded-xl text-[11px] font-bold border border-slate-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="${t('btn_test_sim', 'تجربة')}"
+            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            title="${t('btn_test_sim', 'Simulate')}"
           >
             <span>📱</span>
-            <span>${t('btn_test_sim', 'تجربة')}</span>
+            <span>${t('btn_test_sim', 'Test')}</span>
           </button>
 
           <button 
             onclick="openNfcProgrammerModal('${card.id}')"
-            class="py-2 px-2 bg-slate-800/90 hover:bg-slate-750 text-emerald-400 rounded-xl text-[11px] font-bold border border-slate-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="${t('btn_program_nfc', 'برمجة NFC')}"
+            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            title="${t('btn_program_nfc', 'Write NFC')}"
           >
             <span>📡</span>
-            <span>${t('btn_program_nfc', 'برمجة')}</span>
+            <span>${t('btn_program_nfc', 'NFC')}</span>
           </button>
 
           <button 
             onclick="openEditCardDrawer('${card.id}')"
-            class="py-2 px-2 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-xl text-[11px] font-bold border border-slate-700/80 flex items-center justify-center gap-1 active:scale-95 transition-all"
-            title="${t('btn_edit', 'تعديل')}"
+            class="py-2 px-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-xl text-[11px] font-bold border border-zinc-700 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            title="${t('btn_edit', 'Edit')}"
           >
             <span>✏️</span>
-            <span>${t('btn_edit', 'تعديل')}</span>
+            <span>${t('btn_edit', 'Edit')}</span>
           </button>
 
           <button 
@@ -657,7 +692,7 @@ function renderCardsGrid() {
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
             }"
-            title="${card.isActive ? t('card_status_paused') : t('card_status_active')}"
+            title="${card.isActive ? t('card_status_paused', 'Pause') : t('card_status_active', 'Activate')}"
           >
             <span>${card.isActive ? '⏸' : '▶'}</span>
           </button>
@@ -684,9 +719,8 @@ async function switchCardPreset(cardId, targetId) {
 
   saveLocalCards(cardsList);
   renderCardsGrid();
-  showToast(`تم تبديل الوجهة إلى: ${target.label} 🚀`, 'success');
+  showToast(`Switched destination to: ${target.label} 🚀`, 'success');
 
-  // Push to server if running on backend
   if (!isOfflineOrStatic) {
     try {
       fetch(`/api/cards/${cardId}/switch-target`, {
@@ -705,7 +739,7 @@ async function saveInlineUrl(cardId) {
 
   let newUrl = (input.value || '').trim();
   if (!newUrl) {
-    showToast('يرجى كتابة الرابط الهدف', 'error');
+    showToast(t('toast_enter_url', 'Please enter a target destination URL'), 'error');
     input.focus();
     return;
   }
@@ -721,7 +755,7 @@ async function saveInlineUrl(cardId) {
   card.updatedAt = new Date().toISOString();
   saveLocalCards(cardsList);
   renderCardsGrid();
-  showToast('تم تحديث الرابط الهدف فوراً ✓', 'success');
+  showToast(t('toast_updated', 'Target destination updated successfully! 🚀'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -744,7 +778,7 @@ async function toggleCardActiveState(cardId) {
   saveLocalCards(cardsList);
   renderCardsGrid();
   loadLocalStats();
-  showToast(card.isActive ? 'تم تفعيل البطاقة 🟢' : 'تم تعطيل البطاقة مؤقتاً 🔴', 'info');
+  showToast(card.isActive ? 'Tag activated 🟢' : 'Tag paused 🔴', 'info');
 
   if (!isOfflineOrStatic) {
     try {
@@ -759,7 +793,7 @@ async function toggleCardActiveState(cardId) {
 function openAddCardDrawer() {
   if (navigator.vibrate) navigator.vibrate(10);
   document.getElementById('cardEditId').value = '';
-  document.getElementById('cardDrawerTitle').textContent = 'إضافة بطاقة NFC جديدة';
+  document.getElementById('cardDrawerTitle').textContent = t('drawer_add_title', 'Add New Smart NFC Tag');
   document.getElementById('cardEditorForm').reset();
   document.getElementById('inpIsActive').checked = true;
   tempSavedPresets = [];
@@ -775,7 +809,7 @@ function openEditCardDrawer(cardId) {
   if (!card) return;
 
   document.getElementById('cardEditId').value = card.id;
-  document.getElementById('cardDrawerTitle').textContent = `تعديل: ${card.title}`;
+  document.getElementById('cardDrawerTitle').textContent = `${t('drawer_edit_title', 'Edit Smart NFC Tag')}: ${card.title}`;
   document.getElementById('inpCardTitle').value = card.title || '';
   document.getElementById('inpCardSlug').value = card.slug || '';
   
@@ -840,12 +874,12 @@ function switchEditorTab(tab) {
     if (el) {
       if (t === tab) {
         el.classList.remove('hidden');
-        btn.classList.add('text-indigo-400', 'border-b-2', 'border-indigo-500');
-        btn.classList.remove('text-slate-400');
+        btn?.classList.add('text-emerald-400', 'border-b-2', 'border-emerald-500');
+        btn?.classList.remove('text-zinc-400');
       } else {
         el.classList.add('hidden');
-        btn.classList.remove('text-indigo-400', 'border-b-2', 'border-indigo-500');
-        btn.classList.add('text-slate-400');
+        btn?.classList.remove('text-emerald-400', 'border-b-2', 'border-emerald-500');
+        btn?.classList.add('text-zinc-400');
       }
     }
   });
@@ -868,7 +902,7 @@ function handleAddPresetItem() {
   let url = (urlInp.value || '').trim();
 
   if (!url) {
-    showToast('يرجى إدخال الرابط', 'error');
+    showToast(t('toast_enter_url', 'Please enter a URL first'), 'error');
     urlInp.focus();
     return;
   }
@@ -877,7 +911,7 @@ function handleAddPresetItem() {
 
   tempSavedPresets.push({
     id: 't-' + Date.now().toString(36),
-    label: label || 'رابط سريع',
+    label: label || 'Preset Link',
     icon: icon,
     url: url,
     active: tempSavedPresets.length === 0
@@ -898,21 +932,21 @@ function renderTempPresetsList() {
   if (!container) return;
 
   if (tempSavedPresets.length === 0) {
-    container.innerHTML = `<div class="text-[11px] text-slate-500 text-center py-2">لا توجد روابط سريعة محفوظة بعد. أضف روابطك المتكررة بالأعلى.</div>`;
+    container.innerHTML = `<div class="text-[11px] text-zinc-500 text-center py-2">No saved presets yet. Add frequently used URLs above.</div>`;
     return;
   }
 
   container.innerHTML = tempSavedPresets.map(t => `
-    <div class="flex items-center justify-between p-2.5 bg-slate-800 rounded-xl border border-slate-700 text-xs">
+    <div class="flex items-center justify-between p-2.5 bg-zinc-900 rounded-xl border border-zinc-700 text-xs">
       <div class="flex items-center gap-2 truncate me-2">
         <span>${t.icon || '🔗'}</span>
         <div class="truncate">
           <span class="font-bold text-white block truncate">${t.label}</span>
-          <span class="text-[10px] text-slate-400 font-mono truncate block" dir="ltr">${t.url}</span>
+          <span class="text-[10px] text-zinc-400 font-mono truncate block" dir="ltr">${t.url}</span>
         </div>
       </div>
       <button type="button" onclick="removeTempPreset('${t.id}')" class="text-rose-400 hover:text-rose-300 px-2 py-1 bg-rose-500/10 rounded-lg text-[10px] font-bold">
-        حذف ✕
+        ✕
       </button>
     </div>
   `).join('');
@@ -957,16 +991,7 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
     wifiPassword: document.getElementById('inpCatWifiPass').value.trim(),
     googleReviewUrl: document.getElementById('inpCatGoogleReview').value.trim() || destinationUrl,
     whatsappPhone: document.getElementById('inpProfWhatsapp')?.value.trim() || '',
-    callPhone: document.getElementById('inpProfPhone')?.value.trim() || '',
-    items: [
-      {
-        title: 'وجبة / خدمة مميزة',
-        description: 'جودة استثنائية مصممة خصيصاً لعملائنا الكرام',
-        price: '45 ر.س',
-        badge: 'الأكثر طلباً 🔥',
-        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80'
-      }
-    ]
+    callPhone: document.getElementById('inpProfPhone')?.value.trim() || ''
   };
 
   const profile = {
@@ -982,7 +1007,7 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
   if (destinationUrl && tempSavedPresets.length === 0) {
     tempSavedPresets.push({
       id: 't-main',
-      label: 'الرابط الأساسي',
+      label: 'Main Target',
       url: destinationUrl,
       active: true,
       icon: '🔗'
@@ -1025,9 +1050,8 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
   closeCardEditorDrawer();
   renderCardsGrid();
   loadLocalStats();
-  showToast('تم حفظ ونشر بيانات البطاقة بنجاح ✓', 'success');
+  showToast(t('toast_saved', 'Tag saved & activated successfully! ✨'), 'success');
 
-  // Push to server if available
   if (!isOfflineOrStatic) {
     try {
       const url = editId ? `/api/cards/${editId}` : '/api/cards';
@@ -1061,12 +1085,12 @@ function switchGenTab(tab) {
     if (el) {
       if (t === tab) {
         el.classList.remove('hidden');
-        btn.classList.add('text-emerald-400', 'border-b-2', 'border-emerald-500');
-        btn.classList.remove('text-slate-400');
+        btn?.classList.add('text-emerald-400', 'border-b-2', 'border-emerald-500');
+        btn?.classList.remove('text-zinc-400');
       } else {
         el.classList.add('hidden');
-        btn.classList.remove('text-emerald-400', 'border-b-2', 'border-emerald-500');
-        btn.classList.add('text-slate-400');
+        btn?.classList.remove('text-emerald-400', 'border-b-2', 'border-emerald-500');
+        btn?.classList.add('text-zinc-400');
       }
     }
   });
@@ -1074,31 +1098,32 @@ function switchGenTab(tab) {
 
 function applyGeneratedLink(type) {
   const inpDest = document.getElementById('inpDestinationUrl');
+  if (!inpDest) return;
 
   if (type === 'wa') {
     let phone = (document.getElementById('genWaPhone').value || '').replace(/[^0-9]/g, '');
-    const msg = (document.getElementById('genWaMsg').value || 'مرحباً').trim();
+    const msg = (document.getElementById('genWaMsg').value || 'Hello').trim();
     if (!phone) {
-      showToast('يرجى إدخال رقم الجوال', 'error');
+      showToast('Please enter a phone number', 'error');
       return;
     }
     if (phone.startsWith('05')) phone = '966' + phone.slice(1);
     const link = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
     inpDest.value = link;
-    showToast('تم توليد وتعيين رابط واتساب بنجاح ✓', 'success');
+    showToast('WhatsApp link generated successfully ✓', 'success');
   } else if (type === 'maps') {
-    const q = (document.getElementById('genMapsQuery').value || 'مطعم السفير الرياض').trim();
+    const q = (document.getElementById('genMapsQuery').value || 'Business Location').trim();
     const link = `https://maps.google.com/?q=${encodeURIComponent(q)}`;
     inpDest.value = link;
-    showToast('تم توليد وتعيين رابط خرائط جوجل ✓', 'success');
+    showToast('Google Review link generated successfully ✓', 'success');
   } else if (type === 'tel') {
     const phone = (document.getElementById('genCallNumber').value || '').trim();
     if (!phone) {
-      showToast('يرجى إدخال رقم الاتصال', 'error');
+      showToast('Please enter a phone number', 'error');
       return;
     }
     inpDest.value = `tel:${phone}`;
-    showToast('تم تعيين رابط الاتصال الهاتفي المباشر ✓', 'success');
+    showToast('Direct call link generated successfully ✓', 'success');
   }
 
   closeSmartLinkGenModal();
@@ -1121,14 +1146,14 @@ function openSimulatorDrawer(cardId) {
   // MODE 4: Conditional PIN Check
   if (card.pinCode && card.pinCode.length > 0) {
     container.innerHTML = `
-      <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-xl shadow-lg">🔒</div>
+      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-xl shadow-lg">🔒</div>
       <h4 class="text-sm font-bold text-white">${card.title}</h4>
-      <p class="text-[11px] text-slate-400">هذه البطاقة محمية برمز PIN سري</p>
+      <p class="text-[11px] text-zinc-400">${t('red_pin_prompt', 'Enter security PIN to continue to destination')}</p>
       
       <div class="space-y-2 w-full max-w-[200px]">
-        <input type="password" id="simPinInput" maxlength="6" placeholder="••••" class="w-full text-center tracking-widest text-lg font-mono py-2 bg-slate-800 border border-slate-700 text-white rounded-xl">
-        <button onclick="verifySimPin('${card.pinCode}')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow">
-          فتح الوجهة 🔓
+        <input type="password" id="simPinInput" maxlength="6" placeholder="••••" class="w-full text-center tracking-widest text-lg font-mono py-2 bg-zinc-800 border border-zinc-700 text-white rounded-xl">
+        <button onclick="verifySimPin('${card.pinCode}')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow">
+          ${t('red_pin_btn', 'Unlock Secret Link 🔓')}
         </button>
       </div>
     `;
@@ -1137,22 +1162,22 @@ function openSimulatorDrawer(cardId) {
     const p = card.profile || {};
     const avatar = p.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
     container.innerHTML = `
-      <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-xl overflow-hidden mx-auto">
+      <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-emerald-500 to-green-500 shadow-xl overflow-hidden mx-auto">
         <img src="${avatar}" class="w-full h-full object-cover rounded-full" alt="avatar">
       </div>
       <div>
         <h4 class="text-base font-black text-white">${p.fullName || card.title}</h4>
-        <p class="text-xs text-indigo-300 font-semibold">${p.jobTitle || 'الرئيس التنفيذي'}</p>
-        <p class="text-[11px] text-slate-400">${p.company || ''}</p>
+        <p class="text-xs text-emerald-400 font-semibold">${p.jobTitle || 'Executive'}</p>
+        <p class="text-[11px] text-zinc-400">${p.company || ''}</p>
       </div>
-      <p class="text-[11px] text-slate-300 max-w-[240px] leading-relaxed">${p.bio || 'مرحباً بكم في بطاقتي الرقمية الذكية.'}</p>
+      <p class="text-[11px] text-zinc-300 max-w-[240px] leading-relaxed">${p.bio || 'Welcome to my digital NFC business card.'}</p>
       
       <div class="w-full max-w-[220px] space-y-2 pt-2">
         <a href="${fixedUrl}/vcard" download class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow flex items-center justify-center gap-1.5">
-          <span>💾 حفظ جهة الاتصال (.vcf)</span>
+          <span>💾 ${t('landing_save_contact', 'Save Contact (.vcf)')}</span>
         </a>
-        <a href="./landing.html?slug=${card.slug}" target="_blank" class="w-full py-2 bg-slate-800 text-slate-200 rounded-xl text-xs font-medium border border-slate-700 flex items-center justify-center gap-1">
-          <span>معاينة الصفحة كاملة</span>
+        <a href="./landing.html?slug=${card.slug}" target="_blank" class="w-full py-2 bg-zinc-800 text-zinc-200 rounded-xl text-xs font-medium border border-zinc-700 flex items-center justify-center gap-1">
+          <span>Full Profile Preview</span>
         </a>
       </div>
     `;
@@ -1160,23 +1185,23 @@ function openSimulatorDrawer(cardId) {
     // MODE 3: Smart Catalog / Links Hub
     const cat = card.catalog || {};
     container.innerHTML = `
-      <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-2xl shadow-lg mx-auto">🍽️</div>
+      <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl shadow-lg mx-auto">🍽️</div>
       <div>
         <h4 class="text-sm font-black text-white">${cat.businessName || card.title}</h4>
-        ${cat.tagline ? `<p class="text-[11px] text-slate-300">${cat.tagline}</p>` : ''}
+        ${cat.tagline ? `<p class="text-[11px] text-zinc-300">${cat.tagline}</p>` : ''}
       </div>
       
       <div class="w-full max-w-[220px] space-y-2 pt-1 text-xs">
         ${cat.wifiPassword ? `
-        <div class="p-2.5 bg-slate-800/90 rounded-xl border border-slate-700 flex items-center justify-between">
-          <span class="text-slate-300">📶 واي فاي:</span>
-          <span class="font-mono font-bold text-amber-300">${cat.wifiPassword}</span>
+        <div class="p-2.5 bg-zinc-800/90 rounded-xl border border-zinc-700 flex items-center justify-between">
+          <span class="text-zinc-300">📶 Wi-Fi:</span>
+          <span class="font-mono font-bold text-emerald-300">${cat.wifiPassword}</span>
         </div>` : ''}
-        <a href="${cat.googleReviewUrl || card.destinationUrl || '#'}" target="_blank" class="block w-full py-2 bg-gradient-to-r from-amber-600 to-yellow-500 text-slate-950 font-black rounded-xl shadow">
-          ⭐⭐⭐⭐⭐ تقييم Google
+        <a href="${cat.googleReviewUrl || card.destinationUrl || '#'}" target="_blank" class="block w-full py-2 bg-gradient-to-r from-emerald-600 to-green-500 text-black font-black rounded-xl shadow">
+          ⭐⭐⭐⭐⭐ Rate on Google
         </a>
-        <a href="./catalog.html?slug=${card.slug}" target="_blank" class="block w-full py-2 bg-slate-800 text-slate-200 rounded-xl border border-slate-700">
-          فتح الكتالوج الذكي 📱
+        <a href="./catalog.html?slug=${card.slug}" target="_blank" class="block w-full py-2 bg-zinc-800 text-zinc-200 rounded-xl border border-zinc-700">
+          Open Digital Catalog 📱
         </a>
       </div>
     `;
@@ -1185,36 +1210,34 @@ function openSimulatorDrawer(cardId) {
     let target = card.destinationUrl;
     let slotLabel = '';
 
-    // Check time routing
     const tr = card.timeRouting || card.conditional?.time;
     if (tr && tr.enabled) {
       const ksaHour = (new Date().getUTCHours() + 3) % 24;
       const isMorning = (ksaHour >= 6 && ksaHour < (tr.switchHour || 16));
       target = isMorning ? (tr.morningUrl || target) : (tr.eveningUrl || target);
-      slotLabel = isMorning ? '🌅 فترة الصباح نشطة' : '🌙 فترة المساء نشطة';
+      slotLabel = isMorning ? '🌅 Morning Schedule Active' : '🌙 Evening Schedule Active';
     }
 
-    // Check device routing
     if (card.conditional?.device?.enabled) {
-      slotLabel = '📱 توجيه مخصص حسب نوع الجهاز';
+      slotLabel = '📱 Device OS Routing Active';
     }
 
     container.innerHTML = `
       <div class="relative w-16 h-16 flex items-center justify-center mx-auto">
-        <div class="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping"></div>
-        <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-600/40">📡</div>
+        <div class="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+        <div class="w-12 h-12 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-emerald-600/40">📡</div>
       </div>
       <div>
-        <h4 class="text-sm font-bold text-white mb-1">تم مسح شريحة NFC</h4>
-        <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">تحويل فوري خلال أجزاء من الثانية</span>
+        <h4 class="text-sm font-bold text-white mb-1">${t('red_scanned_title', 'Smart NFC Tag Scanned 📡')}</h4>
+        <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">Instant redirect in milliseconds</span>
       </div>
-      ${slotLabel ? `<div class="text-[11px] font-bold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">${slotLabel}</div>` : ''}
-      <div class="text-[11px] text-slate-400 font-mono bg-slate-800/80 p-2.5 rounded-xl max-w-[240px] truncate" dir="ltr">
+      ${slotLabel ? `<div class="text-[11px] font-bold text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">${slotLabel}</div>` : ''}
+      <div class="text-[11px] text-zinc-400 font-mono bg-zinc-800/80 p-2.5 rounded-xl max-w-[240px] truncate" dir="ltr">
         ${target || 'https://maps.google.com'}
       </div>
       <div class="w-full max-w-[200px] pt-1">
-        <a href="${target || '#'}" target="_blank" class="block w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30">
-          انتقال فوري للرابط 🚀
+        <a href="${target || '#'}" target="_blank" class="block w-full py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/30">
+          ${t('sim_open_target', 'Open Destination URL')} 🚀
         </a>
       </div>
     `;
@@ -1226,11 +1249,11 @@ function openSimulatorDrawer(cardId) {
 function verifySimPin(correctPin) {
   const inp = document.getElementById('simPinInput');
   if (inp && inp.value.trim() === String(correctPin).trim()) {
-    showToast('رمز PIN صحيح! تم فك القفل 🔓', 'success');
+    showToast('PIN verified! Unlocked 🔓', 'success');
     currentActiveCardForSim.pinCode = '';
     openSimulatorDrawer(currentActiveCardForSim.id);
   } else {
-    showToast('رمز PIN غير صحيح!', 'error');
+    showToast(t('red_pin_invalid', 'Incorrect PIN code!'), 'error');
   }
 }
 
@@ -1250,18 +1273,18 @@ function openNfcProgrammerModal(cardId) {
   const bUrl = getBaseUrl();
   const fixedUrl = `${bUrl}/c/${card.slug}`;
 
-  document.getElementById('nfcModalCardTitle').textContent = `برمجة: ${card.title}`;
+  document.getElementById('nfcModalCardTitle').textContent = `${t('modal_nfc_title', 'Program NFC Tag')}: ${card.title}`;
   document.getElementById('inpModalFixedUrl').value = fixedUrl;
 
-  renderCustomQrCode(fixedUrl, '#090d16', '#ffffff');
+  renderCustomQrCode(fixedUrl, '#050806', '#ffffff');
 
   const note = document.getElementById('webNfcSupportNote');
   if ('NDEFReader' in window) {
-    note.textContent = 'متصفحك يدعم كتابة NFC المباشرة! اضغط الزر وقرّب الشريحة من ظهر الهاتف.';
+    note.textContent = 'Your browser natively supports Web NFC! Click write and hold the tag near your device.';
     note.className = 'text-[11px] text-emerald-400 font-bold mt-1.5';
   } else {
-    note.textContent = 'الكتابة المباشرة عبر المتصفح مدعومة في Chrome أندرويد. لأجهزة آيفون، انسخ الرابط وافتحه في تطبيق NFC Tools.';
-    note.className = 'text-[10px] text-slate-400 mt-1.5';
+    note.textContent = 'Web NFC is supported on Google Chrome for Android. On iPhone, copy this URL and write with NFC Tools.';
+    note.className = 'text-[10px] text-zinc-400 mt-1.5';
   }
 
   document.getElementById('drawerNfcProgrammer').classList.add('active');
@@ -1269,13 +1292,14 @@ function openNfcProgrammerModal(cardId) {
 
 function renderCustomQrCode(text, darkColor, lightColor) {
   const qrWrapper = document.getElementById('nfcQrCodeWrapper');
+  if (!qrWrapper) return;
   qrWrapper.innerHTML = '';
   try {
     new QRCode(qrWrapper, {
       text: text,
       width: 170,
       height: 170,
-      colorDark: darkColor || '#090d16',
+      colorDark: darkColor || '#050806',
       colorLight: lightColor || '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
     });
@@ -1296,7 +1320,7 @@ function closeNfcProgrammerDrawer() {
 // Web NFC Writer (Android Chrome NDEFReader)
 document.getElementById('btnDirectWebNfcWrite')?.addEventListener('click', async () => {
   if (!('NDEFReader' in window)) {
-    alert('ميزة Web NFC للكتابة المباشرة من المتصفح مدعومة في متصفح Google Chrome على أجهزة أندرويد.\n\nلمستخدمي آيفون: اضغط زر "نسخ" وافتح تطبيق NFC Tools واكتب الرابط بضغطة واحدة.');
+    alert('Web NFC direct writing is supported on Google Chrome for Android.\n\nFor iPhone users: tap "Copy" and open the free NFC Tools app to write the tag in 1 tap.');
     return;
   }
 
@@ -1304,7 +1328,7 @@ document.getElementById('btnDirectWebNfcWrite')?.addEventListener('click', async
   try {
     const ndef = new NDEFReader();
     await ndef.scan();
-    showToast('جاهز للكتابة! قرّب الشريحة الآن من ظهر الهاتف 📡', 'info');
+    showToast(t('toast_nfc_writing', 'Ready to write! Hold NFC tag near the back of your phone 📡'), 'info');
 
     await ndef.write({
       records: [{ recordType: 'url', data: fixedUrl }]
@@ -1312,16 +1336,16 @@ document.getElementById('btnDirectWebNfcWrite')?.addEventListener('click', async
 
     playChime(true);
     if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
-    showToast('تمت كتابة الرابط داخل شريحة الـ NFC بنجاح! 🎉', 'success');
+    showToast(t('toast_nfc_success', 'URL written to NFC tag successfully! 🎉'), 'success');
   } catch (error) {
     playChime(false);
-    showToast('تعذر الكتابة: ' + (error.message || 'حاول مجدداً'), 'error');
+    showToast(t('toast_nfc_error', 'NFC write error: ') + (error.message || 'try again'), 'error');
   }
 });
 
 document.getElementById('btnCopyModalUrl')?.addEventListener('click', () => {
   const url = document.getElementById('inpModalFixedUrl').value;
-  copyToClipboard(url, 'تم نسخ الرابط الثابت لبرمجة الشريحة 📋');
+  copyToClipboard(url, t('toast_copied', 'Copied permanent URL to clipboard! 📋'));
 });
 
 document.getElementById('btnDownloadQr')?.addEventListener('click', () => {
@@ -1337,7 +1361,7 @@ document.getElementById('btnDownloadQr')?.addEventListener('click', () => {
     a.href = dataUrl;
     a.download = `nfc-qr-${currentActiveCardForQr?.slug || 'code'}.png`;
     a.click();
-    showToast('تم تحميل رمز QR بدقة عالية ✓', 'success');
+    showToast('Downloaded high-res QR code ✓', 'success');
   }
 });
 
@@ -1349,28 +1373,28 @@ function renderRecentActivity(scans) {
   if (!container) return;
 
   if (!scans || scans.length === 0) {
-    container.innerHTML = `<div class="text-center py-5 text-slate-500 text-xs">لا توجد عمليات مسح مسجلة بعد. عند مسح أي بطاقة بالهاتف ستظهر هنا فوراً!</div>`;
+    container.innerHTML = `<div class="text-center py-5 text-zinc-500 text-xs">${t('no_scans_logged', 'No scans logged yet. Scan an NFC tag to view live data.')}</div>`;
     return;
   }
 
   container.innerHTML = scans.slice(0, 5).map(s => {
-    const timeFormatted = s.timestamp ? new Date(s.timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'الآن';
+    const timeFormatted = s.timestamp ? new Date(s.timestamp).toLocaleTimeString() : 'Just now';
     const isIos = (s.deviceType || '').toLowerCase().includes('iphone') || (s.deviceType || '').toLowerCase().includes('ipad');
 
     return `
-      <div class="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs">
+      <div class="flex items-center justify-between p-2.5 bg-zinc-950/70 rounded-xl border border-zinc-800 text-xs">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg ${isIos ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/10 text-emerald-400'} flex items-center justify-center font-bold text-sm">
+          <div class="w-8 h-8 rounded-lg ${isIos ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-500/10 text-emerald-400'} flex items-center justify-center font-bold text-sm">
             ${isIos ? '' : '🤖'}
           </div>
           <div>
             <span class="font-bold text-white block">${s.cardTitle || s.slug}</span>
-            <span class="text-[10px] text-slate-400">${s.deviceType || 'الهاتف'} • ${s.browser || 'المتصفح'}</span>
+            <span class="text-[10px] text-zinc-400">${s.deviceType || 'Mobile'} • ${s.browser || 'Browser'}</span>
           </div>
         </div>
         <div class="text-end">
-          <span class="text-[10px] text-indigo-300 font-mono block">${timeFormatted}</span>
-          <span class="text-[9px] text-emerald-400 font-semibold">تحويل ناجح ✓</span>
+          <span class="text-[10px] text-emerald-300 font-mono block">${timeFormatted}</span>
+          <span class="text-[9px] text-emerald-400 font-semibold">Redirected ✓</span>
         </div>
       </div>
     `;
@@ -1405,13 +1429,13 @@ function renderAnalyticsData(stats) {
   const scans = stats.recentScans || [];
   if (tbody) {
     if (scans.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-500">لا توجد سجلات مسح حتى الآن</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-zinc-500">${t('no_scans_logged', 'No scans logged yet')}</td></tr>`;
     } else {
       tbody.innerHTML = scans.map(s => `
-        <tr class="hover:bg-slate-800/30">
+        <tr class="hover:bg-zinc-800/30">
           <td class="py-2.5 font-bold text-white">${s.cardTitle || s.slug}</td>
-          <td class="py-2.5 text-slate-300 font-mono text-[11px]">${s.deviceType} (${s.browser})</td>
-          <td class="py-2.5 text-slate-400 text-[11px] font-mono">${s.timestamp ? new Date(s.timestamp).toLocaleDateString('ar-SA') : 'الآن'}</td>
+          <td class="py-2.5 text-zinc-300 font-mono text-[11px]">${s.deviceType} (${s.browser})</td>
+          <td class="py-2.5 text-zinc-400 text-[11px] font-mono">${s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'Just now'}</td>
         </tr>
       `).join('');
     }
@@ -1420,16 +1444,16 @@ function renderAnalyticsData(stats) {
   const topList = document.getElementById('analyticsTopCardsList');
   if (topList) {
     if (!cardsList || cardsList.length === 0) {
-      topList.innerHTML = `<div class="p-4 text-center text-slate-500 text-xs">لا توجد بطاقات مسجلة بعد</div>`;
+      topList.innerHTML = `<div class="p-4 text-center text-zinc-500 text-xs">${t('empty_cards_title', 'No NFC tags registered yet')}</div>`;
     } else {
       const sorted = [...cardsList].sort((a, b) => (b.scanCount || 0) - (a.scanCount || 0));
       topList.innerHTML = sorted.slice(0, 4).map((c, i) => `
-        <div class="flex items-center justify-between p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 text-xs">
+        <div class="flex items-center justify-between p-2.5 bg-zinc-950/70 rounded-xl border border-zinc-800 text-xs">
           <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-400 font-black flex items-center justify-center text-xs">#${i + 1}</span>
+            <span class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 font-black flex items-center justify-center text-xs">#${i + 1}</span>
             <span class="font-bold text-white">${c.title}</span>
           </div>
-          <span class="font-mono font-bold text-indigo-300">${c.scanCount || 0} عملية مسح</span>
+          <span class="font-mono font-bold text-emerald-300">${c.scanCount || 0} ${t('scans_count_suffix', 'scans')}</span>
         </div>
       `).join('');
     }
@@ -1441,7 +1465,7 @@ function renderAnalyticsData(stats) {
 // ==========================================
 function exportJsonBackup() {
   const backup = {
-    version: '3.0',
+    version: '3.5',
     exportedAt: new Date().toISOString(),
     cards: cardsList,
     settings: { siteTitle: 'TapLink by MUHAB', theme: 'dark' }
@@ -1451,10 +1475,10 @@ function exportJsonBackup() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `nfc-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `taplink-nfc-backup-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('تم تصدير النسخة الاحتياطية بنجاح 💾', 'success');
+  showToast(t('toast_saved', 'Backup JSON exported successfully 💾'), 'success');
 }
 
 function importJsonBackup(event) {
@@ -1466,7 +1490,7 @@ function importJsonBackup(event) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data || !Array.isArray(data.cards)) {
-        throw new Error('الملف غير صالح');
+        throw new Error('Invalid backup file');
       }
 
       cardsList = data.cards;
@@ -1474,9 +1498,9 @@ function importJsonBackup(event) {
 
       renderCardsGrid();
       loadLocalStats();
-      showToast(`تم استيراد النسخة بنجاح (${cardsList.length} بطاقة) ✓`, 'success');
+      showToast(`Backup restored successfully (${cardsList.length} cards) ✓`, 'success');
     } catch (err) {
-      showToast('خطأ: ملف النسخة الاحتياطية غير صالح', 'error');
+      showToast('Error: Invalid backup JSON file', 'error');
     }
   };
   reader.readAsText(file);
@@ -1485,7 +1509,7 @@ function importJsonBackup(event) {
 // ==========================================
 // 12. UTILITIES
 // ==========================================
-function copyToClipboard(text, successMsg = 'تم النسخ بنجاح 📋') {
+function copyToClipboard(text, successMsg = 'Copied to clipboard! 📋') {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
       showToast(successMsg, 'success');
@@ -1519,13 +1543,13 @@ function setupEventListeners() {
   document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('nfc_theme', isDark ? 'dark' : 'light');
-    showToast(isDark ? 'الوضع الليلي مفعّل 🌙' : 'الوضع النهاري مفعّل ☀️', 'info');
+    showToast(isDark ? 'Dark theme enabled 🌙' : 'Light theme enabled ☀️', 'info');
   });
 
   document.getElementById('btnQuickSearchToggle')?.addEventListener('click', () => {
     const s = document.getElementById('searchBarSection');
-    s.classList.toggle('hidden');
-    if (!s.classList.contains('hidden')) {
+    s?.classList.toggle('hidden');
+    if (s && !s.classList.contains('hidden')) {
       document.getElementById('searchInput')?.focus();
     }
   });
@@ -1543,7 +1567,7 @@ function setupEventListeners() {
     );
     const container = document.getElementById('cardsGridContainer');
     if (filtered.length === 0) {
-      container.innerHTML = `<div class="col-span-full py-8 text-center text-slate-500 text-xs">لا توجد بطاقات تطابق: "${query}"</div>`;
+      container.innerHTML = `<div class="col-span-full py-8 text-center text-zinc-500 text-xs">No cards matching: "${query}"</div>`;
     } else {
       const orig = cardsList;
       cardsList = filtered;
