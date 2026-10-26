@@ -38,21 +38,68 @@ body {
   border-bottom: 1px solid rgba(16, 185, 129, 0.15);
 }
 
-/* 3D Smart Card Aesthetics - Ultra Sleek Black with Emerald Glaze */
+/* 3D Smart Card Aesthetics - Ultra Sleek Black with Emerald Glaze & 3D Perspective */
+.spotlight-card {
+  position: relative;
+  border-radius: 1.5rem;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* React Bits: Glowing Border Beam following mouse cursor */
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    320px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(52, 211, 153, 0.85),
+    rgba(16, 185, 129, 0.3) 45%,
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: var(--spotlight-opacity, 0);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* React Bits: Dynamic Surface Spotlight Glow */
+.spotlight-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(16, 185, 129, 0.15),
+    transparent 70%
+  );
+  opacity: var(--spotlight-opacity, 0);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
 .smart-card-visual {
   position: relative;
   overflow: hidden;
   border-radius: 1.25rem;
   background: linear-gradient(135deg, #07150e 0%, #0c2417 45%, #05482e 100%);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  box-shadow: 0 12px 28px -5px rgba(5, 150, 105, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.7);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  box-shadow: 0 14px 32px -5px rgba(5, 150, 105, 0.35), 0 8px 12px -6px rgba(0, 0, 0, 0.7);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+  transform-style: preserve-3d;
 }
 
 .smart-card-visual:hover {
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 20px 35px -8px rgba(16, 185, 129, 0.45);
-  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 25px 45px -8px rgba(16, 185, 129, 0.5);
+  border-color: rgba(52, 211, 153, 0.6);
 }
 
 .smart-card-visual::before {
@@ -62,36 +109,43 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, transparent 60%);
   pointer-events: none;
 }
 
 .card-theme-emerald {
   background: linear-gradient(135deg, #022c22 0%, #064e3b 45%, #059669 100%);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  box-shadow: 0 12px 28px -5px rgba(5, 150, 105, 0.4);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  box-shadow: 0 14px 32px -5px rgba(5, 150, 105, 0.45);
 }
 
 .card-theme-amber {
   background: linear-gradient(135deg, #09090b 0%, #18181b 45%, #27272a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.7);
 }
 
 .card-theme-purple {
   background: linear-gradient(135deg, #051a11 0%, #093724 45%, #10b981 100%);
-  border: 1px solid rgba(110, 231, 183, 0.4);
-  box-shadow: 0 12px 28px -5px rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(110, 231, 183, 0.45);
+  box-shadow: 0 14px 32px -5px rgba(16, 185, 129, 0.4);
 }
 
-/* Gold / Metallic Chip Graphic */
+/* React Bits: Gold / Metallic Chip with Shimmer Animation */
+@keyframes metallic-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .gold-chip {
-  width: 38px;
-  height: 30px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
+  width: 40px;
+  height: 32px;
+  border-radius: 7px;
+  background: linear-gradient(110deg, #ca8a04 0%, #fef08a 25%, #eab308 50%, #ffffff 60%, #eab308 75%, #ca8a04 100%);
+  background-size: 200% 100%;
   position: relative;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+  animation: metallic-shimmer 4.5s infinite linear;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 0 14px rgba(234, 179, 8, 0.45);
 }
 
 .gold-chip::after {
@@ -101,8 +155,15 @@ body {
   left: 4px;
   right: 4px;
   bottom: 4px;
-  border: 1px solid rgba(161, 98, 7, 0.6);
-  border-radius: 3px;
+  border: 1px solid rgba(161, 98, 7, 0.7);
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(161, 98, 7, 0.25) 3px,
+    rgba(161, 98, 7, 0.25) 4px
+  );
 }
 
 /* Pulsing Status Indicators */
@@ -262,4 +323,231 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.6);
+}
+
+/* ========================================================== */
+/* REACT BITS PRO: AMBIENT AURORA BACKGROUND & CYBER DOT GRID */
+/* ========================================================== */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.16) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+
+@keyframes aurora-float-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translate(60px, -40px) scale(1.15);
+    opacity: 0.38;
+  }
+}
+
+@keyframes aurora-float-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.18;
+  }
+  50% {
+    transform: translate(-50px, 50px) scale(1.22);
+    opacity: 0.32;
+  }
+}
+
+@keyframes aurora-float-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.14;
+  }
+  50% {
+    transform: translate(40px, 60px) scale(0.92);
+    opacity: 0.26;
+  }
+}
+
+.aurora-beam {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.aurora-beam-1 {
+  top: -10%;
+  left: 15%;
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, #059669 0%, #10b981 40%, transparent 70%);
+  animation: aurora-float-1 14s infinite ease-in-out;
+}
+
+.aurora-beam-2 {
+  bottom: 10%;
+  right: 5%;
+  width: 620px;
+  height: 620px;
+  background: radial-gradient(circle, #0284c7 0%, #064e3b 50%, transparent 70%);
+  animation: aurora-float-2 18s infinite ease-in-out;
+}
+
+.aurora-beam-3 {
+  top: 40%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #6366f1 0%, #047857 50%, transparent 75%);
+  animation: aurora-float-3 16s infinite ease-in-out;
+}
+
+.bg-radial-vignette {
+  background: radial-gradient(ellipse at center, transparent 35%, #050706 95%);
+}
+
+/* ========================================================== */
+/* REACT BITS PRO: SHINY TEXT & ANIMATED GRADIENT TEXT        */
+/* ========================================================== */
+.shiny-text {
+  background: linear-gradient(
+    115deg,
+    #9ca3af 0%,
+    #e4e4e7 35%,
+    #ffffff 50%,
+    #e4e4e7 65%,
+    #9ca3af 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shiny-sweep 4s infinite linear;
+  display: inline-block;
+}
+
+.shiny-emerald {
+  background: linear-gradient(
+    115deg,
+    #34d399 0%,
+    #a7f3d0 35%,
+    #ffffff 50%,
+    #a7f3d0 65%,
+    #059669 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shiny-sweep 4s infinite linear;
+  display: inline-block;
+}
+
+@keyframes shiny-sweep {
+  0% { background-position: -250% 0; }
+  100% { background-position: 250% 0; }
+}
+
+.gradient-text-flow {
+  background: linear-gradient(90deg, #34d399, #10b981, #38bdf8, #818cf8, #34d399);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textFlow 6s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes textFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ========================================================== */
+/* REACT BITS PRO: FLOATING GLASS DOCK & MAGNETIC BUTTONS     */
+/* ========================================================== */
+.dock-indicator-spring {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, opacity 0.2s ease;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.28);
+}
+
+.magnetic-btn {
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+@keyframes pulse-beacon-ring {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  60% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.pulse-beacon {
+  animation: pulse-beacon-ring 2.4s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* ========================================================== */
+/* REACT BITS PRO: STAGGERED BLUR-FADE & NFC RIPPLE WAVES     */
+/* ========================================================== */
+@keyframes blurFadeIn {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(18px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+.blur-fade-in {
+  animation: blurFadeIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.20s; }
+.stagger-4 { animation-delay: 0.28s; }
+.stagger-5 { animation-delay: 0.36s; }
+
+/* Concentric NFC Ripple Wave Animation */
+@keyframes nfcPulseWave {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  50% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+    box-shadow: 0 0 25px 12px rgba(16, 185, 129, 0);
+  }
+}
+
+.nfc-ripple-beacon {
+  position: relative;
+  display: inline-flex;
+}
+.nfc-ripple-beacon::before,
+.nfc-ripple-beacon::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1.5px solid rgba(52, 211, 153, 0.6);
+  pointer-events: none;
+  animation: nfcPulseWave 2.8s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+.nfc-ripple-beacon::after {
+  animation-delay: 1.4s;
 }

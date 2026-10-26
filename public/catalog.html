@@ -31,10 +31,13 @@
 </head>
 <body class="bg-[#050706] text-white min-h-screen selection:bg-emerald-500 selection:text-black pb-16 antialiased">
 
-  <!-- Background Ambient Glow -->
-  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-    <div class="absolute -top-32 start-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-gradient-to-b from-emerald-600/20 via-emerald-800/10 to-transparent rounded-full blur-3xl"></div>
-    <div class="absolute bottom-10 start-1/4 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl"></div>
+  <!-- React Bits Pro: Ambient Aurora Lights & Cyber Dot Grid -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-[#050706]">
+    <div class="aurora-beam aurora-beam-1"></div>
+    <div class="aurora-beam aurora-beam-2"></div>
+    <div class="aurora-beam aurora-beam-3"></div>
+    <div class="bg-dot-grid absolute inset-0 opacity-40"></div>
+    <div class="bg-radial-vignette absolute inset-0 pointer-events-none"></div>
   </div>
 
   <!-- Toast Notification Container -->
@@ -52,28 +55,28 @@
   </div>
 
   <!-- Main Content Container -->
-  <main id="catalogContent" class="hidden max-w-md mx-auto px-4 pt-4 space-y-4">
+  <main id="catalogContent" class="hidden max-w-md mx-auto px-4 pt-4 space-y-4 blur-fade-in">
 
     <!-- Top Bar Controls -->
-    <div class="flex items-center justify-between px-1">
+    <div class="flex items-center justify-between px-1 stagger-1">
       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="openStatusBadge">Open Now for Service</span>
       </span>
 
       <div class="flex items-center gap-2">
-        <button id="btnCatalogLang" class="px-2.5 py-1.5 rounded-full bg-zinc-900 border border-emerald-500/20 text-emerald-400 hover:text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1" title="Toggle Language">
+        <button id="btnCatalogLang" class="magnetic-btn px-2.5 py-1.5 rounded-full bg-zinc-900 border border-emerald-500/20 text-emerald-400 hover:text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1" title="Toggle Language">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
           <span id="catalogLangText">عربي</span>
         </button>
-        <button id="btnShareCatalog" class="w-9 h-9 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95" title="Share Hub">
+        <button id="btnShareCatalog" class="magnetic-btn w-9 h-9 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-emerald-500/20 flex items-center justify-center transition-all active:scale-95" title="Share Hub">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
         </button>
       </div>
     </div>
 
     <!-- Business Header Profile Card -->
-    <div class="bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl relative">
+    <div class="bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl relative stagger-2">
       <!-- Cover Banner -->
       <div id="catalogCover" class="h-32 bg-gradient-to-r from-neutral-950 via-emerald-950 to-black relative bg-cover bg-center border-b border-emerald-500/20">
         <div class="absolute inset-0 bg-black/30 backdrop-blur-[1px]"></div>
@@ -94,7 +97,7 @@
           </div>
         </div>
 
-        <h1 id="catalogTitle" class="text-lg font-black text-white">Ambassador Luxury Dining & Lounge</h1>
+        <h1 id="catalogTitle" class="text-lg font-black text-white gradient-text-flow">Ambassador Luxury Dining & Lounge</h1>
         <p id="catalogTagline" class="text-xs text-neutral-300 font-medium mt-0.5">Artisan Coffee, Gourmet Cuisine & Signature Dining</p>
         <p id="catalogHours" class="text-[11px] text-zinc-400 mt-1 flex items-center gap-1">
           <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -104,14 +107,14 @@
     </div>
 
     <!-- High-Impact 5-Star Google Review CTA Box -->
-    <a id="linkGoogleReview" href="#" target="_blank" class="block p-4 rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-green-500 text-black shadow-xl shadow-emerald-500/25 hover:scale-[1.01] active:scale-95 transition-all">
+    <a id="linkGoogleReview" href="#" target="_blank" class="magnetic-btn block p-4 rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-green-500 text-black shadow-xl shadow-emerald-500/25 hover:scale-[1.01] active:scale-95 transition-all stagger-3">
       <div class="flex items-center justify-between">
         <div class="space-y-0.5">
           <div class="flex items-center gap-1 text-xs font-black tracking-wide">
             <span>⭐⭐⭐⭐⭐</span>
             <span class="bg-black/30 text-white px-2 py-0.5 rounded-full text-[10px]">Google Maps</span>
           </div>
-          <h2 class="text-sm font-black text-black">Rate Us 5 Stars on Google Maps</h2>
+          <h2 class="text-sm font-black text-black shiny-text">Rate Us 5 Stars on Google Maps</h2>
           <p class="text-[11px] text-neutral-900 font-medium">Your 5-star review takes 5 seconds and means the world to us!</p>
         </div>
         <div class="w-10 h-10 rounded-2xl bg-black text-emerald-400 flex items-center justify-center shrink-0 shadow-md">
@@ -121,7 +124,7 @@
     </a>
 
     <!-- 1-Click Wi-Fi Copy Widget -->
-    <div id="boxWifi" class="p-3.5 rounded-2xl bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl flex items-center justify-between">
+    <div id="boxWifi" class="p-3.5 rounded-2xl bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl flex items-center justify-between stagger-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg shrink-0">
           📶
@@ -131,25 +134,25 @@
           <span class="text-xs font-bold text-white font-mono" id="wifiSsidDisplay">Guest_WiFi</span>
         </div>
       </div>
-      <button id="btnCopyWifi" class="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/25 flex items-center gap-1 active:scale-90 transition-all">
+      <button id="btnCopyWifi" class="magnetic-btn px-3.5 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/25 flex items-center gap-1 active:scale-90 transition-all">
         <span>Copy Password</span>
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
       </button>
     </div>
 
     <!-- Quick Action Contact Grid -->
-    <div class="grid grid-cols-3 gap-2 text-center text-xs">
-      <a id="btnWhatsappOrder" href="#" target="_blank" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+    <div class="grid grid-cols-3 gap-2 text-center text-xs stagger-5">
+      <a id="btnWhatsappOrder" href="#" target="_blank" class="magnetic-btn p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">💬</div>
         <span class="font-bold text-white text-[11px]">WhatsApp Order</span>
       </a>
 
-      <a id="btnCallPhone" href="#" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+      <a id="btnCallPhone" href="#" class="magnetic-btn p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-blue-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">📞</div>
         <span class="font-bold text-white text-[11px]">Call Front Desk</span>
       </a>
 
-      <a id="btnLocationMap" href="#" target="_blank" class="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
+      <a id="btnLocationMap" href="#" target="_blank" class="magnetic-btn p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition-all flex flex-col items-center gap-1.5 active:scale-95 group">
         <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-base group-hover:scale-110 transition-transform">📍</div>
         <span class="font-bold text-white text-[11px]">Google Maps</span>
       </a>
@@ -383,6 +386,23 @@
     document.getElementById('btnCatalogLang')?.addEventListener('click', () => {
       updateCatalogLanguage(currentCatalogLang === 'en' ? 'ar' : 'en');
     });
+
+    // React Bits Pro: Magnetic Micro-interactions
+    function initMagneticButtons() {
+      if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+      document.querySelectorAll('.magnetic-btn').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          btn.style.transform = `translate3d(${x * 0.22}px, ${y * 0.22}px, 0)`;
+        }, { passive: true });
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = 'translate3d(0, 0, 0)';
+        }, { passive: true });
+      });
+    }
+    initMagneticButtons();
 
     updateCatalogLanguage(currentCatalogLang);
     loadCatalogData();

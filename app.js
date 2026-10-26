@@ -444,13 +444,106 @@ function loadLocalStats() {
   renderAnalyticsData(stats);
 }
 
+// ==========================================================
+// REACT BITS PRO: COUNT UP ANIMATED COUNTER ENGINE
+// ==========================================================
+function animateCountUp(element, endVal, duration = 1100, prefix = '', suffix = '') {
+  if (!element) return;
+  const target = Number(endVal) || 0;
+  const startTime = performance.now();
+  const startVal = 0;
+  const isDecimal = target % 1 !== 0;
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Smooth easeOutExpo curve
+    const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+    const current = startVal + (target - startVal) * ease;
+    element.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString()) + suffix;
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      element.textContent = prefix + (isDecimal ? target.toFixed(1) : target.toLocaleString()) + suffix;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ==========================================================
+// REACT BITS PRO: SPOTLIGHT & 3D TILT CARDS ENGINE
+// ==========================================================
+function initSpotlightAndTiltCards() {
+  const cards = document.querySelectorAll('.spotlight-card');
+  cards.forEach(card => {
+    if (card._spotlightBound) return;
+    card._spotlightBound = true;
+
+    const visual = card.querySelector('.smart-card-visual');
+
+    const handleMove = (e) => {
+      const rect = card.getBoundingClientRect();
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+      card.style.setProperty('--spotlight-opacity', '1');
+
+      if (visual) {
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+        visual.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
+      }
+    };
+
+    const handleLeave = () => {
+      card.style.setProperty('--spotlight-opacity', '0');
+      if (visual) {
+        visual.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      }
+    };
+
+    card.addEventListener('pointermove', handleMove, { passive: true });
+    card.addEventListener('pointerleave', handleLeave, { passive: true });
+  });
+}
+
+// ==========================================================
+// REACT BITS PRO: MAGNETIC BUTTONS ENGINE
+// ==========================================================
+function initMagneticButtons() {
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+
+  const magneticBtns = document.querySelectorAll('.magnetic-btn');
+  magneticBtns.forEach(btn => {
+    if (btn._magneticBound) return;
+    btn._magneticBound = true;
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate3d(${x * 0.22}px, ${y * 0.22}px, 0)`;
+    }, { passive: true });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate3d(0, 0, 0)';
+    }, { passive: true });
+  });
+}
+
 function applyStatsToUI(s) {
   const elTotal = document.getElementById('statTotalCards');
   const elScans = document.getElementById('statTotalScans');
   const elActive = document.getElementById('statActiveCards');
-  if (elTotal) elTotal.textContent = s.totalCards || 0;
-  if (elScans) elScans.textContent = s.totalScans || 0;
-  if (elActive) elActive.textContent = s.activeCards || 0;
+  if (elTotal) animateCountUp(elTotal, s.totalCards || 0);
+  if (elScans) animateCountUp(elScans, s.totalScans || 0);
+  if (elActive) animateCountUp(elActive, s.activeCards || 0);
 
   const topCardTitle = document.getElementById('statTopCardTitle');
   const topCardScans = document.getElementById('statTopCardScans');
@@ -781,6 +874,25 @@ function switchTab(tab) {
   if (tab === 'stats') renderAnalytics();
   if (tab === 'cards') renderCardsGrid();
   if (tab === 'leads') loadLeads();
+
+  updateDockIndicator(tab);
+}
+
+// React Bits Pro: Spring Physics Dock Active Indicator
+function updateDockIndicator(tab) {
+  const btn = document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  const indicator = document.getElementById('dockActiveIndicator');
+  const dock = document.getElementById('floatingGlassDock');
+  if (!btn || !indicator || !dock) return;
+
+  const btnRect = btn.getBoundingClientRect();
+  const dockRect = dock.getBoundingClientRect();
+  const left = btnRect.left - dockRect.left;
+  const width = btnRect.width;
+
+  indicator.style.transform = `translateX(${left}px)`;
+  indicator.style.width = `${width}px`;
+  indicator.style.opacity = '1';
 }
 
 // ==========================================
@@ -969,26 +1081,28 @@ function renderCardsGrid() {
     ` : '';
 
     return `
-      <div class="bg-zinc-950/80 border border-zinc-800 hover:border-emerald-500/30 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
+      <div class="spotlight-card bg-zinc-950/80 border border-zinc-800/90 hover:border-emerald-500/40 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-xl flex flex-col justify-between space-y-4 transition-all">
         
         ${bulkSelectHtml}
 
         <!-- 3D Realistic Smart NFC Card Header Component -->
-        <div class="${themeClasses} p-4 sm:p-5 text-white flex flex-col justify-between min-h-[145px] relative">
+        <div class="${themeClasses} p-4 sm:p-5 text-white flex flex-col justify-between min-h-[145px] relative group select-none">
           
           <!-- Top Row: Chip, TapLink Brand & NFC Icon -->
           <div class="flex items-center justify-between z-10">
             <div class="flex items-center gap-2.5">
               <div class="gold-chip"></div>
-              <span class="text-[9px] font-mono font-bold tracking-widest text-emerald-300 uppercase px-1.5 py-0.5 rounded bg-black/40 border border-emerald-500/20">${t('card_brand_badge', 'TapLink • MUHAB')}</span>
+              <span class="text-[9px] font-mono font-bold tracking-widest text-emerald-300 uppercase px-1.5 py-0.5 rounded bg-black/40 border border-emerald-500/20 shiny-text">${t('card_brand_badge', 'TapLink • MUHAB')}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${card.isActive ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
                 ${card.isActive ? `${t('card_status_active', 'Active')} 🟢` : `${t('card_status_paused', 'Paused')} 🔴`}
               </span>
-              <svg class="w-6 h-6 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-              </svg>
+              <div class="relative w-7 h-7 flex items-center justify-center">
+                <svg class="w-6 h-6 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -1010,7 +1124,7 @@ function renderCardsGrid() {
               <span>${t('scans_count_suffix', 'Scans')}:</span>
               <strong class="text-white font-mono text-xs">${card.scanCount || 0}</strong>
             </div>
-            <button onclick="copyToClipboard('${fixedUrl}', '${t('toast_copied', 'Copied to clipboard!')}')" class="bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
+            <button onclick="copyToClipboard('${fixedUrl}', '${t('toast_copied', 'Copied to clipboard!')}')" class="magnetic-btn bg-black/40 hover:bg-black/60 px-2 py-1 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 border border-white/10 active:scale-95">
               <span>${t('btn_copy_link', 'Copy Link')}</span>
               <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
             </button>
@@ -1042,7 +1156,7 @@ function renderCardsGrid() {
               >
               <button 
                 onclick="saveInlineUrl('${escapeHtml(card.id)}')"
-                class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
+                class="magnetic-btn px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl transition-all active:scale-95 shadow-md shadow-emerald-600/30 shrink-0"
                 title="${t('btn_quick_save', 'Save')}"
               >
                 ${t('btn_quick_save', 'Save')} ✓
@@ -1057,7 +1171,7 @@ function renderCardsGrid() {
               <span class="font-bold text-emerald-300 block">${t('action_profile_title', 'Digital Profile Active')}</span>
               <span class="text-[11px] text-zinc-400">${escapeHtml(card.profile?.fullName || card.title)} - vCard</span>
             </div>
-            <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
+            <a href="${fixedUrl}" target="_blank" class="magnetic-btn px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
               ${t('btn_test_sim', 'Preview')} 👤
             </a>
           </div>
@@ -1069,7 +1183,7 @@ function renderCardsGrid() {
               <span class="font-bold text-white block">${t('action_catalog_title', 'Menu & Catalog Active')}</span>
               <span class="text-[11px] text-zinc-400">${escapeHtml(card.catalog?.businessName || card.title)} - Wi-Fi & Reviews</span>
             </div>
-            <a href="./catalog.html?slug=${escapeHtml(card.slug)}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
+            <a href="./catalog.html?slug=${escapeHtml(card.slug)}" target="_blank" class="magnetic-btn px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md shadow-emerald-600/20">
               ${t('btn_test_sim', 'Preview')} 🍽️
             </a>
           </div>
@@ -1081,7 +1195,7 @@ function renderCardsGrid() {
               <span class="font-bold text-sky-300 block">Smart Wi-Fi Active 📶</span>
               <span class="text-[11px] text-zinc-400">SSID: ${escapeHtml(card.wifi?.ssid || 'Network')}</span>
             </div>
-            <button onclick="openQuickPassModal('${card.id}')" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
+            <button onclick="openQuickPassModal('${card.id}')" class="magnetic-btn px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
               Pass / QR 📲
             </button>
           </div>
@@ -1093,18 +1207,18 @@ function renderCardsGrid() {
               <span class="font-bold text-rose-300 block">Lost & Found / SOS Active 🆘</span>
               <span class="text-[11px] text-zinc-400">${escapeHtml(card.sos?.ownerName || 'Emergency')} (${escapeHtml(card.sos?.phone || '')})</span>
             </div>
-            <a href="${fixedUrl}" target="_blank" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
+            <a href="${fixedUrl}" target="_blank" class="magnetic-btn px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-[11px] rounded-lg transition-all shadow-md">
               SOS Page 🆘
             </a>
           </div>
         ` : ''}
 
-        <!-- Action Control Buttons Footer -->
+        <!-- Action Control Buttons Footer with Magnetic Feedback -->
         <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 pt-2 border-t border-zinc-800/80">
           
           <button 
             onclick="openQuickPassModal('${card.id}')"
-            class="py-2 px-1.5 bg-gradient-to-r from-emerald-600/20 to-green-600/10 hover:bg-emerald-600/30 text-emerald-300 rounded-xl text-[11px] font-bold border border-emerald-500/30 flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm"
+            class="magnetic-btn py-2 px-1.5 bg-gradient-to-r from-emerald-600/20 to-green-600/10 hover:bg-emerald-600/30 text-emerald-300 rounded-xl text-[11px] font-bold border border-emerald-500/30 flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm"
             title="Apple Wallet Quick Pass"
           >
             <span>📲</span>
@@ -1113,7 +1227,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="openSimulatorDrawer('${card.id}')"
-            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="magnetic-btn py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_test_sim', 'Simulate')}"
           >
             <span>📱</span>
@@ -1122,7 +1236,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="openNfcProgrammerModal('${card.id}')"
-            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="magnetic-btn py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 rounded-xl text-[11px] font-bold border border-zinc-700 hover:border-emerald-500/40 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_program_nfc', 'Write NFC')}"
           >
             <span>📡</span>
@@ -1131,7 +1245,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="openEditCardDrawer('${card.id}')"
-            class="py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-xl text-[11px] font-bold border border-zinc-700 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            class="magnetic-btn py-2 px-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-xl text-[11px] font-bold border border-zinc-700 flex items-center justify-center gap-1 active:scale-95 transition-all"
             title="${t('btn_edit', 'Edit')}"
           >
             <span>✏️</span>
@@ -1140,7 +1254,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="toggleCardActiveState('${card.id}')"
-            class="py-2 px-1.5 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-1 active:scale-95 transition-all ${
+            class="magnetic-btn py-2 px-1.5 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-1 active:scale-95 transition-all ${
               card.isActive 
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
@@ -1152,7 +1266,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="deleteCard('${card.id}')"
-            class="py-2 px-1.5 rounded-xl text-[11px] font-bold border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 hover:text-rose-300 flex items-center justify-center gap-0.5 active:scale-95 transition-all shadow-sm"
+            class="magnetic-btn py-2 px-1.5 rounded-xl text-[11px] font-bold border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 hover:text-rose-300 flex items-center justify-center gap-0.5 active:scale-95 transition-all shadow-sm"
             title="${t('btn_delete_card', 'Delete Card Permanently')}"
           >
             <span>🗑️</span>
@@ -1163,6 +1277,10 @@ function renderCardsGrid() {
       </div>
     `;
   }).join('');
+
+  // Re-bind React Bits Pro interactive effects
+  initSpotlightAndTiltCards();
+  initMagneticButtons();
 }
 
 // Switch Preset Function
@@ -2092,9 +2210,9 @@ function renderAnalyticsData(stats) {
   const elP3 = document.getElementById('devPercentOther');
   const elB3 = document.getElementById('devBarOther');
 
-  if (elP1 && elB1) { elP1.textContent = pctIPhone + '%'; elB1.style.width = pctIPhone + '%'; }
-  if (elP2 && elB2) { elP2.textContent = pctAndroid + '%'; elB2.style.width = pctAndroid + '%'; }
-  if (elP3 && elB3) { elP3.textContent = pctOther + '%'; elB3.style.width = pctOther + '%'; }
+  if (elP1 && elB1) { animateCountUp(elP1, pctIPhone, 850, '', '%'); elB1.style.width = pctIPhone + '%'; }
+  if (elP2 && elB2) { animateCountUp(elP2, pctAndroid, 850, '', '%'); elB2.style.width = pctAndroid + '%'; }
+  if (elP3 && elB3) { animateCountUp(elP3, pctOther, 850, '', '%'); elB3.style.width = pctOther + '%'; }
 
   const tbody = document.getElementById('analyticsScansTableBody');
   const scans = stats.recentScans || [];
@@ -2246,6 +2364,15 @@ function setupEventListeners() {
       cardsList = orig;
     }
   });
+
+  // Initialize React Bits Pro interactions & Floating Dock Indicator
+  initSpotlightAndTiltCards();
+  initMagneticButtons();
+  setTimeout(() => updateDockIndicator('home'), 150);
+  window.addEventListener('resize', () => {
+    const currentTab = document.querySelector('[id^="tabView"]:not(.hidden)')?.id?.replace('tabView', '')?.toLowerCase() || 'home';
+    updateDockIndicator(currentTab);
+  }, { passive: true });
 }
 
 // ==========================================
