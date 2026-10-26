@@ -1,14 +1,14 @@
 [
   {
     "id": "card-ksnjv",
-    "title": "Google 5-Star Reviews Smart Card",
+    "title": "بطاقة تقييم جوجل الذكية",
     "slug": "card-ksnjv",
     "mode": "direct",
     "actionType": "direct",
     "destinationUrl": "https://maps.google.com",
     "isActive": true,
-    "scanCount": 0,
-    "lastScannedAt": null,
+    "scanCount": 4,
+    "lastScannedAt": "2026-10-26T13:29:40.701Z",
     "createdAt": "2026-10-25T17:25:00.000Z",
     "updatedAt": "2026-10-25T17:25:00.000Z",
     "pinCode": "",

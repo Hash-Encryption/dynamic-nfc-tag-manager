@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const CARDS_SEED_FILE = path.join(DATA_DIR, 'cards.json');
+const PUBLIC_CARDS_FILE = path.join(__dirname, 'public', 'data', 'cards.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -72,9 +73,12 @@ class Database {
       fs.writeFileSync(tempFile, JSON.stringify(this.data, null, 2), 'utf8');
       fs.renameSync(tempFile, DB_FILE);
 
-      // Keep data/cards.json in sync as well
+      // Keep data/cards.json and public/data/cards.json in sync as well
       try {
         fs.writeFileSync(CARDS_SEED_FILE, JSON.stringify(this.data.cards, null, 2), 'utf8');
+        if (fs.existsSync(path.dirname(PUBLIC_CARDS_FILE))) {
+          fs.writeFileSync(PUBLIC_CARDS_FILE, JSON.stringify(this.data.cards, null, 2), 'utf8');
+        }
       } catch (errCards) {
         console.warn('Failed syncing data/cards.json:', errCards);
       }
