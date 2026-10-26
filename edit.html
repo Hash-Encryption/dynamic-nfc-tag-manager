@@ -247,7 +247,9 @@
       let url = rawUrl.trim();
       url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
       if (!url) return '';
-      if (/^(tel|mailto|sms|whatsapp|tg|geo):/i.test(url)) return url;
+      if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
+      url = url.replace(/[\s\r\n\t]+/g, '');
+      if (/^wa\.me\//i.test(url)) return 'https://' + url;
       url = url.replace(/[\s\r\n\t]+/g, '');
       if (/^https?:\/\//i.test(url)) return url;
       if (url.startsWith('//')) return 'https:' + url;

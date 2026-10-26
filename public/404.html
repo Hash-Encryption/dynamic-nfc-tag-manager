@@ -279,6 +279,18 @@
         document.getElementById('notFoundBox').classList.remove('hidden');
       }
 
+      function sanitizeRedirectUrl(rawUrl) {
+        if (!rawUrl || typeof rawUrl !== 'string') return '';
+        let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+        if (!url) return '';
+        if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
+        url = url.replace(/[\s\r\n\t]+/g, '');
+        if (/^wa\.me\//i.test(url)) return 'https://' + url;
+        if (/^https?:\/\//i.test(url)) return url;
+        if (url.startsWith('//')) return 'https:' + url;
+        return 'https://' + url;
+      }
+
       function executeRedirection(card) {
         let repoBase = '';
         if (window.location.pathname.includes('/dynamic-nfc-tag-manager')) {
@@ -294,12 +306,11 @@
           window.location.replace(`${repoBase}/catalog.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
-        let target = (card.destinationUrl || '').trim();
-        if (target) {
-          window.location.replace(target);
-        } else {
-          window.location.replace('https://maps.google.com');
+        let target = sanitizeRedirectUrl(card.destinationUrl || '');
+        if (!target || target === 'https://') {
+          target = 'https://maps.google.com';
         }
+        window.location.replace(target);
       }
 
       findAndRedirect();

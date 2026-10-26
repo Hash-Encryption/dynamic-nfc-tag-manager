@@ -330,6 +330,18 @@
         if (notFoundBox) notFoundBox.classList.remove('hidden');
       });
 
+      function sanitizeRedirectUrl(rawUrl) {
+        if (!rawUrl || typeof rawUrl !== 'string') return '';
+        let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+        if (!url) return '';
+        if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
+        url = url.replace(/[\s\r\n\t]+/g, '');
+        if (/^wa\.me\//i.test(url)) return 'https://' + url;
+        if (/^https?:\/\//i.test(url)) return url;
+        if (url.startsWith('//')) return 'https:' + url;
+        return 'https://' + url;
+      }
+
       function performRedirect(card) {
         const mode = card.mode || (card.actionType === 'profile' ? 'profile' : 'direct');
         if (mode === 'profile') {
@@ -340,12 +352,11 @@
           window.location.replace(`./catalog.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
-        let target = (card.destinationUrl || '').trim();
-        if (target) {
-          window.location.replace(target);
-        } else {
-          window.location.replace('https://maps.google.com');
+        let target = sanitizeRedirectUrl(card.destinationUrl || '');
+        if (!target || target === 'https://') {
+          target = 'https://maps.google.com';
         }
+        window.location.replace(target);
       }
     })();
   </script>
@@ -730,6 +741,23 @@
         <p class="text-xs text-zinc-400" data-i18n="lock_sub">TapLink Smart Ecosystem • Proprietary by MUHAB</p>
       </div>
 
+      <!-- Demo Data Cleaning Panel -->
+      <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-base shrink-0">🧹</div>
+            <div>
+              <h3 class="text-sm font-bold text-white" data-i18n="settings_cleanup_title">Account Clean-up & Demo Tags</h3>
+              <p class="text-[11px] text-zinc-400" data-i18n="settings_cleanup_desc">Clear initial test/demo tags with 1-click and start with a clean workspace</p>
+            </div>
+          </div>
+          <button onclick="clearAllDemoCards()" class="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shrink-0 shadow-sm">
+            <span>🗑️</span>
+            <span data-i18n="btn_clear_demo">Delete All Demo Tags</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Language Selection Card -->
       <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-5 backdrop-blur-xl space-y-3">
         <div class="flex items-center gap-2.5">
@@ -1046,7 +1074,7 @@
                 <span>🪄 Smart Link Generator</span>
               </button>
             </div>
-            <input type="url" id="inpDestinationUrl" placeholder="https://maps.google.com/ or your website..." data-i18n-placeholder="placeholder_destination_url" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs text-start" dir="ltr">
+            <input type="text" id="inpDestinationUrl" placeholder="https://instagram.com/..., wa.me/..., or any link" data-i18n-placeholder="placeholder_destination_url" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs text-start" dir="ltr">
           </div>
 
           <div class="flex items-center justify-between p-3 bg-zinc-900 rounded-xl border border-zinc-700">
@@ -1074,7 +1102,7 @@
               <input type="text" id="inpNewPresetLabel" placeholder="Label (e.g. Riyadh Branch)" class="col-span-3 bg-[#050806] border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
               <input type="text" id="inpNewPresetIcon" placeholder="⭐" value="⭐" class="col-span-1 bg-[#050806] border border-zinc-700 text-white rounded-lg px-2 py-2 text-center text-xs">
             </div>
-            <input type="url" id="inpNewPresetUrl" placeholder="https://..." dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+            <input type="text" id="inpNewPresetUrl" placeholder="https://..." dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             <button type="button" onclick="handleAddPresetItem()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold text-xs transition-all border border-zinc-700">
               + Add to Quick Presets
             </button>
@@ -1096,8 +1124,8 @@
               <input type="checkbox" id="inpTimeRoutingEnabled" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
             </div>
             <div class="space-y-2">
-              <input type="url" id="inpMorningUrl" placeholder="Morning URL: https://menu.com/breakfast" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-              <input type="url" id="inpEveningUrl" placeholder="Evening URL: https://menu.com/dinner" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="text" id="inpMorningUrl" placeholder="Morning URL: https://menu.com/breakfast" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="text" id="inpEveningUrl" placeholder="Evening URL: https://menu.com/dinner" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
               <div class="flex items-center justify-between text-xs text-zinc-300">
                 <span>Switch to evening at:</span>
                 <select id="inpSwitchHour" class="bg-[#050806] border border-zinc-700 text-white rounded-lg px-2 py-1 text-xs">
@@ -1116,8 +1144,8 @@
               <input type="checkbox" id="inpDeviceRoutingEnabled" class="rounded border-zinc-700 text-emerald-600 focus:ring-emerald-500">
             </div>
             <div class="space-y-2">
-              <input type="url" id="inpIosUrl" placeholder="iPhone / iPad Target URL (e.g. App Store link)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-              <input type="url" id="inpAndroidUrl" placeholder="Android Target URL (e.g. Google Play link)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="text" id="inpIosUrl" placeholder="iPhone / iPad Target URL (e.g. App Store link)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <input type="text" id="inpAndroidUrl" placeholder="Android Target URL (e.g. Google Play link)" dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
 
@@ -1211,9 +1239,13 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-2">
-          <button type="submit" id="btnSaveCard" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all" data-i18n="btn_save_card">
+        <div class="pt-2 flex items-center gap-2">
+          <button type="submit" id="btnSaveCard" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all" data-i18n="btn_save_card">
             Save & Activate Tag 💾
+          </button>
+          <button type="button" id="btnDrawerDeleteCard" onclick="handleDrawerDeleteCard()" class="hidden py-3 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all active:scale-95 flex items-center gap-1.5" title="Delete Card Permanently">
+            <span>🗑️</span>
+            <span data-i18n="btn_delete">Delete</span>
           </button>
         </div>
       </form>

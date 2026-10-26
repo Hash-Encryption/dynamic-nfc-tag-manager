@@ -28,11 +28,11 @@ const t = (key, fallback) => (window.I18N ? window.I18N.t(key, fallback) : (fall
 // Production Auto URL Sanitizer Helper
 function sanitizeUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') return '';
-  let url = rawUrl.trim();
-  url = url.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+  let url = rawUrl.trim().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
   if (!url) return '';
-  if (/^(tel|mailto|sms|whatsapp|tg|geo):/i.test(url)) return url;
+  if (/^(tel|mailto|sms|whatsapp|tg|geo|intent|facetime|instagram):/i.test(url)) return url;
   url = url.replace(/[\s\r\n\t]+/g, '');
+  if (/^wa\.me\//i.test(url)) return 'https://' + url;
   if (/^https?:\/\//i.test(url)) return url;
   if (url.startsWith('//')) return 'https:' + url;
   return 'https://' + url;
@@ -458,9 +458,10 @@ async function syncWithCloudDatabase(showNotification = false) {
       const res = await fetch(url);
       if (res.ok) {
         const cloudCards = await res.json();
-        if (Array.isArray(cloudCards) && cloudCards.length > 0) {
+        if (Array.isArray(cloudCards)) {
           cardsList = cloudCards;
-          saveLocalCards(cloudCards, true); // Save locally without echoing back to cloud
+          saveLocalCards(cloudCards, true);
+          localStorage.setItem('nfc_db_initialized', 'true');
           renderCardsGrid();
           loadLocalStats();
           if (showNotification) showToast(t('toast_cloud_synced', 'Real-time global cloud sync complete 🟢'), 'success');
@@ -723,11 +724,11 @@ function renderCardsGrid() {
             </div>
             <div class="flex items-center gap-1.5">
               <input 
-                type="url" 
+                type="text" 
                 id="inlineUrl_${card.id}" 
                 value="${card.destinationUrl || ''}" 
                 dir="ltr"
-                placeholder="https://maps.google.com/..."
+                placeholder="instagram.com/..., tiktok.com/..., or any link"
                 class="flex-1 bg-[#050806] border border-zinc-700/80 rounded-xl px-3 py-2 text-xs font-mono text-white text-start focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
               <button 
@@ -766,7 +767,7 @@ function renderCardsGrid() {
         ` : ''}
 
         <!-- Action Control Buttons Footer -->
-        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-zinc-800/80">
+        <div class="grid grid-cols-5 gap-1.5 pt-2 border-t border-zinc-800/80">
           
           <button 
             onclick="openSimulatorDrawer('${card.id}')"
@@ -807,7 +808,7 @@ function renderCardsGrid() {
 
           <button 
             onclick="toggleCardActiveState('${card.id}')"
-            class="py-2 px-2 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-1 active:scale-95 transition-all ${
+            class="py-2 px-1.5 rounded-xl text-[11px] font-bold border flex items-center justify-center gap-1 active:scale-95 transition-all ${
               card.isActive 
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
                 : 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
@@ -815,6 +816,14 @@ function renderCardsGrid() {
             title="${card.isActive ? t('card_status_paused', 'Pause') : t('card_status_active', 'Activate')}"
           >
             <span>${card.isActive ? '⏸' : '▶'}</span>
+          </button>
+
+          <button 
+            onclick="deleteCard('${card.id}')"
+            class="py-2 px-1.5 rounded-xl text-[11px] font-bold border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 hover:text-rose-300 flex items-center justify-center gap-0.5 active:scale-95 transition-all shadow-sm"
+            title="${t('btn_delete_card', 'Delete Card Permanently')}"
+          >
+            <span>🗑️</span>
           </button>
 
         </div>
@@ -870,9 +879,19 @@ async function saveInlineUrl(cardId) {
 
   card.destinationUrl = newUrl;
   card.updatedAt = new Date().toISOString();
+  // Clear any conflicting time/device routing
+  if (card.timeRouting) card.timeRouting.enabled = false;
+  if (card.conditional?.time) card.conditional.time.enabled = false;
+  if (card.conditional?.device) card.conditional.device.enabled = false;
+  // Update savedTargets active state
+  if (Array.isArray(card.savedTargets)) {
+    let mainT = card.savedTargets.find(t => t.id === 't-main' || t.label === 'Main Target');
+    if (mainT) mainT.url = newUrl;
+    card.savedTargets.forEach(t => { t.active = (t.url === newUrl); });
+  }
   saveLocalCards(cardsList);
   renderCardsGrid();
-  showToast(t('toast_updated', 'Target destination updated successfully! 🚀'), 'success');
+  showToast(t('toast_saved_sync', '✅ تم الحفظ والمزامنة لجميع الأجهزة'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -910,6 +929,8 @@ async function toggleCardActiveState(cardId) {
 function openAddCardDrawer() {
   if (navigator.vibrate) navigator.vibrate(10);
   document.getElementById('cardEditId').value = '';
+  const delBtn = document.getElementById('btnDrawerDeleteCard');
+  if (delBtn) delBtn.classList.add('hidden');
   document.getElementById('cardDrawerTitle').textContent = t('drawer_add_title', 'Add New Smart NFC Tag');
   document.getElementById('cardEditorForm').reset();
   document.getElementById('inpIsActive').checked = true;
@@ -1167,7 +1188,7 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
   closeCardEditorDrawer();
   renderCardsGrid();
   loadLocalStats();
-  showToast(t('toast_saved', 'Tag saved & activated successfully! ✨'), 'success');
+  showToast(t('toast_saved_sync', '✅ تم الحفظ والمزامنة لجميع الأجهزة'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -1801,4 +1822,58 @@ function setupEventListeners() {
       cardsList = orig;
     }
   });
+}
+
+// ==========================================
+// CARD DELETION & WORKSPACE CLEAN-UP ENGINE
+// ==========================================
+async function deleteCard(cardId) {
+  const card = cardsList.find(c => c.id === cardId);
+  if (!card) return;
+
+  const confirmMsg = t('confirm_delete_card', `هل أنت متأكد من حذف بطاقة "${card.title || card.slug}" نهائياً؟\n\nسيتم مسحها فوراً من هاتفك ومن السحابة المركزية ولا يمكن استرجاعها.`);
+  if (!confirm(confirmMsg)) return;
+
+  if (navigator.vibrate) navigator.vibrate([40, 40]);
+
+  // Permanently remove from array
+  cardsList = cardsList.filter(c => c.id !== cardId);
+
+  // Mark initialized so defaults are never resurrected
+  localStorage.setItem('nfc_db_initialized', 'true');
+
+  // Save to local storage & immediately push empty/updated array to cloud DB
+  saveLocalCards(cardsList);
+  renderCardsGrid();
+  loadLocalStats();
+
+  showToast(t('toast_deleted', '✅ تم حذف البطاقة نهائياً ومزامنة التحديث لجميع الأجهزة 🗑️'), 'success');
+
+  if (!isOfflineOrStatic) {
+    try {
+      fetch(`/api/cards/${cardId}`, { method: 'DELETE' });
+    } catch (e) {}
+  }
+}
+
+function handleDrawerDeleteCard() {
+  const editId = document.getElementById('cardEditId').value;
+  if (!editId) return;
+  closeCardEditorDrawer();
+  deleteCard(editId);
+}
+
+function clearAllDemoCards() {
+  const confirmMsg = t('confirm_clear_demo', 'هل تريد حذف جميع البطاقات التجريبية (Hoomi, ksnjv, cardtest) لتنظيف اللوحة والبدء ببطاقاتك الخاصة فقط؟');
+  if (!confirm(confirmMsg)) return;
+
+  const demoSlugs = ['card-hoomi', 'card-ksnjv', 'cardtest'];
+  cardsList = cardsList.filter(c => !demoSlugs.includes((c.slug || '').toLowerCase()));
+  
+  localStorage.setItem('nfc_db_initialized', 'true');
+  saveLocalCards(cardsList);
+  renderCardsGrid();
+  loadLocalStats();
+
+  showToast(t('toast_demo_cleared', '✅ تم تنظيف وحذف البطاقات التجريبية ومزامنة التحديث لجميع الأجهزة 🧹'), 'success');
 }
