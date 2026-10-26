@@ -67,7 +67,7 @@
   <!-- ========================================== -->
   <!-- VERCEL & SPA INSTANT NFC REDIRECT SCREEN   -->
   <!-- ========================================== -->
-  <div id="cardRedirectScreen" class="fixed inset-0 z-[100] bg-[#050706] flex items-center justify-center p-4">
+  <div id="cardRedirectScreen" class="fixed inset-0 z-[100] bg-[#050706] items-center justify-center p-4 hidden">
     <!-- Ambient Glow -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       <div class="absolute -top-40 -start-40 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl"></div>
@@ -166,9 +166,19 @@
       const hashMatch = hash.match(/#(?:c|go|\/c|\/go)\/([a-zA-Z0-9-_]+)/i);
       
       const slug = (pathMatch && pathMatch[1]) || qSlug || (hashMatch && hashMatch[1]);
-      if (!slug) return; // Regular dashboard visit!
+      if (!slug) {
+        // Regular dashboard visit: permanently remove redirect overlay
+        const sc = document.getElementById('cardRedirectScreen');
+        if (sc) { sc.classList.add('hidden'); sc.remove(); }
+        return;
+      }
 
       window.__IS_CARD_REDIRECT = true;
+      const initialSc = document.getElementById('cardRedirectScreen');
+      if (initialSc) {
+        initialSc.classList.remove('hidden');
+        initialSc.classList.add('flex');
+      }
 
       const BUNDLED_FALLBACK_CARDS = [
         {
@@ -305,7 +315,6 @@
         const notFoundBox = document.getElementById('redirectNotFoundBox');
         if (loadBox) loadBox.classList.add('hidden');
         if (notFoundBox) notFoundBox.classList.remove('hidden');
-      });
       });
 
       function performRedirect(card) {
