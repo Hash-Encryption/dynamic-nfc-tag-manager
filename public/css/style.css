@@ -4,8 +4,23 @@
 :root {
   --font-arabic: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
   --color-brand-emerald: #10b981;
   --color-brand-dark: #050706;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+.safe-bottom {
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+}
+
+.safe-top {
+  padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
 }
 
 body {
@@ -252,7 +267,7 @@ body {
   box-shadow: 0 4px 14px -2px rgba(16, 185, 129, 0.45);
 }
 
-/* Bottom Navigation Item */
+/* Bottom Navigation Item - Mobile-Perfect Luxury Pill */
 .bottom-nav-item {
   position: relative;
   display: flex;
@@ -260,32 +275,52 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 6px 12px;
-  color: #718096;
+  padding: 6px 10px;
+  color: #71717a;
   font-size: 11px;
-  font-weight: 600;
-  transition: all 0.25s ease;
+  font-weight: 700;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  transition: all 0.22s cubic-bezier(0.2, 0, 0, 1);
   user-select: none;
+  min-width: 0;
+  flex: 1;
+}
+
+.bottom-nav-item:hover {
+  color: #e4e4e7;
 }
 
 .bottom-nav-item.active {
   color: #10b981;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.32);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.22);
 }
 
 .bottom-nav-item.active .nav-icon-container {
   transform: translateY(-2px);
   color: #10b981;
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.45));
 }
 
 .bottom-nav-item.active::after {
   content: '';
   position: absolute;
   bottom: 2px;
-  width: 16px;
+  width: 14px;
   height: 3px;
   background: #10b981;
   border-radius: 9999px;
-  box-shadow: 0 0 10px #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.bottom-nav-item span {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: normal;
+  max-width: 100%;
 }
 
 /* Toast Notifications */
@@ -462,11 +497,6 @@ body {
 /* ========================================================== */
 /* REACT BITS PRO: FLOATING GLASS DOCK & MAGNETIC BUTTONS     */
 /* ========================================================== */
-.dock-indicator-spring {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, opacity 0.2s ease;
-  box-shadow: 0 0 18px rgba(16, 185, 129, 0.28);
-}
-
 .magnetic-btn {
   transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
   will-change: transform;
@@ -550,4 +580,123 @@ body {
 }
 .nfc-ripple-beacon::after {
   animation-delay: 1.4s;
+}
+
+/* ========================================================== */
+/* MOBILE RESPONSIVE ENGINE (iOS & Android Universal Tuning)  */
+/* ========================================================== */
+@media (max-width: 640px) {
+  body {
+    padding-bottom: max(6rem, calc(5rem + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .spotlight-card {
+    border-radius: 1.25rem;
+  }
+
+  .smart-card-visual {
+    border-radius: 1rem;
+    padding: 1rem !important;
+  }
+
+  /* Drawers / Bottom Sheets */
+  .bottom-sheet-content {
+    max-height: 94vh !important;
+    border-top-left-radius: 1.75rem !important;
+    border-top-right-radius: 1.75rem !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+  }
+}
+
+/* Medium & Small Smartphones (iPhone 12/13/14/15/16, Galaxy S, Pixel) */
+@media (max-width: 480px) {
+  #floatingGlassDock {
+    padding: 4px 6px;
+    border-radius: 1.25rem;
+    max-width: calc(100vw - 20px);
+  }
+
+  .bottom-nav-item {
+    padding: 5px 4px;
+    border-radius: 0.75rem;
+  }
+
+  .bottom-nav-item span {
+    font-size: 9.5px;
+    line-height: 1.1;
+  }
+
+  .bottom-nav-item .nav-icon-container svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #fabAddCard {
+    width: 48px;
+    height: 48px;
+  }
+
+  #fabAddCard svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Auroras on mobile - tighter blur & size to maximize battery and 60fps */
+  .aurora-beam-1 {
+    width: 320px;
+    height: 320px;
+    filter: blur(70px);
+  }
+
+  .aurora-beam-2 {
+    width: 340px;
+    height: 340px;
+    filter: blur(75px);
+  }
+
+  .aurora-beam-3 {
+    width: 280px;
+    height: 280px;
+    filter: blur(65px);
+  }
+}
+
+/* Ultra Compact Screens (iPhone SE, Galaxy A, screens <= 375px) */
+@media (max-width: 375px) {
+  #floatingGlassDock {
+    padding: 3px 3px;
+    max-width: calc(100vw - 12px);
+  }
+
+  .bottom-nav-item {
+    padding: 4px 2px;
+    gap: 1px;
+  }
+
+  .bottom-nav-item span {
+    font-size: 8.5px;
+    max-width: 48px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bottom-nav-item .nav-icon-container svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #fabAddCard {
+    width: 42px;
+    height: 42px;
+  }
+
+  #fabAddCard svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  header.glass-nav {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
 }

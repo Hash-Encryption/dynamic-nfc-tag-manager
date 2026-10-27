@@ -874,25 +874,6 @@ function switchTab(tab) {
   if (tab === 'stats') renderAnalytics();
   if (tab === 'cards') renderCardsGrid();
   if (tab === 'leads') loadLeads();
-
-  updateDockIndicator(tab);
-}
-
-// React Bits Pro: Spring Physics Dock Active Indicator
-function updateDockIndicator(tab) {
-  const btn = document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1));
-  const indicator = document.getElementById('dockActiveIndicator');
-  const dock = document.getElementById('floatingGlassDock');
-  if (!btn || !indicator || !dock) return;
-
-  const btnRect = btn.getBoundingClientRect();
-  const dockRect = dock.getBoundingClientRect();
-  const left = btnRect.left - dockRect.left;
-  const width = btnRect.width;
-
-  indicator.style.transform = `translateX(${left}px)`;
-  indicator.style.width = `${width}px`;
-  indicator.style.opacity = '1';
 }
 
 // ==========================================
@@ -2365,14 +2346,9 @@ function setupEventListeners() {
     }
   });
 
-  // Initialize React Bits Pro interactions & Floating Dock Indicator
+  // Initialize React Bits Pro interactions
   initSpotlightAndTiltCards();
   initMagneticButtons();
-  setTimeout(() => updateDockIndicator('home'), 150);
-  window.addEventListener('resize', () => {
-    const currentTab = document.querySelector('[id^="tabView"]:not(.hidden)')?.id?.replace('tabView', '')?.toLowerCase() || 'home';
-    updateDockIndicator(currentTab);
-  }, { passive: true });
 }
 
 // ==========================================

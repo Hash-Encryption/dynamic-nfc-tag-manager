@@ -67,7 +67,7 @@
     };
   </script>
 </head>
-<body class="bg-[#050706] text-white min-h-screen selection:bg-emerald-500 selection:text-black pb-32 antialiased">
+<body class="bg-[#050706] text-white min-h-screen selection:bg-emerald-500 selection:text-black pb-32 safe-bottom overflow-x-hidden antialiased">
 
   <!-- ========================================== -->
   <!-- VERCEL & SPA INSTANT NFC REDIRECT SCREEN   -->
@@ -681,52 +681,52 @@
   </div>
 
   <!-- Top App Bar (Mobile-first Navigation Header) -->
-  <header class="sticky top-0 z-40 glass-nav border-b border-emerald-500/15 px-4 py-3 backdrop-blur-2xl">
-    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+  <header class="sticky top-0 z-40 glass-nav border-b border-emerald-500/15 px-2.5 sm:px-4 py-2.5 sm:py-3 backdrop-blur-2xl">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-1.5 sm:gap-3">
       
       <!-- Brand & Cloud Status -->
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-600 p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/30 magnetic-btn">
+      <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-600 p-0.5 flex items-center justify-center shadow-lg shadow-emerald-500/30 magnetic-btn">
           <div class="w-full h-full bg-[#050706] rounded-[14px] flex items-center justify-center">
-            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
           </div>
         </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-sm font-black tracking-wider font-mono gradient-text-flow">TapLink</h1>
-            <span class="px-1.5 py-0.5 text-[9px] font-black bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 tracking-tight shiny-text" data-i18n="brand_sub">by MUHAB</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <h1 class="text-xs sm:text-sm font-black tracking-wider font-mono gradient-text-flow truncate">TapLink</h1>
+            <span class="px-1 py-0.5 text-[8.5px] sm:text-[9px] font-black bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30 tracking-tight shiny-text shrink-0" data-i18n="brand_sub">by MUHAB</span>
           </div>
-          <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold" id="topCloudStatusText">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-active"></span>
-            <span data-i18n="cloud_status_connected" class="shiny-text">🟢 Cloud Synced - Real-time on all devices</span>
+          <p class="text-[9px] sm:text-[10px] text-emerald-400 flex items-center gap-1 font-semibold truncate" id="topCloudStatusText">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-active shrink-0"></span>
+            <span data-i18n="cloud_status_connected" class="shiny-text truncate">🟢 Cloud Synced</span>
           </p>
         </div>
       </div>
 
       <!-- Action Icons -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <!-- Quick Pass Apple Wallet Button -->
-        <button id="btnHeaderQuickPass" onclick="openQuickPassModal()" class="magnetic-btn px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-green-600/20 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm shadow-emerald-500/20" title="Quick Pass Mode">
+        <button id="btnHeaderQuickPass" onclick="openQuickPassModal()" class="magnetic-btn px-2 sm:px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-green-600/20 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-black flex items-center gap-1 transition-all active:scale-95 shadow-sm shadow-emerald-500/20" title="Quick Pass Mode">
           <span>📲</span>
-          <span class="hidden sm:inline" data-i18n="btn_quick_pass">Quick Pass</span>
+          <span class="hidden md:inline" data-i18n="btn_quick_pass">Quick Pass</span>
         </button>
 
         <!-- Language Switcher Button -->
-        <button id="btnLangToggle" class="magnetic-btn px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white hover:bg-emerald-950/40 text-xs font-black flex items-center gap-1.5 transition-all active:scale-95 shadow-sm" title="Switch Language">
+        <button id="btnLangToggle" class="magnetic-btn px-2 sm:px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-400 hover:text-white hover:bg-emerald-950/40 text-xs font-black flex items-center gap-1 transition-all active:scale-95 shadow-sm" title="Switch Language">
           <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
           <span id="currentLangLabel">عربي</span>
         </button>
 
-        <button id="btnQuickSearchToggle" class="magnetic-btn w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_search" title="Quick Search">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <button id="btnQuickSearchToggle" class="magnetic-btn w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_search" title="Quick Search">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </button>
-        <button id="btnThemeToggle" class="magnetic-btn w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_theme" title="Toggle Theme">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <button id="btnThemeToggle" class="magnetic-btn w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-emerald-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_theme" title="Toggle Theme">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
         </button>
-        <button id="btnLockAdmin" class="magnetic-btn w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_lock" title="Lock Dashboard">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <button id="btnLockAdmin" class="magnetic-btn w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition-all active:scale-95" data-i18n-title="btn_lock" title="Lock Dashboard">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         </button>
       </div>
 
@@ -1269,12 +1269,9 @@
   <!-- ========================================================== -->
   <!-- REACT BITS PRO: FLOATING GLASS DOCK (Mobile & Desktop)     -->
   <!-- ========================================================== -->
-  <div class="fixed bottom-3 sm:bottom-4 inset-x-3 sm:inset-x-0 z-40 pointer-events-none flex justify-center">
-    <nav id="floatingGlassDock" class="pointer-events-auto w-full max-w-md bg-zinc-950/85 backdrop-blur-2xl border border-emerald-500/25 rounded-3xl px-2 py-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_25px_rgba(16,185,129,0.18)] relative safe-bottom flex items-center justify-around overflow-visible">
+  <div class="fixed bottom-3 sm:bottom-4 inset-x-2.5 sm:inset-x-0 z-40 pointer-events-none flex justify-center">
+    <nav id="floatingGlassDock" class="pointer-events-auto w-full max-w-md bg-zinc-950/90 backdrop-blur-2xl border border-emerald-500/25 rounded-3xl px-1.5 sm:px-2 py-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_25px_rgba(16,185,129,0.18)] relative safe-bottom flex items-center justify-around overflow-visible">
       
-      <!-- Sliding Spring Active Indicator Pill -->
-      <div id="dockActiveIndicator" class="dock-indicator-spring absolute top-1.5 bottom-1.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 pointer-events-none -z-0"></div>
-
       <!-- Tab 1: Overview -->
       <button onclick="switchTab('home')" id="tabBtnHome" class="bottom-nav-item active flex-1 z-10">
         <div class="nav-icon-container">
