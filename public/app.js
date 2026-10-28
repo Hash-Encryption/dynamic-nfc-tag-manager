@@ -1322,7 +1322,7 @@ async function saveInlineUrl(cardId) {
   }
   saveLocalCards(cardsList);
   renderCardsGrid();
-  showToast(t('toast_saved_sync', '✅ تم الحفظ والمزامنة لجميع الأجهزة'), 'success');
+  showToast(t('toast_saved_sync', 'Saved & synced in real-time across all devices! 🟢'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -1711,7 +1711,7 @@ document.getElementById('cardEditorForm')?.addEventListener('submit', async (e) 
   closeCardEditorDrawer();
   renderCardsGrid();
   loadLocalStats();
-  showToast(t('toast_saved_sync', '✅ تم الحفظ والمزامنة لجميع الأجهزة'), 'success');
+  showToast(t('toast_saved_sync', 'Saved & synced in real-time across all devices! 🟢'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -2358,7 +2358,7 @@ async function deleteCard(cardId) {
   const card = cardsList.find(c => c.id === cardId);
   if (!card) return;
 
-  const confirmMsg = t('confirm_delete_card', `هل أنت متأكد من حذف بطاقة "${card.title || card.slug}" نهائياً؟\n\nسيتم مسحها فوراً من هاتفك ومن السحابة المركزية ولا يمكن استرجاعها.`);
+  const confirmMsg = t('confirm_delete_card', `Are you sure you want to permanently delete "${card.title || card.slug}"?\n\nIt will be immediately erased from your device and central cloud database.`);
   if (!confirm(confirmMsg)) return;
 
   if (navigator.vibrate) navigator.vibrate([40, 40]);
@@ -2374,7 +2374,7 @@ async function deleteCard(cardId) {
   renderCardsGrid();
   loadLocalStats();
 
-  showToast(t('toast_deleted', '✅ تم حذف البطاقة نهائياً ومزامنة التحديث لجميع الأجهزة 🗑️'), 'success');
+  showToast(t('toast_deleted', 'Tag deleted permanently and synced across all devices! 🗑️'), 'success');
 
   if (!isOfflineOrStatic) {
     try {
@@ -2391,7 +2391,7 @@ function handleDrawerDeleteCard() {
 }
 
 function clearAllDemoCards() {
-  const confirmMsg = t('confirm_clear_demo', 'هل تريد حذف جميع البطاقات التجريبية (Hoomi, ksnjv, cardtest) لتنظيف اللوحة والبدء ببطاقاتك الخاصة فقط؟');
+  const confirmMsg = t('confirm_clear_demo', 'Do you want to permanently delete all default demo tags (Hoomi, ksnjv, cardtest)? Your custom tags will remain safe.');
   if (!confirm(confirmMsg)) return;
 
   const demoSlugs = ['card-hoomi', 'card-ksnjv', 'cardtest'];
@@ -2402,7 +2402,7 @@ function clearAllDemoCards() {
   renderCardsGrid();
   loadLocalStats();
 
-  showToast(t('toast_demo_cleared', '✅ تم تنظيف وحذف البطاقات التجريبية ومزامنة التحديث لجميع الأجهزة 🧹'), 'success');
+  showToast(t('toast_demo_cleared', 'Demo tags removed and workspace refreshed! 🧹'), 'success');
 }
 
 // ==========================================

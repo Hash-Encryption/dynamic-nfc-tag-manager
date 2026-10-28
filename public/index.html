@@ -989,6 +989,7 @@
           type="text" 
           id="leadSearchInput" 
           placeholder="Search leads by name, phone, note, or card..." 
+          data-i18n-placeholder="placeholder_search_leads"
           oninput="filterLeadsTable()"
           class="w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl ps-10 pe-4 py-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
@@ -1222,8 +1223,8 @@
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-base">📡</div>
           <div>
-            <h3 class="text-sm font-bold text-white">NFC Chip Programming Guide</h3>
-            <p class="text-[11px] text-zinc-400">Write the permanent URL into the NFC chip once and never touch it again!</p>
+            <h3 class="text-sm font-bold text-white" data-i18n="nfc_guide_title">NFC Chip Programming Guide</h3>
+            <p class="text-[11px] text-zinc-400" data-i18n="nfc_guide_sub">Write the permanent URL into the NFC chip once and never touch it again!</p>
           </div>
         </div>
 
@@ -1350,14 +1351,14 @@
       </div>
 
       <!-- Drawer Sub-tabs -->
-      <div class="px-6 pt-3 flex gap-2 border-b border-zinc-800 overflow-x-auto text-xs font-semibold shrink-0">
-        <button type="button" onclick="switchEditorTab('basic')" id="edTabBtnBasic" class="pb-2 px-2 text-emerald-400 border-b-2 border-emerald-500 whitespace-nowrap">Basic & Mode</button>
-        <button type="button" onclick="switchEditorTab('wifi')" id="edTabBtnWifi" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Smart Wi-Fi 📶</button>
-        <button type="button" onclick="switchEditorTab('sos')" id="edTabBtnSos" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Lost & Found 🆘</button>
-        <button type="button" onclick="switchEditorTab('presets')" id="edTabBtnPresets" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Saved Targets</button>
-        <button type="button" onclick="switchEditorTab('conditional')" id="edTabBtnConditional" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Smart Routing</button>
-        <button type="button" onclick="switchEditorTab('catalog')" id="edTabBtnCatalog" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Menu & Catalog</button>
-        <button type="button" onclick="switchEditorTab('profile')" id="edTabBtnProfile" class="pb-2 px-2 text-zinc-400 whitespace-nowrap">Digital Profile</button>
+      <div class="px-6 pt-3 flex gap-2 border-b border-zinc-800 overflow-x-auto text-xs font-semibold shrink-0 drawer-subtabs scrollbar-none">
+        <button type="button" onclick="switchEditorTab('basic')" id="edTabBtnBasic" class="pb-2 px-2.5 text-emerald-400 border-b-2 border-emerald-500 whitespace-nowrap" data-i18n="ed_tab_basic">Basic & Mode</button>
+        <button type="button" onclick="switchEditorTab('wifi')" id="edTabBtnWifi" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_wifi">Smart Wi-Fi 📶</button>
+        <button type="button" onclick="switchEditorTab('sos')" id="edTabBtnSos" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_sos">Lost & Found 🆘</button>
+        <button type="button" onclick="switchEditorTab('presets')" id="edTabBtnPresets" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_presets">Saved Targets</button>
+        <button type="button" onclick="switchEditorTab('conditional')" id="edTabBtnConditional" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_conditional">Smart Routing</button>
+        <button type="button" onclick="switchEditorTab('catalog')" id="edTabBtnCatalog" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_catalog">Menu & Catalog</button>
+        <button type="button" onclick="switchEditorTab('profile')" id="edTabBtnProfile" class="pb-2 px-2.5 text-zinc-400 whitespace-nowrap" data-i18n="ed_tab_profile">Digital Profile</button>
       </div>
 
       <!-- Drawer Body / Form -->
@@ -1485,12 +1486,12 @@
               <div>
                 <label class="block font-semibold text-zinc-200 mb-1" data-i18n="label_category">المجلد والتصنيف الذكي (Smart Folder)</label>
                 <select id="inpCardCategory" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
-                  <option value="all">📁 عام (General)</option>
-                  <option value="restaurant">🍽️ مطاعم وقوائم طعام (Menu & Food)</option>
-                  <option value="personal">👤 كروت شخصية وvCard (Personal & Business)</option>
-                  <option value="wifi">📶 شبكات واي فاي (Wi-Fi Tags)</option>
-                  <option value="sos">🆘 طوارئ ومفقودات (SOS & Lost Items)</option>
-                  <option value="vip">⭐ VIP & بريميوم (VIP Luxury)</option>
+                  <option value="all" data-i18n="folder_opt_all">📁 عام (General)</option>
+                  <option value="restaurant" data-i18n="folder_opt_restaurant">🍽️ مطاعم وقوائم طعام (Menu & Food)</option>
+                  <option value="personal" data-i18n="folder_opt_personal">👤 كروت شخصية وvCard (Personal & Business)</option>
+                  <option value="wifi" data-i18n="folder_opt_wifi">📶 شبكات واي فاي (Wi-Fi Tags)</option>
+                  <option value="sos" data-i18n="folder_opt_sos">🆘 طوارئ ومفقودات (SOS & Lost Items)</option>
+                  <option value="vip" data-i18n="folder_opt_vip">⭐ VIP & بريميوم (VIP Luxury)</option>
                 </select>
               </div>
 
@@ -1513,8 +1514,8 @@
                     <span data-i18n="label_lead_capture_req">التسجيل إجباري للمتابعة للوجهة (Required)</span>
                   </label>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input type="text" id="inpLeadCaptureTitle" placeholder="العنوان: اترك بياناتك للتواصل" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
-                    <input type="text" id="inpLeadCaptureSubtitle" placeholder="الوصف: سنتواصل معك فوراً" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                    <input type="text" id="inpLeadCaptureTitle" placeholder="العنوان: اترك بياناتك للتواصل" data-i18n-placeholder="placeholder_lead_title" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                    <input type="text" id="inpLeadCaptureSubtitle" placeholder="الوصف: سنتواصل معك فوراً" data-i18n-placeholder="placeholder_lead_sub" class="bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
                   </div>
                 </div>
               </div>
@@ -1531,18 +1532,18 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label class="block text-[10px] text-zinc-400 mb-0.5">الحد الأقصى للمسحات (Max Scans)</label>
-                    <input type="number" id="inpMaxScans" min="0" placeholder="0 = غير محدود" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-xs font-mono">
+                    <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_max_scans">الحد الأقصى للمسحات (Max Scans)</label>
+                    <input type="number" id="inpMaxScans" min="0" placeholder="0 = غير محدود" data-i18n-placeholder="placeholder_max_scans" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-xs font-mono">
                   </div>
                   <div>
-                    <label class="block text-[10px] text-zinc-400 mb-0.5">تاريخ ووقت الانتهاء (Expires At)</label>
+                    <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_expires_at">تاريخ ووقت الانتهاء (Expires At)</label>
                     <input type="datetime-local" id="inpExpiresAt" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-xs">
                   </div>
                 </div>
 
                 <div class="space-y-1.5">
-                  <input type="text" id="inpFallbackUrl" placeholder="رابط بديل بعد الانتهاء: https://example.com/expired" dir="ltr" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono rounded-lg px-2.5 py-1.5 text-[11px] text-start">
-                  <input type="text" id="inpExpiredMessage" placeholder="رسالة مخصصة عند الانتهاء (اختياري)" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
+                  <input type="text" id="inpFallbackUrl" placeholder="رابط بديل بعد الانتهاء: https://example.com/expired" data-i18n-placeholder="placeholder_fallback_url" dir="ltr" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono rounded-lg px-2.5 py-1.5 text-[11px] text-start">
+                  <input type="text" id="inpExpiredMessage" placeholder="رسالة مخصصة عند الانتهاء (اختياري)" data-i18n-placeholder="placeholder_expired_msg" class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg px-2.5 py-1.5 text-[11px]">
                 </div>
               </div>
 
@@ -1559,11 +1560,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_security_pin">رمز فتح الرابط للعميل (PIN)</label>
-                    <input type="password" id="inpPinCode" maxlength="8" placeholder="مثال: 2026" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
+                    <input type="password" id="inpPinCode" maxlength="8" placeholder="مثال: 2026" data-i18n-placeholder="placeholder_pin_code" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
                   </div>
                   <div>
                     <label class="block text-[10px] text-zinc-400 mb-0.5" data-i18n="label_manage_pin">رمز تعديل البطاقة (/c/:slug/edit)</label>
-                    <input type="password" id="inpManagePin" maxlength="8" placeholder="1234" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
+                    <input type="password" id="inpManagePin" maxlength="8" placeholder="1234" data-i18n-placeholder="placeholder_manage_pin" class="w-full bg-zinc-950 border border-zinc-800 text-white font-mono text-center rounded-lg px-2.5 py-1.5 text-xs">
                   </div>
                 </div>
               </div>
@@ -1662,7 +1663,7 @@
               <input type="text" id="inpNewPresetIcon" placeholder="⭐" value="⭐" class="col-span-1 bg-[#050806] border border-zinc-700 text-white rounded-lg px-2 py-2 text-center text-xs">
             </div>
             <input type="text" id="inpNewPresetUrl" placeholder="https://..." dir="ltr" class="w-full bg-[#050806] border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
-            <button type="button" onclick="handleAddPresetItem()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold text-xs transition-all border border-zinc-700">
+            <button type="button" onclick="handleAddPresetItem()" class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold text-xs transition-all border border-zinc-700" data-i18n="btn_add_preset">
               + Add to Quick Presets
             </button>
           </div>
@@ -1728,29 +1729,29 @@
           <p class="text-xs text-zinc-400">Settings for restaurants, cafes, and business hubs:</p>
           
           <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Business Name</label>
-            <input type="text" id="inpCatBusinessName" placeholder="e.g. Ambassador Lounge & Restaurant" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+            <label class="block text-zinc-300 font-semibold mb-1" data-i18n="catalog_biz_name">Business Name</label>
+            <input type="text" id="inpCatBusinessName" placeholder="e.g. Ambassador Lounge & Restaurant" data-i18n-placeholder="catalog_biz_name_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Tagline / Category</label>
-            <input type="text" id="inpCatTagline" placeholder="e.g. Gourmet Dining & Specialty Coffee" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+            <label class="block text-zinc-300 font-semibold mb-1" data-i18n="catalog_tagline">Tagline / Category</label>
+            <input type="text" id="inpCatTagline" placeholder="e.g. Gourmet Dining & Specialty Coffee" data-i18n-placeholder="catalog_tagline_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Wi-Fi Network Name (SSID)</label>
-              <input type="text" id="inpCatWifiSsid" placeholder="e.g. Guest_WiFi" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="catalog_wifi_ssid">Wi-Fi Network Name (SSID)</label>
+              <input type="text" id="inpCatWifiSsid" placeholder="e.g. Guest_WiFi" data-i18n-placeholder="catalog_wifi_ssid_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Wi-Fi Password</label>
-              <input type="text" id="inpCatWifiPass" placeholder="Network password (optional)" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="catalog_wifi_pass">Wi-Fi Password</label>
+              <input type="text" id="inpCatWifiPass" placeholder="Network password (optional)" data-i18n-placeholder="catalog_wifi_pass_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
           </div>
 
           <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Google Maps 5-Star Review URL</label>
-            <input type="url" id="inpCatGoogleReview" placeholder="https://maps.google.com/..." dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+            <label class="block text-zinc-300 font-semibold mb-1" data-i18n="catalog_google_review">Google Maps 5-Star Review URL</label>
+            <input type="url" id="inpCatGoogleReview" placeholder="https://maps.google.com/..." data-i18n-placeholder="catalog_google_review_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
           </div>
         </div>
 
@@ -1760,39 +1761,39 @@
           
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Full Name</label>
-              <input type="text" id="inpProfFullName" placeholder="e.g. Alex Morgan" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_fullname">Full Name</label>
+              <input type="text" id="inpProfFullName" placeholder="e.g. Alex Morgan" data-i18n-placeholder="profile_fullname_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Job Title</label>
-              <input type="text" id="inpProfJobTitle" placeholder="e.g. Chief Executive Officer" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_job">Job Title</label>
+              <input type="text" id="inpProfJobTitle" placeholder="e.g. Chief Executive Officer" data-i18n-placeholder="profile_job_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Company / Organization</label>
-              <input type="text" id="inpProfCompany" placeholder="e.g. MUHAB Technologies" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_company">Company / Organization</label>
+              <input type="text" id="inpProfCompany" placeholder="e.g. MUHAB Technologies" data-i18n-placeholder="profile_company_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs">
             </div>
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Avatar Image URL</label>
-              <input type="url" id="inpProfAvatar" placeholder="https://..." dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_avatar">Avatar Image URL</label>
+              <input type="url" id="inpProfAvatar" placeholder="https://..." data-i18n-placeholder="profile_avatar_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
 
           <div>
-            <label class="block text-zinc-300 font-semibold mb-1">Bio / Summary</label>
-            <textarea id="inpProfBio" rows="2" placeholder="Brief professional biography..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs"></textarea>
+            <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_bio">Bio / Summary</label>
+            <textarea id="inpProfBio" rows="2" placeholder="Brief professional biography..." data-i18n-placeholder="profile_bio_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg px-3 py-2 text-xs"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">Phone Number (vCard)</label>
-              <input type="tel" id="inpProfPhone" placeholder="+1234567890" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_vcard_phone">Phone Number (vCard)</label>
+              <input type="tel" id="inpProfPhone" placeholder="+1234567890" data-i18n-placeholder="profile_vcard_phone_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
             <div>
-              <label class="block text-zinc-300 font-semibold mb-1">WhatsApp Number</label>
-              <input type="tel" id="inpProfWhatsapp" placeholder="+1234567890" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
+              <label class="block text-zinc-300 font-semibold mb-1" data-i18n="profile_whatsapp">WhatsApp Number</label>
+              <input type="tel" id="inpProfWhatsapp" placeholder="+1234567890" data-i18n-placeholder="profile_whatsapp_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-lg px-3 py-2 text-xs text-start">
             </div>
           </div>
         </div>
@@ -1822,31 +1823,31 @@
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-base font-black text-white flex items-center gap-1.5">
-            <span>🪄 Smart Link Generator (TapLink)</span>
+            <span data-i18n="linkgen_title">🪄 Smart Link Generator (TapLink)</span>
           </h3>
-          <p class="text-xs text-zinc-400">Generate high-converting links with 1-click</p>
+          <p class="text-xs text-zinc-400" data-i18n="linkgen_subtitle">Generate high-converting links with 1-click</p>
         </div>
         <button onclick="closeSmartLinkGenModal()" class="w-7 h-7 rounded-full bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-xs">✕</button>
       </div>
 
       <!-- Gen Tabs -->
       <div class="flex gap-2 border-b border-zinc-800 pb-2 text-xs font-bold">
-        <button type="button" onclick="switchGenTab('wa')" id="genTabBtnWa" class="px-2.5 py-1 text-emerald-400 border-b-2 border-emerald-500">WhatsApp 💬</button>
-        <button type="button" onclick="switchGenTab('maps')" id="genTabBtnMaps" class="px-2.5 py-1 text-zinc-400">Google Review ⭐</button>
-        <button type="button" onclick="switchGenTab('phone')" id="genTabBtnPhone" class="px-2.5 py-1 text-zinc-400">Call / Email 📞</button>
+        <button type="button" onclick="switchGenTab('wa')" id="genTabBtnWa" class="px-2.5 py-1 text-emerald-400 border-b-2 border-emerald-500" data-i18n="linkgen_tab_wa">WhatsApp 💬</button>
+        <button type="button" onclick="switchGenTab('maps')" id="genTabBtnMaps" class="px-2.5 py-1 text-zinc-400" data-i18n="linkgen_tab_maps">Google Review ⭐</button>
+        <button type="button" onclick="switchGenTab('phone')" id="genTabBtnPhone" class="px-2.5 py-1 text-zinc-400" data-i18n="linkgen_tab_phone">Call / Email 📞</button>
       </div>
 
       <!-- Gen Tab 1: WhatsApp -->
       <div id="genTabWa" class="space-y-3">
         <div>
-          <label class="block text-zinc-300 font-semibold mb-1">Phone Number (with Country Code)</label>
-          <input type="tel" id="genWaPhone" placeholder="+1234567890 or 0501234567" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
+          <label class="block text-zinc-300 font-semibold mb-1" data-i18n="linkgen_wa_phone">Phone Number (with Country Code)</label>
+          <input type="tel" id="genWaPhone" placeholder="+1234567890 or 0501234567" data-i18n-placeholder="linkgen_wa_phone_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
         </div>
         <div>
-          <label class="block text-zinc-300 font-semibold mb-1">Pre-filled Welcome Message</label>
-          <input type="text" id="genWaMsg" placeholder="Hello, I would like to inquire about your services..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          <label class="block text-zinc-300 font-semibold mb-1" data-i18n="linkgen_wa_msg">Pre-filled Welcome Message</label>
+          <input type="text" id="genWaMsg" placeholder="Hello, I would like to inquire about your services..." data-i18n-placeholder="linkgen_wa_msg_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
-        <button type="button" onclick="applyGeneratedLink('wa')" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">
+        <button type="button" onclick="applyGeneratedLink('wa')" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30" data-i18n="linkgen_apply_wa">
           Apply WhatsApp Link ✓
         </button>
       </div>
@@ -1854,10 +1855,10 @@
       <!-- Gen Tab 2: Google Maps Review -->
       <div id="genTabMaps" class="hidden space-y-3">
         <div>
-          <label class="block text-zinc-300 font-semibold mb-1">Business Name or Google Maps Place Link</label>
-          <input type="text" id="genMapsQuery" placeholder="e.g. Ambassador Lounge Riyadh or Google Maps link" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
+          <label class="block text-zinc-300 font-semibold mb-1" data-i18n="linkgen_maps_query">Business Name or Google Maps Place Link</label>
+          <input type="text" id="genMapsQuery" placeholder="e.g. Ambassador Lounge Riyadh or Google Maps link" data-i18n-placeholder="linkgen_maps_query_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
-        <button type="button" onclick="applyGeneratedLink('maps')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30">
+        <button type="button" onclick="applyGeneratedLink('maps')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/30" data-i18n="linkgen_apply_maps">
           Apply Google Review Link ⭐
         </button>
       </div>
@@ -1865,10 +1866,10 @@
       <!-- Gen Tab 3: Phone / Mail -->
       <div id="genTabPhone" class="hidden space-y-3">
         <div>
-          <label class="block text-zinc-300 font-semibold mb-1">Direct Phone Number</label>
-          <input type="tel" id="genCallNumber" placeholder="+1234567890" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
+          <label class="block text-zinc-300 font-semibold mb-1" data-i18n="linkgen_direct_phone">Direct Phone Number</label>
+          <input type="tel" id="genCallNumber" placeholder="+1234567890" data-i18n-placeholder="linkgen_direct_phone_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3 py-2 text-xs text-start focus:ring-2 focus:ring-emerald-500">
         </div>
-        <button type="button" onclick="applyGeneratedLink('tel')" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 hover:border-emerald-500/40 text-white font-bold rounded-xl text-xs border border-zinc-700">
+        <button type="button" onclick="applyGeneratedLink('tel')" class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 hover:border-emerald-500/40 text-white font-bold rounded-xl text-xs border border-zinc-700" data-i18n="linkgen_apply_tel">
           Apply Direct Call Link 📞
         </button>
       </div>
@@ -2092,14 +2093,14 @@
           dir="ltr"
           class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500 text-start"
         >
-        <p class="text-[10px] text-zinc-500">All selected chips will redirect instantly to this new URL upon the next tap.</p>
+        <p class="text-[10px] text-zinc-500" data-i18n="bulk_desc_hint">All selected chips will redirect instantly to this new URL upon the next tap.</p>
       </div>
 
       <div class="flex items-center gap-2 pt-2">
-        <button onclick="executeBulkUrlSave()" class="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-md shadow-emerald-600/30">
+        <button onclick="executeBulkUrlSave()" class="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-md shadow-emerald-600/30" data-i18n="bulk_apply_btn">
           Apply to All Selected ✓
         </button>
-        <button onclick="closeBulkUrlModal()" class="px-4 py-2.5 bg-zinc-900 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800">
+        <button onclick="closeBulkUrlModal()" class="px-4 py-2.5 bg-zinc-900 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800" data-i18n="bulk_cancel_btn">
           Cancel
         </button>
       </div>
@@ -2117,31 +2118,31 @@
         <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl border border-emerald-500/30">
           📥
         </div>
-        <h3 id="lcVisitorTitle" class="text-base font-black text-white">اترك بياناتك للتواصل</h3>
-        <p id="lcVisitorSubtitle" class="text-xs text-zinc-400">سجل بياناتك للتواصل معك وتقديم أفضل خدمة</p>
+        <h3 id="lcVisitorTitle" class="text-base font-black text-white" data-i18n="lc_visitor_title">اترك بياناتك للتواصل</h3>
+        <p id="lcVisitorSubtitle" class="text-xs text-zinc-400" data-i18n="lc_visitor_subtitle">سجل بياناتك للتواصل معك وتقديم أفضل خدمة</p>
       </div>
 
       <form id="formVisitorLeadCapture" onsubmit="submitVisitorLeadCapture(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_name">الاسم الكامل *</label>
-          <input type="text" id="inpVisitorName" required placeholder="مثال: محمد عبدالله" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
+          <input type="text" id="inpVisitorName" required placeholder="مثال: محمد عبدالله" data-i18n-placeholder="lc_name_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_phone">رقم الجوال (واتساب) *</label>
-          <input type="tel" id="inpVisitorPhone" required placeholder="+966500000000" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 text-xs text-start focus:ring-2 focus:ring-emerald-500">
+          <input type="tel" id="inpVisitorPhone" required placeholder="+966500000000" data-i18n-placeholder="lc_phone_placeholder" dir="ltr" class="w-full bg-zinc-900 border border-zinc-700 text-white font-mono rounded-xl px-3.5 py-2.5 text-xs text-start focus:ring-2 focus:ring-emerald-500">
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-zinc-300 mb-1" data-i18n="lc_note">ملاحظة أو استفسار (اختياري)</label>
-          <input type="text" id="inpVisitorNote" placeholder="مهتم بالخدمة / موعد / استفسار..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
+          <input type="text" id="inpVisitorNote" placeholder="مهتم بالخدمة / موعد / استفسار..." data-i18n-placeholder="lc_note_placeholder" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500">
         </div>
 
         <div class="pt-2 flex items-center gap-2">
-          <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-lg shadow-emerald-600/30">
+          <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl text-xs active:scale-95 transition-all shadow-lg shadow-emerald-600/30" data-i18n="lc_btn_submit">
             إرسال ومتابعة 🚀
           </button>
-          <button type="button" id="btnSkipLeadCapture" onclick="skipVisitorLeadCapture()" class="px-4 py-3 bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800">
+          <button type="button" id="btnSkipLeadCapture" onclick="skipVisitorLeadCapture()" class="px-4 py-3 bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-white rounded-xl text-xs font-bold border border-zinc-800" data-i18n="lc_btn_skip">
             تخطي
           </button>
         </div>
