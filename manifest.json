@@ -12,10 +12,16 @@
   "lang": "ar",
   "icons": [
     {
+      "src": "./logo.webp",
+      "sizes": "2752x1536",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
       "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

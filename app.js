@@ -2492,10 +2492,10 @@ function renderLeadsList(listToRender) {
             <span>💬</span>
             <span>WhatsApp</span>
           </a>
-          <button onclick="downloadSingleLeadVcfHandler('${lead.id}')" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-300 hover:text-white rounded-xl text-xs font-bold border border-zinc-700 active:scale-95 transition-all" title="Download .vcf contact">
+          <button onclick="downloadSingleLeadVcfHandler('${escapeHtml(lead.id)}')" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-850 text-zinc-300 hover:text-white rounded-xl text-xs font-bold border border-zinc-700 active:scale-95 transition-all" title="Download .vcf contact">
             <span>📇</span>
           </button>
-          <button onclick="deleteSingleLeadHandler('${lead.id}')" class="px-2 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all" title="Delete Lead">
+          <button onclick="deleteSingleLeadHandler('${escapeHtml(lead.id)}')" class="px-2 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl text-xs font-bold border border-rose-500/20 active:scale-95 transition-all" title="Delete Lead">
             <span>🗑️</span>
           </button>
         </div>
@@ -2521,14 +2521,14 @@ function filterLeadsTable() {
 }
 
 function generateVcfString(name, phone, note) {
-  return [
+  return '\uFEFF' + [
     'BEGIN:VCARD',
     'VERSION:3.0',
     `FN;CHARSET=UTF-8:${name}`,
     `TEL;TYPE=CELL:${phone}`,
     note ? `NOTE;CHARSET=UTF-8:${note}` : '',
     'END:VCARD'
-  ].filter(Boolean).join('\r\n');
+  ].filter(Boolean).join('\r\n') + '\r\n';
 }
 
 function downloadSingleLeadVcfHandler(leadId) {

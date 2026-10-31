@@ -8,7 +8,24 @@
   <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:;">
+
+  <!-- Favicon & Touch Icons in WebP -->
+  <link rel="icon" type="image/webp" href="./logo.webp">
+  <link rel="apple-touch-icon" href="./logo.webp">
+  <link rel="shortcut icon" href="./logo.webp">
+
+  <!-- Open Graph & Twitter Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TapLink • by MUHAB">
+  <meta property="og:title" content="Tag Currently Paused | TapLink">
+  <meta property="og:description" content="This NFC link has been temporarily paused by its owner.">
+  <meta property="og:image" content="./logo.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="670">
+  <meta property="og:image:alt" content="TapLink by MUHAB Logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="./logo.webp">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,32 +53,42 @@
     <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-orange-600/15 rounded-full blur-3xl"></div>
   </div>
 
-  <main class="w-full max-w-md bg-zinc-950/85 border border-zinc-800 backdrop-blur-xl p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
+  <main class="w-full max-w-md bg-zinc-950/85 border border-zinc-800 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl text-center relative overflow-hidden">
     
-    <!-- Top Bar with Language Toggle -->
-    <div class="flex items-center justify-between mb-4">
-      <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold" id="inactiveStatusBadge">
-        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span>Tag Status: Inactive</span>
-      </span>
+    <!-- Top Bar with Logo & Language Toggle -->
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-2">
+        <img 
+          src="./logo.webp" 
+          alt="TapLink by MUHAB Logo" 
+          width="36" 
+          height="36" 
+          class="w-9 h-9 rounded-xl object-contain border border-amber-500/30 p-0.5 bg-[#050706]"
+          loading="eager"
+        >
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-[11px] font-semibold" id="inactiveStatusBadge">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Tag Status: Inactive</span>
+        </span>
+      </div>
       <button id="btnInactiveLang" class="px-2.5 py-1 rounded-full bg-zinc-900 border border-amber-500/20 text-amber-400 hover:text-white text-xs font-bold transition-all flex items-center gap-1 active:scale-95" title="Switch Language">
         <span id="inactiveLangText">عربي</span>
       </button>
     </div>
 
     <!-- Pause / Inactive Icon -->
-    <div class="relative w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-      <div class="absolute inset-0 bg-amber-500/20 rounded-full nfc-wave-1"></div>
-      <div class="relative w-16 h-16 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-        <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+      <div class="absolute inset-0 bg-amber-500/20 rounded-full animate-pulse"></div>
+      <div class="relative w-14 h-14 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+        <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
       </div>
     </div>
 
-    <h1 class="text-2xl font-bold mb-3 text-white" id="inactiveHeading">This NFC Tag is Currently Paused</h1>
+    <h1 class="text-xl sm:text-2xl font-bold mb-2 text-white" id="inactiveHeading">This NFC Tag is Currently Paused</h1>
     
-    <p class="text-zinc-400 text-sm leading-relaxed mb-6" id="inactiveDesc">
+    <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6" id="inactiveDesc">
       This link has been temporarily disabled by its owner. Redirection is currently unavailable.
     </p>
 
@@ -71,6 +98,15 @@
         <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         <span id="inactiveBtnRetry">إعادة المحاولة والتحديث • Retry</span>
       </button>
+    </div>
+
+    <!-- Owner Management Section (Fixed Missing Elements) -->
+    <div class="mt-6 pt-5 border-t border-zinc-800/80 text-start space-y-2">
+      <p class="text-xs font-bold text-zinc-300" id="inactiveOwnerQ">هل أنت صاحب هذه البطاقة؟</p>
+      <p class="text-[11px] text-zinc-400 leading-relaxed" id="inactiveOwnerHint">يمكنك إعادة تفعيل البطاقة فوراً من لوحة التحكم بالضغط على زر "تفعيل".</p>
+      <a href="./login.html" id="inactiveBtnLogin" class="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 font-bold text-xs rounded-xl border border-emerald-500/30 transition-all">
+        تسجيل الدخول للوحة التحكم
+      </a>
     </div>
 
     <p class="text-[11px] text-zinc-500 mt-6">
@@ -91,13 +127,21 @@
       if (langBtnText) langBtnText.textContent = isAr ? 'EN' : 'عربي';
 
       document.title = isAr ? 'البطاقة متوقفة حالياً | TapLink' : 'Tag Currently Paused | TapLink - MUHAB';
-      document.getElementById('inactiveHeading').textContent = isAr ? 'هذه البطاقة متوقفة حالياً' : 'This NFC Tag is Currently Paused';
-      document.getElementById('inactiveDesc').textContent = isAr ? 'تم إيقاف تفعيل هذا الرابط مؤقتاً من قبل صاحب البطاقة. لا يمكن تحويلك أو عرض البيانات في الوقت الحالي.' : 'This link has been temporarily disabled by its owner. Redirection is currently unavailable.';
-      document.getElementById('inactiveOwnerQ').textContent = isAr ? 'هل أنت صاحب هذه البطاقة؟' : 'Are you the owner of this card?';
-      document.getElementById('inactiveOwnerHint').textContent = isAr ? 'يمكنك إعادة تفعيل البطاقة فوراً من لوحة التحكم بالضغط على زر "تفعيل".' : 'You can reactivate this card anytime from the admin dashboard by clicking "Activate".';
-      document.getElementById('inactiveBtnRetry').textContent = isAr ? 'إعادة المحاولة والتحديث' : 'Retry & Refresh';
-      document.getElementById('inactiveBtnLogin').textContent = isAr ? 'تسجيل الدخول للوحة التحكم' : 'Login to Admin Dashboard';
-      document.getElementById('inactiveStatusBadge').querySelector('span:last-child').textContent = isAr ? 'حالة الشريحة: غير نشطة' : 'Tag Status: Inactive';
+      
+      const setEl = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      };
+
+      setEl('inactiveHeading', isAr ? 'هذه البطاقة متوقفة حالياً' : 'This NFC Tag is Currently Paused');
+      setEl('inactiveDesc', isAr ? 'تم إيقاف تفعيل هذا الرابط مؤقتاً من قبل صاحب البطاقة. لا يمكن تحويلك أو عرض البيانات في الوقت الحالي.' : 'This link has been temporarily disabled by its owner. Redirection is currently unavailable.');
+      setEl('inactiveOwnerQ', isAr ? 'هل أنت صاحب هذه البطاقة؟' : 'Are you the owner of this card?');
+      setEl('inactiveOwnerHint', isAr ? 'يمكنك إعادة تفعيل البطاقة فوراً من لوحة التحكم بالضغط على زر "تفعيل".' : 'You can reactivate this card anytime from the admin dashboard by clicking "Activate".');
+      setEl('inactiveBtnRetry', isAr ? 'إعادة المحاولة والتحديث' : 'Retry & Refresh');
+      setEl('inactiveBtnLogin', isAr ? 'تسجيل الدخول للوحة التحكم' : 'Login to Admin Dashboard');
+
+      const badge = document.getElementById('inactiveStatusBadge')?.querySelector('span:last-child');
+      if (badge) badge.textContent = isAr ? 'حالة الشريحة: غير نشطة' : 'Tag Status: Inactive';
     }
 
     document.getElementById('btnInactiveLang')?.addEventListener('click', () => {

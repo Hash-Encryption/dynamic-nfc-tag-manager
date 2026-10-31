@@ -474,7 +474,12 @@ const I18N = {
       share_gps_wa: "Send My GPS Location via WhatsApp",
       bulk_apply_btn: "Apply to All Selected ✓",
       bulk_cancel_btn: "Cancel",
-      bulk_desc_hint: "All selected chips will redirect instantly to this new URL upon the next tap."
+      bulk_desc_hint: "All selected chips will redirect instantly to this new URL upon the next tap.",
+      footer_ecosystem_sub: "Dynamic NFC Tag Ecosystem & Instant Smart Routing",
+      footer_encrypted: "256-bit Encrypted",
+      footer_speed: "⚡ Sub-10ms Instant Redirect",
+      footer_zerotrust: "🔒 Zero-Trust Security Architecture",
+      footer_copyright: "TapLink Smart NFC Ecosystem © 2026 • Engineered & Owned by MUHAB Corporation"
     },
 
     ar: {
@@ -942,7 +947,12 @@ const I18N = {
       share_gps_wa: "إرسال موقعي الجغرافي عبر واتساب",
       bulk_apply_btn: "تطبيق على جميع البطاقات المحددة ✓",
       bulk_cancel_btn: "إلغاء",
-      bulk_desc_hint: "ستتحول كافة البطاقات المحددة فوراً إلى هذا الرابط الجديد عند أول مسحة قادمة."
+      bulk_desc_hint: "ستتحول كافة البطاقات المحددة فوراً إلى هذا الرابط الجديد عند أول مسحة قادمة.",
+      footer_ecosystem_sub: "منظومة بطاقات الـ NFC الذكية والتحويل الديناميكي الفوري للروابط",
+      footer_encrypted: "تشفير آمن 256-bit",
+      footer_speed: "⚡ تحويل فوري فائق السرعة بأقل من 10ms",
+      footer_zerotrust: "🔒 نظام حماية Zero-Trust متقدم",
+      footer_copyright: "جميع الحقوق محفوظة © 2026 • منظومة TapLink الذكية • تطوير وتملك شركة MUHAB"
     }
   },
 

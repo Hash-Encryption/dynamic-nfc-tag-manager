@@ -16,24 +16,76 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(SESSION_SECRET));
 
-// Zero-Trust Security Headers Middleware
+// Enforce HTTPS in Production environments behind SSL/TLS proxies
+app.use((req, res, next) => {
+  const isHttps = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  if (!isHttps && process.env.NODE_ENV === 'production') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
+// Zero-Trust Security Headers Middleware (A+ Security Hardening)
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;");
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:;"
+  );
   next();
 });
 
-// Anti-Spam Rate Limiter for NFC Scans (10s throttle per IP per slug)
-const scanRateLimit = new Map();
+// --- In-Memory Zero-Trust Rate Limiters ---
+const scanRateLimit = new Map();       // Key: IP_slug -> timestamp
+const loginAttempts = new Map();       // Key: IP -> { count, firstAttempt, lockedUntil }
+const pinAttempts = new Map();         // Key: IP_slug -> { count, firstAttempt, lockedUntil }
+const leadSubmissions = new Map();     // Key: IP -> timestamps[]
+
+// Periodic garbage collection for rate limiters (Every 5 minutes)
 setInterval(() => {
   const now = Date.now();
   for (const [key, timestamp] of scanRateLimit.entries()) {
     if (now - timestamp > 60000) scanRateLimit.delete(key);
   }
-}, 10 * 60 * 1000);
+  for (const [key, rec] of loginAttempts.entries()) {
+    if (rec.lockedUntil && now > rec.lockedUntil + 15 * 60 * 1000) loginAttempts.delete(key);
+    else if (!rec.lockedUntil && now - rec.firstAttempt > 15 * 60 * 1000) loginAttempts.delete(key);
+  }
+  for (const [key, rec] of pinAttempts.entries()) {
+    if (rec.lockedUntil && now > rec.lockedUntil + 10 * 60 * 1000) pinAttempts.delete(key);
+    else if (!rec.lockedUntil && now - rec.firstAttempt > 10 * 60 * 1000) pinAttempts.delete(key);
+  }
+  for (const [key, times] of leadSubmissions.entries()) {
+    const active = times.filter(t => now - t < 10 * 60 * 1000);
+    if (active.length === 0) leadSubmissions.delete(key);
+    else leadSubmissions.set(key, active);
+  }
+}, 5 * 60 * 1000);
+
+// CSRF Origin & Referer Shield Middleware for Mutation Requests
+function csrfShield(req, res, next) {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  const origin = req.headers.origin || req.headers.referer;
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      const host = req.headers.host;
+      if (originHost && host && originHost !== host) {
+        console.warn(`[Security Alert] CSRF Blocked: origin ${originHost} does not match host ${host}`);
+        return res.status(403).json({ success: false, error: 'Cross-Origin Request Blocked (CSRF Shield)' });
+      }
+    } catch (e) {
+      return res.status(403).json({ success: false, error: 'Malformed Origin Header' });
+    }
+  }
+  next();
+}
+app.use('/api', csrfShield);
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -111,8 +163,16 @@ function verifyAuthToken(token) {
     const raw = Buffer.from(token, 'base64').toString('utf8');
     const [user, time, signature] = raw.split(':');
     if (user !== 'admin') return false;
+
+    // Check expiration: 7 days max validity
+    const tokenTime = parseInt(time, 10);
+    if (isNaN(tokenTime) || Date.now() - tokenTime > 7 * 24 * 60 * 60 * 1000) {
+      return false;
+    }
+
     const expectedSig = crypto.createHmac('sha256', SESSION_SECRET).update(`${user}:${time}`).digest('hex');
-    return signature === expectedSig;
+    if (!signature || signature.length !== expectedSig.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig));
   } catch (e) {
     return false;
   }
@@ -700,10 +760,23 @@ app.get(['/c/:slug/edit', '/go/:slug/edit'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'edit.html'));
 });
 
-// Verify Management PIN for a specific card
+// Verify Management PIN for a specific card with Anti-Brute-Force Shield
 app.post(['/api/cards/:slug/quick-edit-auth'], (req, res) => {
   const { slug } = req.params;
   const { pin } = req.body;
+  const clientIp = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').split(',')[0].trim();
+  const pinKey = `${clientIp}_${slug}`;
+  const now = Date.now();
+  const rec = pinAttempts.get(pinKey) || { count: 0, firstAttempt: now, lockedUntil: 0 };
+
+  if (rec.lockedUntil && now < rec.lockedUntil) {
+    const waitMin = Math.ceil((rec.lockedUntil - now) / 60000);
+    return res.status(429).json({
+      success: false,
+      error: `تم إيقاف محاولات إدخال الرمز مؤقتاً لحماية البطاقة. يرجى الانتظار ${waitMin} دقيقة.`
+    });
+  }
+
   const card = db.getCardBySlug(slug);
   if (!card) {
     return res.status(404).json({ success: false, error: 'البطاقة غير موجودة / Card not found' });
@@ -711,8 +784,25 @@ app.post(['/api/cards/:slug/quick-edit-auth'], (req, res) => {
 
   const isValid = db.verifyManagePin(slug, pin);
   if (!isValid) {
-    return res.status(401).json({ success: false, error: 'رمز PIN الخاص بإدارة هذه البطاقة غير صحيح / Invalid Card PIN' });
+    rec.count += 1;
+    if (rec.count >= 5) {
+      rec.lockedUntil = now + 10 * 60 * 1000;
+      pinAttempts.set(pinKey, rec);
+      return res.status(429).json({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للمحاولات (5 محاولات). تم قفل البطاقة لمدة 10 دقائق لحمايتها.'
+      });
+    }
+    pinAttempts.set(pinKey, rec);
+    const left = 5 - rec.count;
+    return res.status(401).json({
+      success: false,
+      error: `رمز PIN الخاص بإدارة هذه البطاقة غير صحيح. يتبقى لديك ${left} محاولة.`
+    });
   }
+
+  // Clear lockout on success
+  pinAttempts.delete(pinKey);
 
   res.json({
     success: true,
@@ -728,10 +818,23 @@ app.post(['/api/cards/:slug/quick-edit-auth'], (req, res) => {
   });
 });
 
-// Update Destination URL using Card Management PIN
+// Update Destination URL using Card Management PIN with Anti-Brute-Force Shield
 app.post(['/api/cards/:slug/quick-edit-update'], (req, res) => {
   const { slug } = req.params;
   const { pin, destinationUrl } = req.body;
+  const clientIp = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').split(',')[0].trim();
+  const pinKey = `${clientIp}_${slug}`;
+  const now = Date.now();
+  const rec = pinAttempts.get(pinKey) || { count: 0, firstAttempt: now, lockedUntil: 0 };
+
+  if (rec.lockedUntil && now < rec.lockedUntil) {
+    const waitMin = Math.ceil((rec.lockedUntil - now) / 60000);
+    return res.status(429).json({
+      success: false,
+      error: `تم إيقاف محاولات إدخال الرمز مؤقتاً لحماية البطاقة. يرجى الانتظار ${waitMin} دقيقة.`
+    });
+  }
+
   const card = db.getCardBySlug(slug);
   if (!card) {
     return res.status(404).json({ success: false, error: 'البطاقة غير موجودة / Card not found' });
@@ -739,6 +842,7 @@ app.post(['/api/cards/:slug/quick-edit-update'], (req, res) => {
 
   try {
     const updated = db.updateDestinationByManagePin(slug, pin, destinationUrl);
+    pinAttempts.delete(pinKey);
     res.json({
       success: true,
       message: 'تم تحديث رابط البطاقة فوراً / Card destination updated successfully',
@@ -751,6 +855,16 @@ app.post(['/api/cards/:slug/quick-edit-update'], (req, res) => {
       }
     });
   } catch (err) {
+    rec.count += 1;
+    if (rec.count >= 5) {
+      rec.lockedUntil = now + 10 * 60 * 1000;
+      pinAttempts.set(pinKey, rec);
+      return res.status(429).json({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للمحاولات الخاطئة. تم قفل التعديل لمدة 10 دقائق.'
+      });
+    }
+    pinAttempts.set(pinKey, rec);
     res.status(400).json({ success: false, error: err.message });
   }
 });
@@ -819,20 +933,50 @@ app.get('/api/public/card/:slug', (req, res) => {
 // ==========================================
 app.post('/api/auth/login', (req, res) => {
   const { password } = req.body;
+  const clientIp = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').split(',')[0].trim();
+  const now = Date.now();
+  const rec = loginAttempts.get(clientIp) || { count: 0, firstAttempt: now, lockedUntil: 0 };
+
+  if (rec.lockedUntil && now < rec.lockedUntil) {
+    const remainingMin = Math.ceil((rec.lockedUntil - now) / 60000);
+    return res.status(429).json({
+      success: false,
+      error: `تم حظر المحاولات مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى الانتظار ${remainingMin} دقيقة.`
+    });
+  }
+
   if (!password) {
     return res.status(400).json({ success: false, error: 'كلمة المرور مطلوبة' });
   }
 
   const isValid = db.verifyAdmin(password);
   if (!isValid) {
-    return res.status(401).json({ success: false, error: 'كلمة المرور غير صحيحة' });
+    rec.count += 1;
+    if (rec.count >= 5) {
+      rec.lockedUntil = now + 15 * 60 * 1000;
+      loginAttempts.set(clientIp, rec);
+      return res.status(429).json({
+        success: false,
+        error: 'تم تجاوز الحد الأقصى للمحاولات (5 محاولات). تم إيقاف الدخول لمدة 15 دقيقة لحماية اللوحة.'
+      });
+    }
+    loginAttempts.set(clientIp, rec);
+    const left = 5 - rec.count;
+    return res.status(401).json({
+      success: false,
+      error: `كلمة المرور غير صحيحة. يتبقى لديك ${left} محاولات.`
+    });
   }
+
+  // Clear failed attempts on successful login
+  loginAttempts.delete(clientIp);
 
   const token = createAuthToken();
   res.cookie('admin_session', token, {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: 'lax'
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production'
   });
 
   res.json({
@@ -1026,15 +1170,37 @@ app.post('/api/backup/import', requireAuth, (req, res) => {
 });
 
 // --- Leads CRM API Endpoints ---
-app.get('/api/leads', (req, res) => {
+// Protected: Only authenticated administrators can view visitor leads data
+app.get('/api/leads', requireAuth, (req, res) => {
   const leads = db.getAllLeads();
   res.json({ success: true, count: leads.length, leads });
 });
 
+// Public Lead Capture Submission (Protected with Anti-Spam Rate Limiting)
 app.post('/api/leads', (req, res) => {
+  const clientIp = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1').split(',')[0].trim();
+  const now = Date.now();
+  const times = (leadSubmissions.get(clientIp) || []).filter(t => now - t < 10 * 60 * 1000);
+
+  if (times.length >= 10) {
+    return res.status(429).json({
+      success: false,
+      error: 'تم تجاوز الحد الأقصى لإرسال البيانات. يرجى الانتظار بضع دقائق.'
+    });
+  }
+
+  times.push(now);
+  leadSubmissions.set(clientIp, times);
+
   try {
     const lead = db.addLead(req.body);
-    res.cookie(`lead_${req.body.cardSlug || 'tag'}`, '1', { maxAge: 24 * 60 * 60 * 1000, httpOnly: false });
+    const slugCookie = String(req.body.cardSlug || 'tag').replace(/[^a-zA-Z0-9-_]/g, '');
+    res.cookie(`lead_${slugCookie}`, '1', {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
+    });
     res.json({ success: true, lead });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });

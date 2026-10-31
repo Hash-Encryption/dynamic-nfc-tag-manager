@@ -8,7 +8,24 @@
   <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:;">
+
+  <!-- Favicon & Touch Icons in WebP -->
+  <link rel="icon" type="image/webp" href="./logo.webp">
+  <link rel="apple-touch-icon" href="./logo.webp">
+  <link rel="shortcut icon" href="./logo.webp">
+
+  <!-- Open Graph & Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TapLink • by MUHAB">
+  <meta property="og:title" content="Quick Tag Editor • TapLink">
+  <meta property="og:description" content="Instant NFC tag redirect management portal.">
+  <meta property="og:image" content="./logo.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="670">
+  <meta property="og:image:alt" content="TapLink by MUHAB Logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="./logo.webp">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,9 +65,14 @@
   <!-- Header & Language Switcher -->
   <header class="w-full max-w-md flex items-center justify-between mb-4 px-2">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-black font-extrabold text-sm shadow-md shadow-emerald-500/20">
-        ⚡
-      </div>
+      <img 
+        src="./logo.webp" 
+        alt="TapLink by MUHAB Logo" 
+        width="36" 
+        height="36" 
+        class="w-9 h-9 rounded-xl object-contain border border-emerald-500/30 p-0.5 bg-[#050706] shadow-md shadow-emerald-500/20"
+        loading="eager"
+      >
       <div>
         <h1 class="text-sm font-bold text-white tracking-tight">TapLink <span class="text-emerald-400 font-mono text-xs">• Quick Edit</span></h1>
         <p class="text-[10px] text-zinc-400" id="headerSubtitle">Card Destination Manager</p>
@@ -456,20 +478,32 @@
           loadEditor(data.card);
           return;
         } else {
-          throw new Error(data.error || 'Invalid PIN');
-        }
-      } catch (err) {
-        // Fallback for offline/static hosting
-        if (pin === '1234') {
-          verifiedPin = pin;
-          playChime(true);
-          loadEditor({
-            title: 'Google 5-Star Reviews Card',
-            slug: currentSlug,
-            destinationUrl: 'https://maps.google.com'
-          });
+          // Explicit error from server (wrong PIN or 429 lockout)
+          playChime(false);
+          if (navigator.vibrate) navigator.vibrate([80, 50, 80]);
+          const box = document.getElementById('pinGateSection');
+          box.classList.remove('shake-anim');
+          void box.offsetWidth;
+          box.classList.add('shake-anim');
+          errEl.textContent = data.error || (i18n[currentLang]?.pinErr || 'Incorrect PIN code');
+          errEl.classList.remove('hidden');
           return;
         }
+      } catch (err) {
+        // Fallback ONLY when network/server is completely unreachable
+        try {
+          const raw = localStorage.getItem('nfc_cards_db');
+          if (raw) {
+            const list = JSON.parse(raw);
+            const found = list.find(c => c.slug === currentSlug);
+            if (found && found.managePin && String(found.managePin).trim() === pin) {
+              verifiedPin = pin;
+              playChime(true);
+              loadEditor(found);
+              return;
+            }
+          }
+        } catch (e) {}
 
         playChime(false);
         if (navigator.vibrate) navigator.vibrate([80, 50, 80]);

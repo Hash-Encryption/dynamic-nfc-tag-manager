@@ -8,7 +8,24 @@
   <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:;">
+
+  <!-- Favicon & App Icons in WebP -->
+  <link rel="icon" type="image/webp" href="./logo.webp">
+  <link rel="apple-touch-icon" href="./logo.webp">
+  <link rel="shortcut icon" href="./logo.webp">
+
+  <!-- Open Graph & Twitter Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TapLink • by MUHAB">
+  <meta property="og:title" content="لوحة تحكم المدير | TapLink - شركة MUHAB">
+  <meta property="og:description" content="تسجيل دخول المدير لإدارة وتحويل بطاقات NFC الذكية والروابط الديناميكية.">
+  <meta property="og:image" content="./logo.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="670">
+  <meta property="og:image:alt" content="شعار TapLink الذكي">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="./logo.webp">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +56,7 @@
     <div class="absolute -bottom-40 -end-40 w-96 h-96 bg-green-600/10 rounded-full blur-3xl"></div>
   </div>
 
-  <main class="w-full max-w-md bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+  <main class="w-full max-w-md bg-[#0b100d]/90 border border-emerald-500/20 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden">
     
     <!-- Top Bar Controls -->
     <div class="flex items-center justify-between mb-4">
@@ -52,14 +69,17 @@
       </button>
     </div>
 
-    <!-- Header Logo & Branding -->
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-gradient-to-tr from-emerald-600 to-green-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mx-auto mb-4">
-        <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-      </div>
-      <h1 class="text-2xl font-black text-white mb-1" id="loginHeading">NFC Tags Control Center</h1>
+    <!-- Header Logo & Branding with WebP -->
+    <div class="text-center mb-6">
+      <img 
+        src="./logo.webp" 
+        alt="شعار TapLink الذكي - شركة MUHAB" 
+        width="180" 
+        height="100" 
+        class="w-40 sm:w-48 h-auto mx-auto mb-3 object-contain drop-shadow-[0_10px_25px_rgba(16,185,129,0.35)]"
+        loading="eager"
+      >
+      <h1 class="text-xl sm:text-2xl font-black text-white mb-1" id="loginHeading">NFC Tags Control Center</h1>
       <p class="text-zinc-400 text-xs" id="loginSubtitle">Sign in to manage dynamic links, NFC chips, and real-time cloud analytics</p>
     </div>
 
@@ -70,7 +90,7 @@
     </div>
 
     <!-- Login Form -->
-    <form id="loginForm" class="space-y-5">
+    <form id="loginForm" class="space-y-4">
       <div>
         <label for="password" class="block text-xs font-semibold text-zinc-300 mb-2" id="loginPassLabel">Master Admin Password</label>
         <div class="relative">
@@ -98,20 +118,23 @@
 
       <button 
         type="submit" 
-        id="submitBtn" 
-        class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] text-black font-black rounded-xl transition-all shadow-lg shadow-emerald-500/30 text-sm flex items-center justify-center gap-2"
+        id="submitBtn"
+        class="w-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-600 hover:from-emerald-500 hover:to-green-500 active:scale-95 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
       >
         <span id="btnText">Sign In to Dashboard</span>
-        <svg id="btnSpinner" class="hidden w-4 h-4 animate-spin text-black" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <div id="btnSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
       </button>
+
+      <div class="text-center pt-2">
+        <a href="./index.html" class="text-xs text-zinc-400 hover:text-emerald-400 transition-colors" id="loginBackHome">
+          &larr; Return to Dashboard
+        </a>
+      </div>
     </form>
 
-    <div class="mt-8 pt-6 border-t border-emerald-500/15 text-center">
-      <a href="./" class="text-xs text-zinc-400 hover:text-emerald-400 transition-colors" id="loginBackHome">
-        &larr; Return to Homepage
-      </a>
+    <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
+      <p class="text-[11px] text-zinc-500">TapLink Smart Ecosystem &copy; 2026 • by MUHAB</p>
     </div>
-
   </main>
 
   <script>
@@ -142,7 +165,7 @@
         document.getElementById('password').placeholder = 'أدخل كلمة المرور...';
         document.getElementById('loginDefaultHint').innerHTML = 'كلمة المرور الافتراضية: <code class="bg-black/60 border border-emerald-500/20 px-2 py-0.5 rounded text-emerald-400 font-mono">admin123</code>';
         btnText.textContent = 'دخول لوحة التحكم';
-        document.getElementById('loginBackHome').textContent = 'الذهاب إلى الصفحة الرئيسية &larr;';
+        document.getElementById('loginBackHome').textContent = 'الذهاب إلى لوحة التحكم &larr;';
       } else {
         document.title = 'Admin Login | TapLink - MUHAB';
         document.getElementById('loginHeading').textContent = 'NFC Tags Control Center';
@@ -151,7 +174,7 @@
         document.getElementById('password').placeholder = 'Enter password...';
         document.getElementById('loginDefaultHint').innerHTML = 'Default password: <code class="bg-black/60 border border-emerald-500/20 px-2 py-0.5 rounded text-emerald-400 font-mono">admin123</code>';
         btnText.textContent = 'Sign In to Dashboard';
-        document.getElementById('loginBackHome').textContent = '&larr; Return to Homepage';
+        document.getElementById('loginBackHome').textContent = '&larr; Return to Dashboard';
       }
     }
 
@@ -165,7 +188,7 @@
     updateLoginI18n();
 
     // Toggle Password Visibility
-    togglePasswordBtn.addEventListener('click', () => {
+    togglePasswordBtn?.addEventListener('click', () => {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
     });
@@ -195,7 +218,7 @@
       }
     }
 
-    // Form Submission
+    // Form Submission with Anti-Brute-Force & Server Priority
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorAlert.classList.add('hidden');
@@ -206,28 +229,8 @@
       submitBtn.disabled = true;
 
       const entered = passwordInput.value.trim();
-      const enteredHash = await hashPassword(entered);
-      const savedHash = localStorage.getItem('nfc_admin_pass_hash') || DEFAULT_ADMIN_HASH;
-      const legacySavedPass = localStorage.getItem('nfc_custom_admin_pass');
 
-      const isMatch = (enteredHash === savedHash) || 
-                      (enteredHash === DEFAULT_ADMIN_HASH) || 
-                      (entered === 'admin123') || 
-                      (legacySavedPass && entered === legacySavedPass);
-
-      if (isMatch) {
-        if (legacySavedPass) {
-          localStorage.setItem('nfc_admin_pass_hash', enteredHash);
-          localStorage.removeItem('nfc_custom_admin_pass');
-        }
-        localStorage.setItem('nfc_admin_auth', 'authenticated');
-        btnText.textContent = isAr ? 'تم الدخول بنجاح!' : 'Login successful!';
-        setTimeout(() => {
-          window.location.href = './index.html';
-        }, 300);
-        return;
-      }
-
+      // 1. Prioritize Server-side Authentication (Hardened with Rate-Limiting & Cryptographic check)
       try {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
@@ -236,18 +239,37 @@
         });
         const data = await res.json();
 
-        if (data.success) {
+        if (res.ok && data.success) {
           localStorage.setItem('nfc_admin_auth', 'authenticated');
           btnText.textContent = isAr ? 'تم الدخول بنجاح!' : 'Login successful!';
-          window.location.href = './index.html';
+          setTimeout(() => {
+            window.location.href = './index.html';
+          }, 200);
+          return;
         } else {
-          errorMessage.textContent = isAr ? (data.error || 'فشل تسجيل الدخول') : 'Incorrect password, please try again';
+          // Explicit error from server (wrong password or rate-limited 429)
+          errorMessage.textContent = isAr ? (data.error || 'كلمة المرور غير صحيحة') : (data.errorEn || data.error || 'Incorrect password, please try again');
+          errorAlert.classList.remove('hidden');
+          passwordInput.select();
+          return;
+        }
+      } catch (networkErr) {
+        // 2. Offline / Static host fallback (e.g., GitHub Pages without Node server)
+        const enteredHash = await hashPassword(entered);
+        const savedHash = localStorage.getItem('nfc_admin_pass_hash') || DEFAULT_ADMIN_HASH;
+
+        if (enteredHash === savedHash) {
+          localStorage.setItem('nfc_admin_auth', 'authenticated');
+          btnText.textContent = isAr ? 'تم الدخول بنجاح!' : 'Login successful!';
+          setTimeout(() => {
+            window.location.href = './index.html';
+          }, 200);
+          return;
+        } else {
+          errorMessage.textContent = isAr ? 'كلمة المرور غير صحيحة، حاول مجدداً' : 'Incorrect password, please try again';
           errorAlert.classList.remove('hidden');
           passwordInput.select();
         }
-      } catch (err) {
-        errorMessage.textContent = isAr ? 'كلمة المرور غير صحيحة، حاول مجدداً' : 'Incorrect password, please try again';
-        errorAlert.classList.remove('hidden');
       } finally {
         btnText.textContent = isAr ? 'دخول لوحة التحكم' : 'Sign In to Dashboard';
         btnSpinner.classList.add('hidden');

@@ -66,11 +66,13 @@ try {
   console.warn('Could not read cards.json:', e);
 }
 
+const defaultAdminPass = process.env.ADMIN_PASSWORD || 'admin123';
+
 const initialData = {
   admin: {
     username: 'admin',
-    // Default password is 'admin123'
-    passwordHash: crypto.createHash('sha256').update('admin123').digest('hex'),
+    // Default master password initialized from ENV or fallback
+    passwordHash: crypto.createHash('sha256').update(defaultAdminPass).digest('hex'),
     createdAt: new Date().toISOString()
   },
   settings: {
@@ -141,10 +143,17 @@ class Database {
     }
   }
 
-  // --- Auth & Admin Methods ---
+  // --- Auth & Admin Methods (Timing-Safe Protection) ---
   verifyAdmin(password) {
+    if (!password || typeof password !== 'string') return false;
     const hash = crypto.createHash('sha256').update(password).digest('hex');
-    return hash === this.data.admin.passwordHash;
+    const storedHash = this.data.admin?.passwordHash;
+    if (!storedHash || hash.length !== storedHash.length) return false;
+    try {
+      return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(storedHash));
+    } catch {
+      return false;
+    }
   }
 
   updateAdminPassword(newPassword) {
@@ -312,7 +321,13 @@ class Database {
     const card = this.getCardBySlug(slug);
     if (!card) return false;
     const expectedPin = String(card.managePin || '1234').trim();
-    return String(enteredPin || '').trim() === expectedPin;
+    const provided = String(enteredPin || '').trim();
+    if (expectedPin.length !== provided.length) return false;
+    try {
+      return crypto.timingSafeEqual(Buffer.from(expectedPin), Buffer.from(provided));
+    } catch {
+      return false;
+    }
   }
 
   updateDestinationByManagePin(slug, enteredPin, newDestinationUrl) {
@@ -547,17 +562,19 @@ class Database {
   }
 
   addLead(leadData = {}) {
-    const name = (leadData.visitorName || leadData.name || '').trim();
-    const phone = (leadData.visitorPhone || leadData.phone || '').trim();
-    const note = (leadData.visitorNote || leadData.note || '').trim();
+    const stripTags = (s, len = 250) => (s && typeof s === 'string' ? s.replace(/<[^>]*>?/gm, '').trim().slice(0, len) : '');
+    const name = stripTags(leadData.visitorName || leadData.name || '', 100);
+    const phone = stripTags(leadData.visitorPhone || leadData.phone || '', 40);
+    const note = stripTags(leadData.visitorNote || leadData.note || '', 500);
+
     if (!name && !phone) {
       throw new Error('الاسم أو رقم الجوال مطلوب');
     }
     const newLead = {
       id: leadData.id || ('lead-' + crypto.randomUUID().slice(0, 8)),
-      cardId: leadData.cardId || '',
-      cardTitle: (leadData.cardTitle || '').trim(),
-      cardSlug: (leadData.cardSlug || '').trim(),
+      cardId: stripTags(leadData.cardId || '', 60),
+      cardTitle: stripTags(leadData.cardTitle || '', 120),
+      cardSlug: stripTags(leadData.cardSlug || '', 60),
       visitorName: name,
       name: name || 'زائر بدون اسم',
       visitorPhone: phone,

@@ -8,7 +8,24 @@
   <!-- Security Headers Meta Tags (Zero-Trust Hardening) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.npoint.io https://www.npoint.io https://raw.githubusercontent.com data: blob:; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:;">
+  
+  <!-- Favicon & Touch Icons in WebP -->
+  <link rel="icon" type="image/webp" href="./logo.webp">
+  <link rel="apple-touch-icon" href="./logo.webp">
+  <link rel="shortcut icon" href="./logo.webp">
+
+  <!-- Open Graph & Social Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TapLink • by MUHAB">
+  <meta property="og:title" content="TapLink | تحويل البطاقة الذكية">
+  <meta property="og:description" content="جاري تحويل البطاقة الذكية إلى الوجهة المحددة فوراً.">
+  <meta property="og:image" content="./logo.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="670">
+  <meta property="og:image:alt" content="شعار TapLink الذكي">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="./logo.webp">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,13 +56,15 @@
 
   <!-- Loading State (Instant sub-second visual) -->
   <div id="redirectLoadingBox" class="text-center p-6 max-w-sm w-full">
-    <div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-      <div class="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
-      <div class="relative w-14 h-14 bg-gradient-to-tr from-emerald-600 to-emerald-400 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004.07 7.07M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-      </div>
+    <div class="relative mx-auto mb-4 flex items-center justify-center">
+      <img 
+        src="./logo.webp" 
+        alt="شعار TapLink الذكي - شركة MUHAB" 
+        width="140" 
+        height="78" 
+        class="w-32 h-auto mx-auto object-contain drop-shadow-[0_10px_25px_rgba(16,185,129,0.35)]"
+        loading="eager"
+      >
     </div>
     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold mb-2">
       <span>TapLink • by MUHAB</span>

@@ -1,13 +1,18 @@
-// PWA Service Worker for Smart NFC Tag Manager - Enterprise Pro v7
-const CACHE_NAME = 'nfc-manager-v7';
+// PWA Service Worker for Smart NFC Tag Manager - Enterprise Pro v8
+const CACHE_NAME = 'nfc-manager-v8';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './landing.html',
+  './catalog.html',
+  './edit.html',
   './login.html',
   './inactive.html',
   './404.html',
+  './logo.webp',
+  './icon.svg',
   './css/style.css',
+  './js/i18n.js',
   './js/qrcode.min.js',
   './manifest.json'
 ];
@@ -39,7 +44,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network first for APIs and cloud data, cache fallback for static assets
+  // Network first for APIs and dynamic cards data, cache fallback for static assets
   const url = new URL(event.request.url);
 
   if (url.pathname.startsWith('/api/') || url.pathname.includes('/cards.json') || event.request.method !== 'GET') {
