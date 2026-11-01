@@ -14,6 +14,10 @@
     }
   ],
   "rewrites": [
+    { "source": "/c/logo.webp", "destination": "/logo.webp" },
+    { "source": "/go/logo.webp", "destination": "/logo.webp" },
+    { "source": "/c/:slug/logo.webp", "destination": "/logo.webp" },
+    { "source": "/go/:slug/logo.webp", "destination": "/logo.webp" },
     { "source": "/c/:slug/edit", "destination": "/edit.html" },
     { "source": "/go/:slug/edit", "destination": "/edit.html" },
     { "source": "/c/:slug*", "destination": "/index.html" },

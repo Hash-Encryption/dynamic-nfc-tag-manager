@@ -38,6 +38,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Universal Logo & Asset Path Resolver -->
+  <script>
+    (function() {
+      var isGh = window.location.pathname.includes('/dynamic-nfc-tag-manager');
+      window.__APP_BASE = isGh ? '/dynamic-nfc-tag-manager/' : '/';
+      window.__APP_LOGO = window.__APP_BASE + 'logo.webp';
+      window.handleLogoFallback = function(img) {
+        if (!img || img.dataset.retried) return;
+        img.dataset.retried = '1';
+        img.src = window.__APP_LOGO;
+      };
+    })();
+  </script>
+
   <!-- i18n Bilingual Engine (English Default) -->
   <script src="./js/i18n.js"></script>
 
@@ -98,12 +112,14 @@
     <div id="redirectLoadingBox" class="text-center p-6 max-w-sm w-full blur-fade-in">
       <div class="relative mx-auto mb-3 flex items-center justify-center">
         <img 
-          src="./logo.webp" 
+          id="redirectLogoImg"
+          src="logo.webp" 
           alt="شعار TapLink الذكي - شركة MUHAB" 
           width="130" 
           height="72" 
           class="w-32 h-auto mx-auto object-contain drop-shadow-[0_10px_25px_rgba(16,185,129,0.35)]"
           loading="eager"
+          onerror="handleLogoFallback(this)"
         >
       </div>
       <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold mb-2">
@@ -262,6 +278,11 @@
       if (initialSc) {
         initialSc.classList.remove('hidden');
         initialSc.classList.add('flex');
+        const redirectLogo = document.getElementById('redirectLogoImg');
+        if (redirectLogo) {
+          const isGh = window.location.pathname.includes('/dynamic-nfc-tag-manager');
+          redirectLogo.src = isGh ? '/dynamic-nfc-tag-manager/logo.webp' : '/logo.webp';
+        }
       }
 
       const BUNDLED_FALLBACK_CARDS = [
@@ -473,17 +494,22 @@
           renderClientSosView(card);
           return;
         }
+        const isGh = window.location.pathname.includes('/dynamic-nfc-tag-manager');
+        const base = isGh ? '/dynamic-nfc-tag-manager/' : '/';
         if (mode === 'profile') {
-          window.location.replace(`./landing.html?slug=${encodeURIComponent(slug)}`);
+          window.location.replace(`${base}landing.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
         if (mode === 'catalog') {
-          window.location.replace(`./catalog.html?slug=${encodeURIComponent(slug)}`);
+          window.location.replace(`${base}catalog.html?slug=${encodeURIComponent(slug)}`);
           return;
         }
         let target = sanitizeRedirectUrl(card.destinationUrl || '');
         if (!target || target === 'https://') target = 'https://maps.google.com';
-        window.location.replace(target);
+        // Smooth transition (350ms) to ensure the branded TapLink logo and confirmation are clearly seen
+        setTimeout(() => {
+          window.location.replace(target);
+        }, 350);
       }
 
       function performRedirect(card) {
@@ -667,6 +693,7 @@
           height="72" 
           class="w-32 h-auto object-contain drop-shadow-[0_10px_25px_rgba(16,185,129,0.35)]"
           loading="eager"
+          onerror="handleLogoFallback(this)"
         >
       </div>
       <div>
@@ -718,6 +745,7 @@
           class="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl object-contain bg-[#050706] p-0.5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0"
           loading="eager"
           decoding="async"
+          onerror="handleLogoFallback(this)"
         >
         <div class="min-w-0">
           <div class="flex items-center gap-1 sm:gap-1.5">
@@ -1307,6 +1335,7 @@
           class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl object-contain border border-emerald-500/30 p-1 bg-[#050706] shadow-lg shadow-emerald-500/20"
           loading="lazy"
           decoding="async"
+          onerror="handleLogoFallback(this)"
         >
         <div class="text-start">
           <div class="flex items-center gap-1.5">

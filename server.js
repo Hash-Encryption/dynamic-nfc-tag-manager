@@ -568,6 +568,11 @@ function renderExpiredPage(card, msg = '') {
 // Paths: /c/:slug and /go/:slug
 // ==========================================
 function handleDynamicRedirect(req, res, slug) {
+  // If static logo is requested under /c/ or /go/
+  if (slug === 'logo.webp' || slug.endsWith('.webp') || slug.endsWith('.png') || slug.endsWith('.ico')) {
+    return res.sendFile(path.join(__dirname, 'public', 'logo.webp'));
+  }
+
   const card = db.getCardBySlug(slug);
 
   // If card doesn't exist
@@ -732,22 +737,109 @@ function handleDynamicRedirect(req, res, slug) {
 
   res.end(`
     <!DOCTYPE html>
-    <html lang="en" dir="ltr">
+    <html lang="ar" dir="rtl">
     <head>
       <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <meta http-equiv="refresh" content="0;url=${encodeURI(targetUrl)}">
-      <title>Redirecting...</title>
+      <title>جاري التحويل... | TapLink</title>
+      <link rel="icon" type="image/webp" href="/logo.webp">
       <script>
         window.location.replace("${encodeURI(targetUrl)}");
       </script>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+          background: #050706;
+          color: #e4e4e7;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.5rem;
+          text-align: center;
+        }
+        .card-box {
+          background: rgba(9, 9, 11, 0.95);
+          border: 1px solid rgba(16, 185, 129, 0.25);
+          border-radius: 1.5rem;
+          padding: 2rem 1.5rem;
+          max-width: 360px;
+          width: 100%;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.15);
+        }
+        .logo-img {
+          width: 120px;
+          height: auto;
+          margin: 0 auto 0.75rem auto;
+          display: block;
+          filter: drop-shadow(0 10px 25px rgba(16, 185, 129, 0.35));
+        }
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          padding: 0.2rem 0.75rem;
+          border-radius: 9999px;
+          background: rgba(16, 185, 129, 0.15);
+          color: #6ee7b7;
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          font-size: 10px;
+          font-weight: 700;
+          margin-bottom: 0.75rem;
+          letter-spacing: 0.5px;
+        }
+        .title {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin-bottom: 0.25rem;
+        }
+        .subtitle {
+          font-size: 0.8rem;
+          color: #34d399;
+          font-family: monospace;
+          margin-bottom: 1.25rem;
+        }
+        .spinner {
+          width: 32px;
+          height: 32px;
+          border: 3px solid rgba(16, 185, 129, 0.2);
+          border-top-color: #10b981;
+          border-radius: 50%;
+          margin: 0 auto 1rem auto;
+          animation: spin 0.8s linear infinite;
+        }
+        .manual-link {
+          font-size: 0.75rem;
+          color: #71717a;
+        }
+        .manual-link a {
+          color: #10b981;
+          text-decoration: underline;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      </style>
     </head>
-    <body style="font-family: sans-serif; background: #050806; color: #94a3b8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center;">
-      <div>
-        <div style="width: 48px; height: 48px; border: 3px solid rgba(16,185,129,0.2); border-top-color: #10b981; border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite;"></div>
-        <p style="font-size: 1.1rem; margin-bottom: 8px; color: #f8fafc; font-weight: bold;">Redirecting you automatically...</p>
-        <p style="font-size: 0.85rem; color: #64748b;">If not redirected, <a href="${encodeURI(targetUrl)}" style="color: #34d399; text-decoration: underline;">click here to continue</a></p>
+    <body>
+      <div class="card-box">
+        <img 
+          src="/logo.webp" 
+          alt="TapLink • MUHAB" 
+          class="logo-img" 
+          width="120" 
+          height="67"
+          onerror="this.onerror=null; this.src='./logo.webp';"
+        >
+        <div class="badge">
+          <span>TapLink • MUHAB</span>
+        </div>
+        <h2 class="title">Smart NFC Tag Scanned 📡</h2>
+        <p class="subtitle">جاري تحويلك إلى الوجهة المطلوبة...</p>
+        <div class="spinner"></div>
+        <p class="manual-link">إذا لم يتم تحويلك تلقائياً، <a href="${encodeURI(targetUrl)}">اضغط هنا للمتابعة</a></p>
       </div>
-      <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     </body>
     </html>
   `);
@@ -867,6 +959,17 @@ app.post(['/api/cards/:slug/quick-edit-update'], (req, res) => {
     pinAttempts.set(pinKey, rec);
     res.status(400).json({ success: false, error: err.message });
   }
+});
+
+// Static Logo Resolution Routes (Root, /c/, /go/, and nested)
+app.get([
+  '/logo.webp',
+  '/c/logo.webp',
+  '/go/logo.webp',
+  '/c/:slug/logo.webp',
+  '/go/:slug/logo.webp'
+], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'logo.webp'));
 });
 
 // Redirect Routes: /c/:slug and /go/:slug

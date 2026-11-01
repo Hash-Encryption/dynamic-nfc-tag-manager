@@ -27,6 +27,20 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="./logo.webp">
   
+  <!-- Universal Logo & Asset Path Resolver -->
+  <script>
+    (function() {
+      var isGh = window.location.pathname.includes('/dynamic-nfc-tag-manager');
+      window.__APP_BASE = isGh ? '/dynamic-nfc-tag-manager/' : '/';
+      window.__APP_LOGO = window.__APP_BASE + 'logo.webp';
+      window.handleLogoFallback = function(img) {
+        if (!img || img.dataset.retried) return;
+        img.dataset.retried = '1';
+        img.src = window.__APP_LOGO;
+      };
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -58,12 +72,14 @@
   <div id="redirectLoadingBox" class="text-center p-6 max-w-sm w-full">
     <div class="relative mx-auto mb-4 flex items-center justify-center">
       <img 
-        src="./logo.webp" 
+        id="redirect404Logo"
+        src="logo.webp" 
         alt="شعار TapLink الذكي - شركة MUHAB" 
         width="140" 
         height="78" 
         class="w-32 h-auto mx-auto object-contain drop-shadow-[0_10px_25px_rgba(16,185,129,0.35)]"
         loading="eager"
+        onerror="handleLogoFallback(this)"
       >
     </div>
     <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold mb-2">
@@ -169,6 +185,11 @@
       }
 
       const normalizedSlug = slug.toLowerCase();
+      const redirectLogo = document.getElementById('redirect404Logo');
+      if (redirectLogo) {
+        const isGh = window.location.pathname.includes('/dynamic-nfc-tag-manager');
+        redirectLogo.src = isGh ? '/dynamic-nfc-tag-manager/logo.webp' : '/logo.webp';
+      }
       document.getElementById('loadingSlugText').textContent = `Tag: ${normalizedSlug}`;
       document.getElementById('displaySlug').textContent = normalizedSlug;
 
@@ -391,7 +412,10 @@
         if (!target || target === 'https://') {
           target = 'https://maps.google.com';
         }
-        window.location.replace(target);
+        // Smooth transition (350ms) to ensure the branded TapLink logo and confirmation are clearly seen
+        setTimeout(() => {
+          window.location.replace(target);
+        }, 350);
       }
 
       findAndRedirect();
