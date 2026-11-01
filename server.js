@@ -737,12 +737,12 @@ function handleDynamicRedirect(req, res, slug) {
 
   res.end(`
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <meta http-equiv="refresh" content="0;url=${encodeURI(targetUrl)}">
-      <title>جاري التحويل... | TapLink</title>
+      <title>Redirecting... | TapLink</title>
       <link rel="icon" type="image/webp" href="/logo.webp">
       <script>
         window.location.replace("${encodeURI(targetUrl)}");
@@ -836,9 +836,9 @@ function handleDynamicRedirect(req, res, slug) {
           <span>TapLink • MUHAB</span>
         </div>
         <h2 class="title">Smart NFC Tag Scanned 📡</h2>
-        <p class="subtitle">جاري تحويلك إلى الوجهة المطلوبة...</p>
+        <p class="subtitle">Redirecting to destination...</p>
         <div class="spinner"></div>
-        <p class="manual-link">إذا لم يتم تحويلك تلقائياً، <a href="${encodeURI(targetUrl)}">اضغط هنا للمتابعة</a></p>
+        <p class="manual-link">If you are not redirected automatically, <a href="${encodeURI(targetUrl)}">click here to continue</a></p>
       </div>
     </body>
     </html>

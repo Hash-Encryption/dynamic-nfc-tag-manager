@@ -675,8 +675,8 @@ const I18N = {
       toast_enter_url: "يرجى كتابة الرابط الهدف أولاً",
 
       // Unregistered / Redirect Screen
-      red_scanned_title: "تم مسح الشريحة الذكية 📡",
-      red_redirecting: "جاري التحويل للوجهة...",
+      red_scanned_title: "Smart NFC Tag Scanned 📡",
+      red_redirecting: "Redirecting to destination...",
       red_pin_title: "رابط محمي برمز PIN",
       red_pin_prompt: "أدخل رمز الحماية السري للمتابعة إلى الوجهة",
       red_pin_btn: "فتح الرابط السري 🔓",
